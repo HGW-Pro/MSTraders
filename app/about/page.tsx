@@ -27,8 +27,8 @@ export default function AboutPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div className="relative aspect-square md:aspect-[4/3] lg:aspect-square rounded-2xl overflow-hidden shadow-xl">
               <Image 
-                src="https://picsum.photos/seed/about-factory/800/800" 
-                alt="MS Traders Facility"
+                src="https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=1000&q=80" 
+                alt="MS TRADERS Paper Bag Manufacturing"
                 fill
                 className="object-cover"
                 referrerPolicy="no-referrer"

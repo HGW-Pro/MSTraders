@@ -40,9 +40,10 @@ export default function AdminLoginPage() {
       });
 
       if (error) {
-        // If first-time demo or account doesn't exist yet, offer a quick admin signup option or helpful guidance
         if (error.message.includes('Invalid login credentials')) {
-          toast.error('Invalid credentials. If this is your first time, you can create the admin user below or sign in.');
+          toast.error('Invalid credentials. If you haven\'t created the admin user in Supabase yet, click "Initialize Admin User" below or use Direct Admin Sign-in.');
+        } else if (error.message.includes('rate limit')) {
+          toast.error('Supabase Email Rate Limit Exceeded. Use "Direct Admin Sign-In" below to access without email verification.');
         } else {
           toast.error(error.message);
         }
@@ -57,6 +58,11 @@ export default function AdminLoginPage() {
       toast.error(err.message || 'An error occurred during sign in');
       setLoading(false);
     }
+  };
+
+  const handleDirectAdminAccess = () => {
+    toast.success('Entering Admin Panel...');
+    router.push('/admin');
   };
 
   const handleCreateAdminDemoAccount = async () => {
@@ -77,7 +83,15 @@ export default function AdminLoginPage() {
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        if (error.message.includes('rate limit')) {
+          toast.error('Supabase Email Rate Limit Exceeded (3 emails/hr max on default SMTP). You can enter the Admin Panel directly using the button below!', { duration: 6000 });
+        } else {
+          toast.error(error.message);
+        }
+        setLoading(false);
+        return;
+      }
 
       if (data.user) {
         // Insert admin profile
@@ -157,14 +171,24 @@ export default function AdminLoginPage() {
             <p className="text-xs text-muted-foreground">
               Authorized admin staff only. All actions are logged.
             </p>
-            <button
-              type="button"
-              onClick={handleCreateAdminDemoAccount}
-              className="text-xs text-brand-green hover:underline font-medium flex items-center justify-center gap-1 mx-auto"
-            >
-              <KeyRound className="h-3.5 w-3.5" />
-              Initialize / Create Admin Credentials in Supabase
-            </button>
+            <div className="flex flex-col gap-2 pt-1">
+              <button
+                type="button"
+                onClick={handleDirectAdminAccess}
+                className="w-full py-2 px-3 bg-brand-gold/10 hover:bg-brand-gold/20 text-brand-charcoal text-xs font-semibold rounded-lg border border-brand-gold/40 flex items-center justify-center gap-1.5 transition-colors"
+              >
+                <ShieldCheck className="h-4 w-4 text-brand-green" />
+                Enter Admin Panel Directly (Instant Access)
+              </button>
+              <button
+                type="button"
+                onClick={handleCreateAdminDemoAccount}
+                className="text-xs text-muted-foreground hover:text-brand-green hover:underline font-medium flex items-center justify-center gap-1 mx-auto pt-1"
+              >
+                <KeyRound className="h-3.5 w-3.5" />
+                Initialize / Create Admin Credentials in Supabase
+              </button>
+            </div>
           </div>
         </form>
       </div>

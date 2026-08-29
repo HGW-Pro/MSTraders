@@ -34,10 +34,9 @@ export default function HomePage() {
             </div>
             
             <div className="relative aspect-[4/3] md:aspect-square w-full rounded-2xl overflow-hidden shadow-2xl">
-              {/* Note: Using picsum for placeholder as actual uploads are not yet in storage */}
               <Image 
-                src="https://picsum.photos/seed/mstraders_hero/800/800" 
-                alt="Premium bags by MS Traders"
+                src="https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=1200&q=80" 
+                alt="Premium customized paper bags by MS TRADERS"
                 fill
                 className="object-cover"
                 priority
@@ -71,15 +70,15 @@ export default function HomePage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { name: 'Paper Bags', image: 'paper-bags', desc: 'Eco-friendly retail' },
-              { name: 'Kraft Bags', image: 'kraft-bags', desc: 'Natural & durable' },
-              { name: 'Non-Woven Bags', image: 'nonwoven-bags', desc: 'Reusable & strong' },
-              { name: 'W-Cut Bags', image: 'wcut-bags', desc: 'Standard shopping' },
-              { name: 'D-Cut Bags', image: 'dcut-bags', desc: 'Modern handle' },
-              { name: 'Designer Bags', image: 'designer-bags', desc: 'Premium luxury' },
-              { name: 'Gift Bags', image: 'gift-bags', desc: 'Special occasions' },
-              { name: 'Customized Bags', image: 'custom-bags', desc: 'Your exact design' }
-            ].map((category, i) => (
+              { name: 'Paper Bags', imageUrl: 'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=800&q=80', desc: 'Eco-friendly retail' },
+              { name: 'Kraft Bags', imageUrl: 'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?auto=format&fit=crop&w=800&q=80', desc: 'Natural & durable' },
+              { name: 'Non-Woven Bags', imageUrl: 'https://images.unsplash.com/photo-1597484661643-2f5fef640dd1?auto=format&fit=crop&w=800&q=80', desc: 'Reusable & strong' },
+              { name: 'W-Cut Bags', imageUrl: 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=800&q=80', desc: 'Standard shopping' },
+              { name: 'D-Cut Bags', imageUrl: 'https://images.unsplash.com/photo-1572021335469-31706a17aaef?auto=format&fit=crop&w=800&q=80', desc: 'Modern handle' },
+              { name: 'Designer Bags', imageUrl: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=800&q=80', desc: 'Premium luxury' },
+              { name: 'Gift Bags', imageUrl: 'https://images.unsplash.com/photo-1513885535751-8b9238bd345a?auto=format&fit=crop&w=800&q=80', desc: 'Special occasions' },
+              { name: 'Customized Bags', imageUrl: 'https://images.unsplash.com/photo-1512909006721-3d6018887383?auto=format&fit=crop&w=800&q=80', desc: 'Your exact design' }
+            ].map((category) => (
               <Link 
                 key={category.name} 
                 href={`/shop?category=${encodeURIComponent(category.name.toLowerCase())}`}
@@ -87,7 +86,7 @@ export default function HomePage() {
               >
                 <div className="relative aspect-[4/3] w-full overflow-hidden">
                   <Image 
-                    src={`https://picsum.photos/seed/${category.image}/600/450`} 
+                    src={category.imageUrl} 
                     alt={category.name}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-500"
@@ -148,13 +147,13 @@ export default function HomePage() {
             
             <div className="grid grid-cols-2 gap-4">
                <div className="space-y-4 pt-12">
-                 <div className="relative aspect-[3/4] rounded-xl overflow-hidden">
-                    <Image src="https://picsum.photos/seed/custom1/400/600" alt="Custom Bag" fill className="object-cover" referrerPolicy="no-referrer" />
+                 <div className="relative aspect-[3/4] rounded-xl overflow-hidden shadow-lg border border-white/10">
+                    <Image src="https://images.unsplash.com/photo-1590874103328-eac38a683ce7?auto=format&fit=crop&w=600&q=80" alt="Custom Kraft Paper Bag" fill className="object-cover" referrerPolicy="no-referrer" />
                  </div>
                </div>
                <div className="space-y-4">
-                 <div className="relative aspect-[3/4] rounded-xl overflow-hidden">
-                    <Image src="https://picsum.photos/seed/custom2/400/600" alt="Custom Bag" fill className="object-cover" referrerPolicy="no-referrer" />
+                 <div className="relative aspect-[3/4] rounded-xl overflow-hidden shadow-lg border border-white/10">
+                    <Image src="https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=600&q=80" alt="Custom Boutique Designer Bag" fill className="object-cover" referrerPolicy="no-referrer" />
                  </div>
                </div>
             </div>
