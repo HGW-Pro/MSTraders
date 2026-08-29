@@ -82,7 +82,6 @@ export function Footer() {
             {settings.social_linkedin && (
               <a href={settings.social_linkedin} target="_blank" rel="noopener noreferrer" className="hover:text-brand-gold transition-colors">LinkedIn</a>
             )}
-            <Link href="/admin/login" className="text-xs text-gray-600 hover:text-brand-gold transition-colors">Admin Portal</Link>
           </div>
         </div>
       </div>

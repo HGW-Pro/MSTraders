@@ -406,7 +406,14 @@ export default function CustomerAccountPage() {
             </div>
           </div>
 
-          <div className="flex items-center gap-3 w-full md:w-auto">
+          <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
+            {(profile?.role === 'admin' || sessionUser.email?.toLowerCase().includes('admin')) && (
+              <Button size="sm" asChild className="bg-brand-gold hover:bg-amber-400 text-brand-charcoal font-bold text-xs flex-1 md:flex-none shadow-sm">
+                <Link href="/admin">
+                  <ShieldCheck className="h-3.5 w-3.5 mr-1.5 text-brand-charcoal" /> Admin Panel
+                </Link>
+              </Button>
+            )}
             <Button variant="outline" size="sm" asChild className="border-white/20 text-white hover:bg-white/10 hover:text-white font-bold text-xs flex-1 md:flex-none">
               <Link href="/track-order">Guest Track Order</Link>
             </Button>
