@@ -8,6 +8,8 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'motion/react';
 
+import { Logo } from '@/components/logo';
+
 const mainNav = [
   { title: 'HOME', href: '/' },
   { title: 'SHOP', href: '/shop' },
@@ -36,10 +38,8 @@ export function Header() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-20 items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
-            <span className="font-heading text-2xl font-bold tracking-tight text-brand-green">
-              MS TRADERS
-            </span>
+          <Link href="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
+            <Logo size="md" />
           </Link>
 
           {/* Desktop Navigation */}

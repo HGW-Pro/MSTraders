@@ -2,26 +2,30 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { 
   LayoutDashboard, 
   Package, 
   FileText, 
+  ShoppingBag, 
   Users, 
   Image as ImageIcon, 
   Settings, 
   LogOut,
   Menu,
-  X
+  X,
+  ExternalLink
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { supabase } from '@/lib/supabase/client';
 import { toast } from 'sonner';
 
 const adminNav = [
   { title: 'Dashboard', href: '/admin', icon: LayoutDashboard },
-  { title: 'Products', href: '/admin/products', icon: Package },
+  { title: 'Products Catalog', href: '/admin/products', icon: Package },
   { title: 'Quotes', href: '/admin/quotes', icon: FileText },
+  { title: 'Orders', href: '/admin/orders', icon: ShoppingBag },
   { title: 'Customers', href: '/admin/customers', icon: Users },
   { title: 'Gallery', href: '/admin/gallery', icon: ImageIcon },
   { title: 'Settings', href: '/admin/settings', icon: Settings },
@@ -29,17 +33,60 @@ const adminNav = [
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
-  
-  // Basic mock auth check could go here
-  
-  const handleLogout = () => {
-    toast.success('Logged out successfully');
-    // window.location.href = '/';
+  const [userEmail, setUserEmail] = React.useState<string | null>(null);
+  const [isCheckingAuth, setIsCheckingAuth] = React.useState(true);
+
+  // Skip auth check if on login page
+  const isLoginPage = pathname === '/admin/login';
+
+  React.useEffect(() => {
+    if (isLoginPage) {
+      const timer = setTimeout(() => setIsCheckingAuth(false), 0);
+      return () => clearTimeout(timer);
+    }
+
+    let active = true;
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (active) {
+        if (!session?.user) {
+          setUserEmail('admin@mstraders.com');
+        } else {
+          setUserEmail(session.user.email || 'Admin');
+        }
+        setIsCheckingAuth(false);
+      }
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (active && session?.user) {
+        setUserEmail(session.user.email || 'Admin');
+      }
+    });
+
+    return () => {
+      active = false;
+      subscription.unsubscribe();
+    };
+  }, [isLoginPage]);
+
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      toast.success('Signed out successfully');
+      router.push('/admin/login');
+    } catch (err: any) {
+      toast.error('Error signing out');
+    }
   };
 
+  if (isLoginPage) {
+    return <>{children}</>;
+  }
+
   return (
-    <div className="min-h-screen bg-muted/30 flex">
+    <div className="min-h-screen bg-slate-50 flex">
       {/* Mobile Sidebar Overlay */}
       {isSidebarOpen && (
         <div 
@@ -50,23 +97,24 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       {/* Sidebar */}
       <aside className={cn(
-        "fixed inset-y-0 left-0 z-50 w-64 bg-brand-charcoal text-white transition-transform duration-300 lg:static lg:translate-x-0 flex flex-col",
+        "fixed inset-y-0 left-0 z-50 w-64 bg-brand-charcoal text-white transition-transform duration-300 lg:static lg:translate-x-0 flex flex-col shadow-xl",
         isSidebarOpen ? "translate-x-0" : "-translate-x-full"
       )}>
         <div className="h-20 flex items-center justify-between px-6 border-b border-white/10">
-          <span className="font-heading text-xl font-bold text-brand-gold">
-            MS TRADERS
-          </span>
+          <div>
+            <span className="font-heading text-xl font-bold text-brand-gold tracking-tight block">
+              MS TRADERS
+            </span>
+            <span className="text-[10px] uppercase text-white/50 tracking-widest block font-sans">
+              Admin Portal
+            </span>
+          </div>
           <button className="lg:hidden text-white/70 hover:text-white" onClick={() => setIsSidebarOpen(false)}>
             <X className="h-5 w-5" />
           </button>
         </div>
-        
-        <div className="px-6 py-4 text-xs font-semibold text-white/50 uppercase tracking-wider">
-          Admin Panel
-        </div>
-        
-        <nav className="flex-1 px-4 space-y-1 overflow-y-auto">
+
+        <nav className="flex-1 px-4 py-6 space-y-1.5 overflow-y-auto">
           {adminNav.map((item) => {
             const isActive = pathname === item.href || (item.href !== '/admin' && pathname?.startsWith(item.href));
             return (
@@ -75,23 +123,27 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 href={item.href}
                 onClick={() => setIsSidebarOpen(false)}
                 className={cn(
-                  "flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors",
+                  "flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all",
                   isActive 
-                    ? "bg-brand-green text-white" 
-                    : "text-white/70 hover:bg-white/10 hover:text-white"
+                    ? "bg-brand-green text-white shadow-sm font-semibold" 
+                    : "text-white/75 hover:bg-white/10 hover:text-white"
                 )}
               >
-                <item.icon className="h-4 w-4" />
+                <item.icon className="h-4 w-4 shrink-0" />
                 {item.title}
               </Link>
             )
           })}
         </nav>
         
-        <div className="p-4 border-t border-white/10">
+        <div className="p-4 border-t border-white/10 bg-black/20">
+          <div className="mb-3 px-2">
+            <p className="text-xs text-white/50">Signed in as</p>
+            <p className="text-xs font-medium text-brand-gold truncate">{userEmail || 'admin@mstraders.com'}</p>
+          </div>
           <button 
             onClick={handleLogout}
-            className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium text-white/70 hover:bg-white/10 hover:text-white w-full transition-colors"
+            className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold text-red-300 hover:bg-red-500/20 hover:text-red-200 w-full transition-colors"
           >
             <LogOut className="h-4 w-4" />
             Sign Out
@@ -101,7 +153,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       {/* Main Content */}
       <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <header className="h-20 bg-white border-b border-border flex items-center justify-between px-4 sm:px-6 lg:px-8 z-30">
+        <header className="h-20 bg-white border-b border-border flex items-center justify-between px-4 sm:px-6 lg:px-8 z-30 shadow-xs">
           <div className="flex items-center gap-4">
             <button 
               className="lg:hidden text-brand-charcoal hover:bg-muted p-2 rounded-md transition-colors"
@@ -109,16 +161,19 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             >
               <Menu className="h-5 w-5" />
             </button>
-            <h1 className="font-heading text-xl font-semibold text-brand-charcoal hidden sm:block">
+            <h1 className="font-heading text-xl font-bold text-brand-charcoal">
               {adminNav.find(item => pathname === item.href || (item.href !== '/admin' && pathname?.startsWith(item.href)))?.title || 'Dashboard'}
             </h1>
           </div>
           
           <div className="flex items-center gap-4">
-            <Button variant="outline" size="sm" asChild>
-              <Link href="/">View Website</Link>
+            <Button variant="outline" size="sm" asChild className="hidden sm:inline-flex">
+              <Link href="/" target="_blank" className="flex items-center gap-1.5">
+                <span>View Storefront</span>
+                <ExternalLink className="h-3.5 w-3.5" />
+              </Link>
             </Button>
-            <div className="h-8 w-8 rounded-full bg-brand-gold flex items-center justify-center text-brand-charcoal font-bold text-sm">
+            <div className="h-9 w-9 rounded-full bg-brand-gold flex items-center justify-center text-brand-charcoal font-bold text-sm shadow-xs border border-brand-charcoal/20">
               A
             </div>
           </div>

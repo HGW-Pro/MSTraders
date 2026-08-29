@@ -198,7 +198,70 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 5. HOW IT WORKS */}
+      {/* 5. BRAND PROMISE & VALUE PILLARS */}
+      <section className="py-16 bg-brand-green text-white relative overflow-hidden">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center max-w-3xl mx-auto mb-12">
+            <span className="text-brand-gold text-xs font-bold tracking-[0.2em] uppercase mb-2 block">
+              OUR PROMISE TO YOU
+            </span>
+            <h2 className="font-heading text-3xl md:text-5xl font-bold text-white mb-3">
+              TRUST • QUALITY • VALUE
+            </h2>
+            <p className="text-brand-cream/80 text-base md:text-lg">
+              Wholesale & Retail Supplier of Paper Bags, Non-Woven Bags, Customized Bags & Designer Bags
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+            <div className="bg-white/10 backdrop-blur-xs p-6 rounded-xl border border-white/10">
+              <div className="w-12 h-12 rounded-full bg-brand-gold/20 text-brand-gold mx-auto flex items-center justify-center font-bold text-xl mb-3">
+                ✓
+              </div>
+              <h3 className="font-heading font-semibold text-lg text-brand-gold mb-1">PREMIUM QUALITY</h3>
+              <p className="text-xs text-white/80">High-load bearing capacity & top-grade paper & fabric</p>
+            </div>
+            <div className="bg-white/10 backdrop-blur-xs p-6 rounded-xl border border-white/10">
+              <div className="w-12 h-12 rounded-full bg-brand-gold/20 text-brand-gold mx-auto flex items-center justify-center font-bold text-xl mb-3">
+                🍃
+              </div>
+              <h3 className="font-heading font-semibold text-lg text-brand-gold mb-1">ECO-FRIENDLY</h3>
+              <p className="text-xs text-white/80">Reusable, 100% recyclable & planet-conscious materials</p>
+            </div>
+            <div className="bg-white/10 backdrop-blur-xs p-6 rounded-xl border border-white/10">
+              <div className="w-12 h-12 rounded-full bg-brand-gold/20 text-brand-gold mx-auto flex items-center justify-center font-bold text-xl mb-3">
+                🖨️
+              </div>
+              <h3 className="font-heading font-semibold text-lg text-brand-gold mb-1">CUSTOM PRINTING</h3>
+              <p className="text-xs text-white/80">Precision logo reproduction in all sizes & color variants</p>
+            </div>
+            <div className="bg-white/10 backdrop-blur-xs p-6 rounded-xl border border-white/10">
+              <div className="w-12 h-12 rounded-full bg-brand-gold/20 text-brand-gold mx-auto flex items-center justify-center font-bold text-xl mb-3">
+                🚚
+              </div>
+              <h3 className="font-heading font-semibold text-lg text-brand-gold mb-1">RELIABLE SERVICE</h3>
+              <p className="text-xs text-white/80">Wholesale pricing with guaranteed on-time dispatch</p>
+            </div>
+          </div>
+
+          <div className="mt-12 pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left text-sm text-brand-cream/90">
+            <div>
+              <span className="font-semibold text-brand-gold">Factory & Showroom:</span> 57, Kalasari, Dabripitha, Ujjain (M.P.)
+            </div>
+            <div className="flex items-center gap-4">
+              <a href="tel:9131268724" className="hover:text-brand-gold transition-colors font-medium">
+                📞 +91 91312 68724
+              </a>
+              <span>|</span>
+              <a href="tel:9009446352" className="hover:text-brand-gold transition-colors font-medium">
+                📞 +91 90094 46352
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 6. HOW IT WORKS */}
       <section className="py-24 bg-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
