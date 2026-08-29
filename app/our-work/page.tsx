@@ -32,7 +32,7 @@ export default function OurWorkPage() {
         <div className="text-center mb-16">
           <h1 className="font-heading text-4xl md:text-5xl font-bold text-brand-charcoal mb-6">Our Work</h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            A showcase of premium bags we've manufactured for brands and businesses across India.
+            A showcase of premium bags we&apos;ve manufactured for brands and businesses across India.
           </p>
         </div>
 

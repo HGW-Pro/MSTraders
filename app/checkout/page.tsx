@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -11,13 +12,9 @@ import { toast } from 'sonner';
 
 export default function CheckoutPage() {
   const { items, subtotal, clearCart } = useCartStore();
-  const [mounted, setMounted] = React.useState(false);
+  const mounted = React.useSyncExternalStore(() => () => {}, () => true, () => false);
   const [step, setStep] = React.useState(1);
   const [isProcessing, setIsProcessing] = React.useState(false);
-
-  React.useEffect(() => {
-    setMounted(true);
-  }, []);
 
   if (!mounted) return null;
 
@@ -41,7 +38,7 @@ export default function CheckoutPage() {
           </div>
           <h1 className="font-heading text-3xl font-bold text-brand-charcoal mb-4">Order Confirmed!</h1>
           <p className="text-muted-foreground mb-8">
-            Thank you for your purchase. We've sent a confirmation email with your order details.
+            Thank you for your purchase. We&apos;ve sent a confirmation email with your order details.
           </p>
           <div className="space-y-4">
             <Button size="lg" className="w-full" asChild>

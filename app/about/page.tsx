@@ -40,7 +40,7 @@ export default function AboutPage() {
                 Our Commitment to Quality
               </h2>
               <p className="text-lg text-muted-foreground leading-relaxed">
-                We understand that a bag is more than just a carrier; it's a mobile billboard for your brand. That's why every product that leaves our facility is crafted with precision, using premium materials that reflect the quality of your business.
+                We understand that a bag is more than just a carrier; it&apos;s a mobile billboard for your brand. That&apos;s why every product that leaves our facility is crafted with precision, using premium materials that reflect the quality of your business.
               </p>
               <p className="text-lg text-muted-foreground leading-relaxed">
                 From luxury retail boutiques and upscale hotels to everyday supermarkets and pharmacies, we provide customized solutions that meet specific requirements across sizes, materials, and printing techniques.

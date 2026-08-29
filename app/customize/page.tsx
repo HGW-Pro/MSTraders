@@ -21,7 +21,7 @@ const STEPS = [
 function CustomizeForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const initialProduct = searchParams.get('product');
+  const initialProduct = searchParams?.get('product') || '';
   
   const [currentStep, setCurrentStep] = React.useState(0);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
@@ -278,7 +278,7 @@ function CustomizeForm() {
                 </div>
                 <h3 className="font-semibold text-lg mb-2">Upload your artwork</h3>
                 <p className="text-muted-foreground text-sm mb-6 max-w-sm">
-                  Attach your logo, design file, or a reference image of what you're looking for. (Max 10MB)
+                  Attach your logo, design file, or a reference image of what you&apos;re looking for. (Max 10MB)
                 </p>
                 <div className="relative">
                   <input 

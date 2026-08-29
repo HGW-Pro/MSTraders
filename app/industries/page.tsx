@@ -115,7 +115,7 @@ export default function IndustriesPage() {
       {/* CTA */}
       <section className="py-24 bg-brand-cream border-t border-border">
         <div className="container mx-auto px-4 text-center max-w-3xl">
-          <h2 className="font-heading text-3xl md:text-4xl font-bold text-brand-charcoal mb-6">Don't see your industry?</h2>
+          <h2 className="font-heading text-3xl md:text-4xl font-bold text-brand-charcoal mb-6">Don&apos;t see your industry?</h2>
           <p className="text-lg text-muted-foreground mb-10">
             We manufacture custom bags for all types of businesses. Reach out to us with your specific requirements.
           </p>

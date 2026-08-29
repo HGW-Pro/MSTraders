@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -10,11 +11,7 @@ import { toast } from 'sonner';
 
 export default function CartPage() {
   const { items, updateQuantity, removeItem, clearCart } = useCartStore();
-  const [mounted, setMounted] = React.useState(false);
-
-  React.useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = React.useSyncExternalStore(() => () => {}, () => true, () => false);
 
   if (!mounted) return null; // Prevent hydration mismatch
 
@@ -29,7 +26,7 @@ export default function CartPage() {
             <ShoppingBag className="h-10 w-10 text-brand-green" />
           </div>
           <h1 className="font-heading text-3xl font-bold text-brand-charcoal mb-4">Your Cart is Empty</h1>
-          <p className="text-muted-foreground mb-8">Looks like you haven't added any products to your cart yet.</p>
+          <p className="text-muted-foreground mb-8">Looks like you haven&apos;t added any products to your cart yet.</p>
           <Button size="lg" className="w-full" asChild>
             <Link href="/shop">Start Shopping</Link>
           </Button>

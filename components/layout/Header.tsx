@@ -19,7 +19,7 @@ const mainNav = [
 ];
 
 export function Header() {
-  const pathname = usePathname();
+  const pathname = usePathname() || "";
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
 
   // Prevent scrolling when mobile menu is open
