@@ -51,17 +51,21 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (active) {
         if (!session?.user) {
-          setUserEmail('admin@mstraders.com');
+          router.push('/admin/login');
         } else {
           setUserEmail(session.user.email || 'Admin');
+          setIsCheckingAuth(false);
         }
-        setIsCheckingAuth(false);
       }
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (active && session?.user) {
-        setUserEmail(session.user.email || 'Admin');
+      if (active) {
+        if (!session?.user) {
+          router.push('/admin/login');
+        } else {
+          setUserEmail(session.user.email || 'Admin');
+        }
       }
     });
 
@@ -69,7 +73,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       active = false;
       subscription.unsubscribe();
     };
-  }, [isLoginPage]);
+  }, [isLoginPage, router]);
 
   const handleLogout = async () => {
     try {
@@ -83,6 +87,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   if (isLoginPage) {
     return <>{children}</>;
+  }
+
+  if (isCheckingAuth) {
+    return (
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center text-white p-6">
+        <div className="text-center space-y-3">
+          <div className="w-10 h-10 border-4 border-brand-gold border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="text-xs text-slate-400 font-medium tracking-wider uppercase">Verifying Admin Session...</p>
+        </div>
+      </div>
+    );
   }
 
   return (

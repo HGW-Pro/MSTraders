@@ -54,6 +54,87 @@ function CustomizeForm() {
 
   const [file, setFile] = React.useState<File | null>(null);
 
+  const getMaterialOptions = () => {
+    switch (formData.bagType) {
+      case 'paper-bags':
+      case 'kraft-bags':
+        return [
+          { value: '120 GSM Natural Virgin Kraft', label: '120 GSM Natural Virgin Kraft' },
+          { value: '150 GSM White Bleached Kraft Paper', label: '150 GSM White Bleached Kraft Paper' },
+          { value: '180 GSM Heavy Ribbed Kraft', label: '180 GSM Heavy Ribbed Kraft' },
+          { value: '210 GSM Laminated Art Card', label: '210 GSM Laminated Art Card' },
+        ];
+      case 'non-woven-bags':
+      case 'w-cut-bags':
+      case 'd-cut-bags':
+        return [
+          { value: '70 GSM Spunbond Non-Woven', label: '70 GSM Spunbond Non-Woven' },
+          { value: '80 GSM Heavy Non-Woven Fabric', label: '80 GSM Heavy Non-Woven Fabric' },
+          { value: '90 GSM Laminated Non-Woven', label: '90 GSM Laminated Non-Woven' },
+        ];
+      case 'designer-bags':
+      case 'gift-bags':
+        return [
+          { value: '210 GSM Gloss Art Board with Matte Lamination', label: '210 GSM Gloss Art Board with Matte Lamination' },
+          { value: '250 GSM Rigid Velvet Touch Board', label: '250 GSM Rigid Velvet Touch Board' },
+          { value: '200 GSM Metallic Texture Board', label: '200 GSM Metallic Texture Board' },
+        ];
+      case 'envelopes':
+        return [
+          { value: '120 GSM Natural Brown Kraft', label: '120 GSM Natural Brown Kraft' },
+          { value: '180 GSM Pure White Card Stock', label: '180 GSM Pure White Card Stock' },
+          { value: '250 GSM Rigid Document Board', label: '250 GSM Rigid Document Board' },
+        ];
+      default:
+        return [
+          { value: '120 GSM Natural Virgin Kraft', label: '120 GSM Natural Virgin Kraft' },
+          { value: '150 GSM White Kraft Paper', label: '150 GSM White Kraft Paper' },
+          { value: '210 GSM Laminated Art Card', label: '210 GSM Laminated Art Card' },
+          { value: '80 GSM Non-Woven Spunbond', label: '80 GSM Non-Woven Spunbond' },
+        ];
+    }
+  };
+
+  const getHandleOptions = () => {
+    switch (formData.bagType) {
+      case 'paper-bags':
+      case 'kraft-bags':
+        return [
+          { value: 'twisted', label: 'Twisted Paper Cord Handle' },
+          { value: 'flat', label: 'Flat Paper Strip Handle' },
+          { value: 'rope', label: 'Braided Cotton Rope' },
+        ];
+      case 'non-woven-bags':
+      case 'w-cut-bags':
+      case 'd-cut-bags':
+        return [
+          { value: 'dcut', label: 'D-Cut Die Punch Hole' },
+          { value: 'wcut', label: 'W-Cut Vest Handle' },
+          { value: 'loop', label: 'Loop Fabric Handle' },
+        ];
+      case 'designer-bags':
+      case 'gift-bags':
+        return [
+          { value: 'rope', label: 'Braided Cotton Rope' },
+          { value: 'ribbon', label: 'Satin Ribbon Tie' },
+          { value: 'twisted', label: 'Metallic Cord Handle' },
+        ];
+      case 'envelopes':
+        return [
+          { value: 'none', label: 'No Handle (Peel & Seal Flap)' },
+          { value: 'string', label: 'String & Button Tie' },
+        ];
+      default:
+        return [
+          { value: 'twisted', label: 'Twisted Paper Cord' },
+          { value: 'flat', label: 'Flat Paper Handle' },
+          { value: 'rope', label: 'Braided Cotton Rope' },
+          { value: 'dcut', label: 'D-Cut Die Punch' },
+          { value: 'wcut', label: 'W-Cut Vest Handle' },
+        ];
+    }
+  };
+
   const handleNext = () => {
     // Validate required fields before step advancement
     if (currentStep === 0 && !formData.bagType) {
@@ -282,11 +363,9 @@ function CustomizeForm() {
                       <SelectValue placeholder="Select material" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="120 GSM Natural Virgin Kraft">120 GSM Natural Virgin Kraft</SelectItem>
-                      <SelectItem value="150 GSM White Kraft Paper">150 GSM White Kraft Paper</SelectItem>
-                      <SelectItem value="210 GSM Laminated Art Card">210 GSM Laminated Art Card</SelectItem>
-                      <SelectItem value="70 GSM Spunbond Non-Woven">70 GSM Spunbond Non-Woven</SelectItem>
-                      <SelectItem value="80 GSM Heavy Non-Woven">80 GSM Heavy Non-Woven</SelectItem>
+                      {getMaterialOptions().map((opt) => (
+                        <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
@@ -322,12 +401,9 @@ function CustomizeForm() {
                       <SelectValue placeholder="Select handle" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="twisted">Twisted Paper Cord</SelectItem>
-                      <SelectItem value="flat">Flat Paper Handle</SelectItem>
-                      <SelectItem value="rope">Braided Cotton Rope</SelectItem>
-                      <SelectItem value="ribbon">Satin Ribbon</SelectItem>
-                      <SelectItem value="dcut">D-Cut Die Punch</SelectItem>
-                      <SelectItem value="wcut">W-Cut Grocery Vest</SelectItem>
+                      {getHandleOptions().map((opt) => (
+                        <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>

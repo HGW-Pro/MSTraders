@@ -164,7 +164,7 @@ export const DEFAULT_INDUSTRIES: Industry[] = [
     short_description: 'Grease-resistant take-away food bags, bakery pouches, and sturdy delivery bags.',
     full_description: 'Sturdy, wide-bottom food packaging bags crafted to hold containers without tipping. Grease-resistant liners and ventilated virgin kraft paper maintain food freshness and cleanliness.',
     recommended_bags: ['Premium Kraft Paper Bag', 'Eco Supermarket W-Cut Bag'],
-    features: ['Food-grade Safe Materials', 'Wide Gussets for Flat Placement', 'Heavy Load Capacity (Up to 8kg)', 'Thermal & Moisture Resistant Options'],
+    features: ['Wide Gussets for Flat Placement', 'Reinforced Square Bottom', 'Custom Logo Printing', 'Multiple Size Options'],
     image_url: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80',
     display_order: 2,
     status: 'published'
@@ -504,13 +504,7 @@ export async function createQuote(quoteData: {
 
     if (error) {
       console.error('Supabase quote insert error:', error);
-      // Create local fallback object with quote_number if offline
-      return {
-        id: `local-${Date.now()}`,
-        created_at: new Date().toISOString(),
-        ...newQuote,
-        status: 'NEW'
-      } as Quote;
+      return null;
     }
 
     return data as Quote;
@@ -658,16 +652,7 @@ export async function createOrder(orderData: {
       } as Order;
     }
 
-    // Local fallback if database insert fails or is offline
-    return {
-      id: `local-ord-${Date.now()}`,
-      created_at: new Date().toISOString(),
-      ...newOrder,
-      order_items: orderData.items.map((it, idx) => ({
-        id: `item-${idx}`,
-        ...it
-      }))
-    } as Order;
+    return null;
   } catch (err) {
     console.error('Error creating order request:', err);
     return null;
@@ -848,9 +833,8 @@ export async function uploadFileToSupabase(
       });
 
     if (uploadError) {
-      console.warn(`Bucket upload notice (${bucket}):`, uploadError.message);
-      // Fallback object URL if bucket hasn't been provisioned yet in user's remote Supabase instance
-      return URL.createObjectURL(file);
+      console.error(`Bucket upload error (${bucket}):`, uploadError.message);
+      throw new Error(`Upload failed: ${uploadError.message}`);
     }
 
     const { data: publicUrlData } = supabase.storage
@@ -860,6 +844,6 @@ export async function uploadFileToSupabase(
     return publicUrlData.publicUrl;
   } catch (err: any) {
     console.error('Upload error:', err);
-    return URL.createObjectURL(file);
+    throw err;
   }
 }

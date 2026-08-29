@@ -109,23 +109,23 @@ export const FALLBACK_PRODUCTS: Product[] = [
   {
     id: '6',
     created_at: new Date().toISOString(),
-    name: 'Custom Printed Polythene Carry Bag',
-    slug: 'custom-printed-polythene-carry-bag',
-    description: 'High-density custom printed plastic carry bag with loop handle or punch handle options for wholesale, hardware, and retail store packaging.',
-    price: 7,
-    sale_price: 5.5,
-    category: 'customized-bags',
-    sku: 'MST-PB-006',
-    material: '50+ Micron Recyclable Polyethylene',
-    moq: 2000,
+    name: 'Custom Printed Envelope Pouch Bag',
+    slug: 'custom-printed-envelope-pouch-bag',
+    description: 'Heavy kraft or art paper envelope pouch bag with peel-and-seal flap for boutique items, documents, jewellery, and gift certificates.',
+    price: null,
+    sale_price: null,
+    category: 'envelopes',
+    sku: 'MST-EP-006',
+    material: '180 GSM Kraft / Card Board',
+    moq: 1000,
     is_featured: false,
     is_customizable: true,
     status: 'published',
-    images: ['https://images.unsplash.com/photo-1572021335469-31706a17aaef?auto=format&fit=crop&w=800&q=80'],
-    sizes: ['11x14"', '13x17"', '16x20"'],
-    colors: ['Milky White', 'Clear Transparent', 'Silver Grey'],
-    handles: ['Soft Loop Handle', 'Punch Cut Handle'],
-    printing_options: ['Multi-Color Flexo Printing']
+    images: ['https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=800&q=80'],
+    sizes: ['6x9 inch', '9x12 inch', '10x14 inch'],
+    colors: ['Natural Kraft', 'Pure White', 'Custom Printed'],
+    handles: ['Flap Closure'],
+    printing_options: ['Screen Print', 'Foil Stamp']
   }
 ];
 

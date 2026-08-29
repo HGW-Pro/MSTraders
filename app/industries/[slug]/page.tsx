@@ -28,7 +28,7 @@ const INDUSTRY_DETAILS: Record<string, { title: string; desc: string; bags: stri
   retail: {
     title: 'Supermarkets & Retail Chains',
     desc: 'Heavy-duty non-woven W-cut vest handle bags and reinforced brown kraft carry bags designed for high volume weight capacity.',
-    bags: ['Non-Woven W-Cut Vest Bags', 'Non-Woven D-Cut Punch Bags', 'Kraft Grocery Carry Bags', 'Custom Printed Poly Bags'],
+    bags: ['Non-Woven W-Cut Vest Bags', 'Non-Woven D-Cut Punch Bags', 'Kraft Grocery Carry Bags', 'Custom Printed Paper Bags'],
     img: 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=1000&q=80'
   },
   'medical-pharma': {
