@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-green: #0E3D2B;
+  --color-brand-gold: #D4AF37;
+  --color-brand-cream: #F7F1E1;
+  --color-brand-charcoal: #1A1A1A;
+  
+  --color-background: var(--color-brand-cream);
+  --color-foreground: var(--color-brand-charcoal);
+
+  --color-primary: var(--color-brand-green);
+  --color-primary-foreground: #FFFFFF;
+
+  --color-secondary: var(--color-brand-gold);
+  --color-secondary-foreground: var(--color-brand-charcoal);
+  
+  --color-muted: #E5DFCF;
+  --color-muted-foreground: #666666;
+  
+  --color-border: #D1CBB8;
+  --color-input: #D1CBB8;
+  --color-ring: var(--color-brand-gold);
+  
+  --color-popover: #FFFFFF;
+  --color-popover-foreground: var(--color-brand-charcoal);
+  
+  --color-accent: #E5DFCF;
+  --color-accent-foreground: var(--color-brand-charcoal);
+
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-heading: 'Playfair Display', Georgia, serif;
+}
+
+@layer base {
+  :root {
+    --background: var(--color-brand-cream);
+    --foreground: var(--color-brand-charcoal);
+  }
+  
+  body {
+    @apply bg-background text-foreground antialiased selection:bg-brand-gold selection:text-brand-charcoal;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+  }
+}
