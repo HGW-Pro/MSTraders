@@ -14,6 +14,7 @@ const mainNav = [
   { title: 'HOME', href: '/' },
   { title: 'SHOP', href: '/shop' },
   { title: 'CUSTOMIZE', href: '/customize' },
+  { title: 'TRACK ORDER', href: '/track-order' },
   { title: 'INDUSTRIES', href: '/industries' },
   { title: 'OUR WORK', href: '/our-work' },
   { title: 'ABOUT', href: '/about' },

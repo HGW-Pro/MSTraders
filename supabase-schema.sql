@@ -26,7 +26,8 @@ CREATE TABLE IF NOT EXISTS categories (
   slug TEXT UNIQUE NOT NULL,
   description TEXT,
   image_url TEXT,
-  display_order INT DEFAULT 0
+  display_order INT DEFAULT 0,
+  is_active BOOLEAN DEFAULT true
 );
 
 -- 3. PRODUCTS
@@ -152,6 +153,67 @@ CREATE TABLE IF NOT EXISTS industries (
   status TEXT DEFAULT 'published' CHECK (status IN ('published', 'draft', 'archived'))
 );
 
+-- 10. ADDRESSES
+CREATE TABLE IF NOT EXISTS addresses (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+  title TEXT NOT NULL,
+  contact_person TEXT,
+  phone TEXT,
+  address_line1 TEXT NOT NULL,
+  address_line2 TEXT,
+  city TEXT NOT NULL,
+  state TEXT NOT NULL,
+  pincode TEXT NOT NULL,
+  is_default BOOLEAN DEFAULT false,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 11. HOMEPAGE SECTIONS
+CREATE TABLE IF NOT EXISTS homepage_sections (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  section_key TEXT UNIQUE NOT NULL,
+  title TEXT,
+  subtitle TEXT,
+  description TEXT,
+  image_url TEXT,
+  primary_cta_text TEXT,
+  primary_cta_link TEXT,
+  secondary_cta_text TEXT,
+  secondary_cta_link TEXT,
+  enabled BOOLEAN DEFAULT true,
+  display_order INT DEFAULT 0,
+  metadata JSONB DEFAULT '{}'::jsonb,
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 12. TESTIMONIALS
+CREATE TABLE IF NOT EXISTS testimonials (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  customer_name TEXT NOT NULL,
+  business_name TEXT,
+  role TEXT DEFAULT 'Store Owner',
+  rating INTEGER DEFAULT 5,
+  review TEXT NOT NULL,
+  photo_url TEXT,
+  display_order INTEGER DEFAULT 0,
+  status TEXT DEFAULT 'published' CHECK (status IN ('published', 'draft')),
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 13. MEDIA
+CREATE TABLE IF NOT EXISTS media (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  name TEXT NOT NULL,
+  file_url TEXT NOT NULL,
+  file_size INTEGER,
+  mime_type TEXT,
+  category TEXT DEFAULT 'General',
+  alt_text TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- INDEXES
 CREATE INDEX IF NOT EXISTS idx_products_slug ON products(slug);
 CREATE INDEX IF NOT EXISTS idx_products_category ON products(category);
@@ -171,6 +233,10 @@ ALTER TABLE order_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE gallery ENABLE ROW LEVEL SECURITY;
 ALTER TABLE settings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE industries ENABLE ROW LEVEL SECURITY;
+ALTER TABLE addresses ENABLE ROW LEVEL SECURITY;
+ALTER TABLE homepage_sections ENABLE ROW LEVEL SECURITY;
+ALTER TABLE testimonials ENABLE ROW LEVEL SECURITY;
+ALTER TABLE media ENABLE ROW LEVEL SECURITY;
 
 -- Helper function to check if user is an admin
 CREATE OR REPLACE FUNCTION public.is_admin()
@@ -264,6 +330,42 @@ CREATE POLICY "Public can view published industries" ON industries
 
 CREATE POLICY "Admins can manage industries" ON industries
   FOR ALL USING (public.is_admin());
+
+-- ADDRESSES POLICIES
+CREATE POLICY "Users can manage their own addresses" ON addresses
+  FOR ALL USING (auth.uid() = user_id OR public.is_admin());
+
+-- HOMEPAGE SECTIONS POLICIES
+CREATE POLICY "Public can view homepage sections" ON homepage_sections
+  FOR SELECT USING (true);
+
+CREATE POLICY "Admins can manage homepage sections" ON homepage_sections
+  FOR ALL USING (public.is_admin());
+
+-- TESTIMONIALS POLICIES
+CREATE POLICY "Public can view published testimonials" ON testimonials
+  FOR SELECT USING (status = 'published' OR public.is_admin());
+
+CREATE POLICY "Admins can manage testimonials" ON testimonials
+  FOR ALL USING (public.is_admin());
+
+-- MEDIA POLICIES
+CREATE POLICY "Public can view media" ON media
+  FOR SELECT USING (true);
+
+CREATE POLICY "Admins can manage media" ON media
+  FOR ALL USING (public.is_admin());
+
+-- STORAGE BUCKETS SETUP
+INSERT INTO storage.buckets (id, name, public) 
+VALUES ('media', 'media', true), ('attachments', 'attachments', true)
+ON CONFLICT (id) DO NOTHING;
+
+CREATE POLICY "Public Read Access on Storage" ON storage.objects
+  FOR SELECT USING (bucket_id IN ('media', 'attachments'));
+
+CREATE POLICY "Public Upload Access on Storage" ON storage.objects
+  FOR INSERT WITH CHECK (bucket_id IN ('media', 'attachments'));
 
 -- AUTOMATIC UPDATED_AT TRIGGER FUNCTION
 CREATE OR REPLACE FUNCTION update_updated_at_column()

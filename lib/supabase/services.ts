@@ -8,6 +8,10 @@ import {
   BusinessSettings, 
   Industry, 
   UserProfile,
+  CustomerAddress,
+  HomepageSection,
+  Testimonial,
+  MediaItem,
   QuoteStatus,
   OrderStatus 
 } from '@/types';
@@ -24,9 +28,9 @@ export const DEFAULT_SETTINGS: BusinessSettings = {
   state: 'Madhya Pradesh',
   pincode: '456006',
   business_hours: 'Mon - Sat: 9:30 AM - 8:30 PM',
-  social_facebook: 'https://facebook.com',
-  social_instagram: 'https://instagram.com',
-  social_linkedin: 'https://linkedin.com',
+  social_facebook: '',
+  social_instagram: '',
+  social_linkedin: '',
   footer_about: 'MS TRADERS is a premier wholesale & retail supplier of customized paper bags, W-cut & D-cut non-woven bags, designer gift bags, envelopes, and eco-friendly packaging in Ujjain (M.P).',
   seo_title: 'MS TRADERS - Wholesale & Retail Paper Bags & Non-Woven Bags in Ujjain',
   seo_description: 'Official wholesale & retail supplier of paper bags, non-woven W-cut and D-cut bags, customized printed bags, designer gift bags, and envelope pouches in Ujjain (M.P).'
@@ -42,6 +46,7 @@ export const DEFAULT_CATEGORIES: Category[] = [
   { id: 'cat-6', name: 'Designer Bags', slug: 'designer-bags', description: 'Luxury laminated boutique bags with foil stamping and velvet or rope handles.', image_url: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=800&q=80', display_order: 6 },
   { id: 'cat-7', name: 'Gift Bags', slug: 'gift-bags', description: 'Festive and corporate gift packaging bags with custom prints.', image_url: 'https://images.unsplash.com/photo-1513885535751-8b9238bd345a?auto=format&fit=crop&w=800&q=80', display_order: 7 },
   { id: 'cat-8', name: 'Customized Bags', slug: 'customized-bags', description: 'Tailor-made bags engineered to your exact dimension, GSM, handle, and printing specs.', image_url: 'https://images.unsplash.com/photo-1572021335469-31706a17aaef?auto=format&fit=crop&w=800&q=80', display_order: 8 },
+  { id: 'cat-9', name: 'Envelopes', slug: 'envelopes', description: 'Heavy paper envelope pouches for documents, boutique items, and gifts.', image_url: 'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=800&q=80', display_order: 9 },
 ];
 
 // DEFAULT SEED PRODUCTS FOR FIRST-TIME SUPABASE INITIALIZATION
@@ -813,7 +818,7 @@ export async function getIndustryBySlug(slug: string): Promise<Industry | null> 
 // --- STORAGE FILE UPLOADS ---
 export async function uploadFileToSupabase(
   file: File, 
-  bucket: 'product-images' | 'gallery-images' | 'quote-attachments' | 'settings-assets'
+  bucket: 'product-images' | 'gallery-images' | 'quote-attachments' | 'settings-assets' | 'media' | 'category-images' | 'hero-images'
 ): Promise<string | null> {
   try {
     // Validate file size (Max 10MB)
@@ -847,3 +852,428 @@ export async function uploadFileToSupabase(
     throw err;
   }
 }
+
+// --- ORDER TRACKING SERVICE ---
+export async function getOrderByNumberAndPhone(orderNumber: string, phone: string): Promise<Order | null> {
+  try {
+    const cleanNum = orderNumber.trim().toUpperCase();
+    const cleanPhone = phone.replace(/\D/g, '');
+
+    if (!cleanNum || !cleanPhone) return null;
+
+    const { data: orders, error } = await supabase
+      .from('orders')
+      .select('*, order_items(*)')
+      .ilike('order_number', cleanNum);
+
+    if (error || !orders || orders.length === 0) return null;
+
+    // Filter by phone match on main order or shipping address
+    const matchedOrder = orders.find(ord => {
+      const ordPhone = (ord.phone || '').replace(/\D/g, '');
+      const addrPhone = (ord.shipping_address?.phone || '').replace(/\D/g, '');
+      return (
+        (ordPhone && (ordPhone.endsWith(cleanPhone) || cleanPhone.endsWith(ordPhone))) ||
+        (addrPhone && (addrPhone.endsWith(cleanPhone) || cleanPhone.endsWith(addrPhone)))
+      );
+    });
+
+    return (matchedOrder as Order) || null;
+  } catch (err) {
+    console.error('Error in getOrderByNumberAndPhone:', err);
+    return null;
+  }
+}
+
+// --- CUSTOMER PROFILE & ADDRESS SERVICES ---
+export async function getUserProfile(userId: string): Promise<UserProfile | null> {
+  try {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .single();
+
+    if (error || !data) return null;
+    return data as UserProfile;
+  } catch (err) {
+    return null;
+  }
+}
+
+export async function updateUserProfile(userId: string, updates: Partial<UserProfile>): Promise<boolean> {
+  try {
+    const { error } = await supabase
+      .from('profiles')
+      .upsert({ id: userId, ...updates, updated_at: new Date().toISOString() });
+
+    if (error) throw error;
+    return true;
+  } catch (err) {
+    console.error('Error updating user profile:', err);
+    return false;
+  }
+}
+
+export async function getCustomerOrders(email: string, userId?: string): Promise<Order[]> {
+  try {
+    let query = supabase.from('orders').select('*, order_items(*)');
+    if (userId) {
+      query = query.or(`customer_id.eq.${userId},email.ilike.${email.trim()}`);
+    } else {
+      query = query.ilike('email', email.trim());
+    }
+    const { data, error } = await query.order('created_at', { ascending: false });
+    if (error || !data) return [];
+    return data as Order[];
+  } catch (err) {
+    return [];
+  }
+}
+
+export async function getCustomerQuotes(email: string, userId?: string): Promise<Quote[]> {
+  try {
+    let query = supabase.from('quotes').select('*');
+    if (userId) {
+      query = query.or(`customer_id.eq.${userId},email.ilike.${email.trim()}`);
+    } else {
+      query = query.ilike('email', email.trim());
+    }
+    const { data, error } = await query.order('created_at', { ascending: false });
+    if (error || !data) return [];
+    return data as Quote[];
+  } catch (err) {
+    return [];
+  }
+}
+
+export async function getCustomerAddresses(userId: string): Promise<CustomerAddress[]> {
+  try {
+    const { data, error } = await supabase
+      .from('addresses')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+
+    if (error || !data) return [];
+    return data as CustomerAddress[];
+  } catch (err) {
+    return [];
+  }
+}
+
+export async function saveCustomerAddress(userId: string, address: Partial<CustomerAddress>): Promise<CustomerAddress | null> {
+  try {
+    const { data, error } = await supabase
+      .from('addresses')
+      .upsert([{ ...address, user_id: userId, updated_at: new Date().toISOString() }])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data as CustomerAddress;
+  } catch (err) {
+    console.error('Error saving address:', err);
+    return null;
+  }
+}
+
+export async function deleteCustomerAddress(addressId: string, userId: string): Promise<boolean> {
+  try {
+    const { error } = await supabase
+      .from('addresses')
+      .delete()
+      .eq('id', addressId)
+      .eq('user_id', userId);
+
+    if (error) throw error;
+    return true;
+  } catch (err) {
+    return false;
+  }
+}
+
+// --- CATEGORIES CRUD SERVICE ---
+export async function saveCategory(category: Partial<Category>): Promise<Category | null> {
+  try {
+    const { data, error } = await supabase
+      .from('categories')
+      .upsert([category])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data as Category;
+  } catch (err) {
+    console.error('Error saving category:', err);
+    return null;
+  }
+}
+
+export async function deleteCategory(id: string): Promise<boolean> {
+  try {
+    const { error } = await supabase.from('categories').delete().eq('id', id);
+    if (error) throw error;
+    return true;
+  } catch (err) {
+    return false;
+  }
+}
+
+// --- HOMEPAGE CMS SERVICE ---
+export const DEFAULT_HOMEPAGE_SECTIONS: Record<string, HomepageSection> = {
+  hero: {
+    id: 'sec-hero',
+    section_key: 'hero',
+    title: 'Customized Paper Bags & Non-Woven Carry Bags',
+    subtitle: 'WHOLESALE & RETAIL SUPPLIER IN UJJAIN',
+    description: 'Premier manufacturer & bulk supplier of high-quality paper bags, W-cut vest bags, D-cut punch bags, luxury laminated boutique gift bags, and envelope pouches.',
+    image_url: 'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=1200&q=80',
+    primary_cta_text: 'GET CUSTOM QUOTE',
+    primary_cta_link: '/customize',
+    secondary_cta_text: 'EXPLORE CATALOG',
+    secondary_cta_link: '/shop',
+    enabled: true,
+    display_order: 1
+  },
+  categories: {
+    id: 'sec-categories',
+    section_key: 'categories',
+    title: 'Explore Bag Categories',
+    subtitle: 'BROWSE OUR RANGE',
+    description: 'From everyday grocery W-cut non-woven carry bags to luxury foil-stamped boutique packaging.',
+    enabled: true,
+    display_order: 2
+  },
+  customization: {
+    id: 'sec-customization',
+    section_key: 'customization',
+    title: 'Tailor-Made Wholesale Bag Manufacturing',
+    subtitle: 'CUSTOM BRANDING & PRINTS',
+    description: 'Select your preferred paper GSM, handles, screen/flexo multi-color printing, and custom dimensions.',
+    image_url: 'https://images.unsplash.com/photo-1572021335469-31706a17aaef?auto=format&fit=crop&w=800&q=80',
+    primary_cta_text: 'START CUSTOM ORDER',
+    primary_cta_link: '/customize',
+    enabled: true,
+    display_order: 3
+  },
+  industries: {
+    id: 'sec-industries',
+    section_key: 'industries',
+    title: 'Specialized Packaging For Every Industry',
+    subtitle: 'INDUSTRIES WE SERVE',
+    description: 'Engineered for supermarkets, retail fashion, hotels, restaurants, and medical establishments.',
+    enabled: true,
+    display_order: 4
+  },
+  process: {
+    id: 'sec-process',
+    section_key: 'process',
+    title: 'How Bulk Orders Work',
+    subtitle: 'SIMPLE 4-STEP PROCESS',
+    description: 'Seamless ordering experience from design request to bulk delivery.',
+    enabled: true,
+    display_order: 5,
+    metadata: {
+      steps: [
+        { step: '01', title: 'Submit Requirements', desc: 'Specify bag type, dimensions, quantity, and print requirements.' },
+        { step: '02', title: 'Instant Quote & Sample', desc: 'Receive wholesale pricing breakdown and artwork proofing.' },
+        { step: '03', title: 'Precision Manufacturing', desc: 'High-speed automated production with quality inspection.' },
+        { step: '04', title: 'Fast Delivery', desc: 'Secure packaging and dispatch across Ujjain and surrounding regions.' }
+      ]
+    }
+  },
+  why_us: {
+    id: 'sec-why_us',
+    section_key: 'why_us',
+    title: 'Why Choose MS TRADERS',
+    subtitle: 'OUR PROMISE',
+    description: 'Trusted wholesale manufacturer delivering precision quality and reliable bulk fulfillment.',
+    enabled: true,
+    display_order: 6,
+    metadata: {
+      features: [
+        { title: 'Factory Direct Wholesale', desc: 'Competitive bulk tier pricing straight from manufacturing units.' },
+        { title: 'Custom Multi-Color Printing', desc: 'Precision flexo, offset, and screen printing with your logo.' },
+        { title: 'Durable Quality Standard', desc: 'High tear strength, reinforced handles, and clean seam sealing.' },
+        { title: 'On-Time Dispatch', desc: 'Reliable order processing and fulfillment for retail schedules.' }
+      ]
+    }
+  },
+  our_work: {
+    id: 'sec-our_work',
+    section_key: 'our_work',
+    title: 'Recent Manufactured Batches',
+    subtitle: 'PORTFOLIO & CRAFTSMANSHIP',
+    description: 'Explore custom printed carry bags completed for boutiques, supermarkets, and corporate clients.',
+    enabled: true,
+    display_order: 7
+  },
+  testimonials: {
+    id: 'sec-testimonials',
+    section_key: 'testimonials',
+    title: 'What Our Clients Say',
+    subtitle: 'CLIENT FEEDBACK',
+    description: 'Genuine reviews from business owners, store managers, and event coordinators.',
+    enabled: true,
+    display_order: 8
+  },
+  final_cta: {
+    id: 'sec-final_cta',
+    section_key: 'final_cta',
+    title: 'Ready to Upgrade Your Brand Packaging?',
+    subtitle: 'BULK WHOLESALE INQUIRIES',
+    description: 'Get in touch with MS TRADERS today for custom sample kits and bulk pricing quotes.',
+    primary_cta_text: 'REQUEST WHOLESALE QUOTE',
+    primary_cta_link: '/customize',
+    secondary_cta_text: 'CONTACT SALES DESK',
+    secondary_cta_link: '/contact',
+    enabled: true,
+    display_order: 9
+  }
+};
+
+export async function getHomepageSections(): Promise<Record<string, HomepageSection>> {
+  try {
+    const { data, error } = await supabase
+      .from('homepage_sections')
+      .select('*')
+      .order('display_order', { ascending: true });
+
+    if (error || !data || data.length === 0) {
+      return DEFAULT_HOMEPAGE_SECTIONS;
+    }
+
+    const sections: Record<string, HomepageSection> = { ...DEFAULT_HOMEPAGE_SECTIONS };
+    data.forEach((row: any) => {
+      if (row.section_key) {
+        sections[row.section_key] = {
+          ...sections[row.section_key],
+          ...row
+        };
+      }
+    });
+
+    return sections;
+  } catch (err) {
+    return DEFAULT_HOMEPAGE_SECTIONS;
+  }
+}
+
+export async function updateHomepageSection(sectionKey: string, sectionData: Partial<HomepageSection>): Promise<boolean> {
+  try {
+    const { error } = await supabase
+      .from('homepage_sections')
+      .upsert([{ section_key: sectionKey, ...sectionData, updated_at: new Date().toISOString() }], { onConflict: 'section_key' });
+
+    if (error) throw error;
+    return true;
+  } catch (err) {
+    console.error(`Error updating homepage section ${sectionKey}:`, err);
+    return false;
+  }
+}
+
+// --- TESTIMONIALS SERVICE ---
+export async function getTestimonials(onlyPublished = true): Promise<Testimonial[]> {
+  try {
+    let query = supabase.from('testimonials').select('*').order('display_order', { ascending: true });
+    if (onlyPublished) {
+      query = query.eq('status', 'published');
+    }
+    const { data, error } = await query;
+    if (error || !data) return [];
+    
+    return data.map((t: any) => ({
+      ...t,
+      name: t.name || t.customer_name,
+      customer_name: t.customer_name || t.name,
+      content: t.content || t.review,
+      review: t.review || t.content,
+      company: t.company || t.business_name,
+      business_name: t.business_name || t.company
+    })) as Testimonial[];
+  } catch (err) {
+    return [];
+  }
+}
+
+export async function saveTestimonial(testimonial: Partial<Testimonial>): Promise<Testimonial | null> {
+  try {
+    const payload = {
+      ...testimonial,
+      customer_name: testimonial.name || testimonial.customer_name || 'Valued Client',
+      review: testimonial.content || testimonial.review || '',
+      business_name: testimonial.company || testimonial.business_name || null
+    };
+
+    const { data, error } = await supabase
+      .from('testimonials')
+      .upsert([payload])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return {
+      ...data,
+      name: data.name || data.customer_name,
+      content: data.content || data.review,
+      company: data.company || data.business_name
+    } as Testimonial;
+  } catch (err) {
+    console.error('Error saving testimonial:', err);
+    return null;
+  }
+}
+
+export async function deleteTestimonial(id: string): Promise<boolean> {
+  try {
+    const { error } = await supabase.from('testimonials').delete().eq('id', id);
+    if (error) throw error;
+    return true;
+  } catch (err) {
+    return false;
+  }
+}
+
+// --- MEDIA LIBRARY SERVICE ---
+export async function getMediaItems(category?: string): Promise<MediaItem[]> {
+  try {
+    let query = supabase.from('media').select('*').order('created_at', { ascending: false });
+    if (category && category !== 'ALL') {
+      query = query.eq('category', category);
+    }
+    const { data, error } = await query;
+    if (error || !data) return [];
+    return data as MediaItem[];
+  } catch (err) {
+    return [];
+  }
+}
+
+export async function saveMediaItem(item: Partial<MediaItem>): Promise<MediaItem | null> {
+  try {
+    const { data, error } = await supabase
+      .from('media')
+      .insert([item])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data as MediaItem;
+  } catch (err) {
+    console.error('Error saving media item:', err);
+    return null;
+  }
+}
+
+export async function deleteMediaItem(id: string): Promise<boolean> {
+  try {
+    const { error } = await supabase.from('media').delete().eq('id', id);
+    if (error) throw error;
+    return true;
+  } catch (err) {
+    return false;
+  }
+}
+

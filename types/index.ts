@@ -32,6 +32,7 @@ export interface Category {
   description: string | null;
   image_url: string | null;
   display_order?: number;
+  is_active?: boolean;
 }
 
 export type QuoteStatus = 'NEW' | 'CONTACTED' | 'REVIEWING' | 'QUOTE_SENT' | 'APPROVED' | 'REJECTED' | 'COMPLETED';
@@ -173,3 +174,61 @@ export interface UserProfile {
   role: 'customer' | 'admin';
   created_at?: string;
 }
+
+export interface CustomerAddress {
+  id: string;
+  user_id: string;
+  title: string;
+  full_name: string;
+  phone: string;
+  address: string;
+  city: string;
+  state: string;
+  pincode: string;
+  is_default: boolean;
+  created_at?: string;
+}
+
+export interface HomepageSection {
+  id: string;
+  section_key: 'hero' | 'categories' | 'customization' | 'industries' | 'process' | 'why_us' | 'our_work' | 'testimonials' | 'final_cta';
+  title?: string | null;
+  subtitle?: string | null;
+  description?: string | null;
+  image_url?: string | null;
+  primary_cta_text?: string | null;
+  primary_cta_link?: string | null;
+  secondary_cta_text?: string | null;
+  secondary_cta_link?: string | null;
+  enabled: boolean;
+  display_order: number;
+  metadata?: Record<string, any> | null;
+  updated_at?: string;
+}
+
+export interface Testimonial {
+  id: string;
+  customer_name?: string;
+  name?: string;
+  business_name?: string | null;
+  company?: string | null;
+  role?: string | null;
+  rating: number;
+  review?: string;
+  content?: string;
+  photo_url?: string | null;
+  display_order: number;
+  status: 'published' | 'draft';
+  created_at?: string;
+}
+
+export interface MediaItem {
+  id: string;
+  title: string;
+  alt_text?: string | null;
+  url: string;
+  category: 'Logo' | 'Homepage' | 'Products' | 'Gallery' | 'Industries' | 'About';
+  size_bytes?: number | null;
+  created_at?: string;
+}
+

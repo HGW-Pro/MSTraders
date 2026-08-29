@@ -14,7 +14,11 @@ import {
   LogOut,
   Menu,
   X,
-  ExternalLink
+  ExternalLink,
+  FolderKanban,
+  LayoutTemplate,
+  FolderGit2,
+  MessageSquareQuote
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -24,9 +28,13 @@ import { toast } from 'sonner';
 const adminNav = [
   { title: 'Dashboard', href: '/admin', icon: LayoutDashboard },
   { title: 'Products Catalog', href: '/admin/products', icon: Package },
+  { title: 'Categories', href: '/admin/categories', icon: FolderKanban },
+  { title: 'Homepage CMS', href: '/admin/content/homepage', icon: LayoutTemplate },
+  { title: 'Media Library', href: '/admin/media', icon: FolderGit2 },
   { title: 'Quotes', href: '/admin/quotes', icon: FileText },
   { title: 'Orders', href: '/admin/orders', icon: ShoppingBag },
   { title: 'Customers', href: '/admin/customers', icon: Users },
+  { title: 'Testimonials', href: '/admin/testimonials', icon: MessageSquareQuote },
   { title: 'Gallery', href: '/admin/gallery', icon: ImageIcon },
   { title: 'Settings', href: '/admin/settings', icon: Settings },
 ];
