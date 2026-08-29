@@ -213,8 +213,8 @@ function CustomizeForm() {
             />
             
             {STEPS.map((step, index) => (
-              <div key={step} className="flex flex-col items-center gap-2 bg-background px-2">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border-2 transition-colors
+              <div key={step} className="flex flex-col items-center gap-2 bg-background px-1 sm:px-2">
+                <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs font-bold border-2 transition-colors
                   ${index <= currentStep 
                     ? 'border-brand-green bg-brand-green text-white' 
                     : 'border-border bg-background text-muted-foreground'
@@ -228,6 +228,9 @@ function CustomizeForm() {
               </div>
             ))}
           </div>
+          <p className="md:hidden text-center mt-3 text-xs font-bold text-brand-green uppercase tracking-wider">
+            Step {currentStep + 1} of {STEPS.length}: {STEPS[currentStep]}
+          </p>
         </div>
 
         <div className="bg-white border border-border/60 rounded-2xl p-6 md:p-10 shadow-xs">

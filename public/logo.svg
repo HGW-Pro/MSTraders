@@ -1,48 +1,61 @@
 <svg width="500" height="500" viewBox="0 0 500 500" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="msGoldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#F7DF94" />
-      <stop offset="40%" stop-color="#D4AF37" />
+      <stop offset="45%" stop-color="#D4AF37" />
       <stop offset="100%" stop-color="#99770F" />
     </linearGradient>
-    <linearGradient id="msGreenGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#1B6349" />
-      <stop offset="100%" stop-color="#082E20" />
+
+    <linearGradient id="greenGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#185E3E" />
+      <stop offset="100%" stop-color="#09311E" />
     </linearGradient>
-    <filter id="shadow" x="-10%" y="-10%" width="130%" height="130%">
-      <feDropShadow dx="2" dy="4" stdDeviation="3" flood-color="#000000" flood-opacity="0.25" />
+
+    <filter id="softShadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="2" dy="5" stdDeviation="4" flood-color="#000000" flood-opacity="0.2" />
     </filter>
   </defs>
 
-  {/* Outer Circle Ring */}
-  {/* Gold Upper Arc */}
-  <path d="M 100 290 A 180 180 0 1 1 390 280" stroke="url(#msGoldGrad)" stroke-width="18" stroke-linecap="round" filter="url(#shadow)" />
-  {/* Dark Green Lower Arc */}
-  <path d="M 385 270 A 180 180 0 0 1 95 300" stroke="url(#msGreenGrad)" stroke-width="22" stroke-linecap="round" filter="url(#shadow)" />
+  <!-- Background Circle Canvas -->
+  <circle cx="250" cy="250" r="240" fill="#FFFBF0" />
 
-  {/* Monogram MS */}
-  {/* Forest Green M */}
-  <text x="110" y="295" font-family="'Times New Roman', Georgia, serif" font-size="190" font-weight="bold" fill="url(#msGreenGrad)" filter="url(#shadow)" letter-spacing="-6">M</text>
-  {/* Gold S */}
-  <text x="220" y="295" font-family="'Times New Roman', Georgia, serif" font-size="195" font-weight="bold" fill="url(#msGoldGrad)" filter="url(#shadow)">S</text>
+  <!-- Outer Double Gold Arc Ring -->
+  <path d="M 70 270 A 190 190 0 1 1 425 240" stroke="url(#goldGrad)" stroke-width="16" stroke-linecap="round" fill="none" filter="url(#softShadow)" />
+  <path d="M 425 270 A 190 190 0 0 1 110 425" stroke="url(#greenGrad)" stroke-width="18" stroke-linecap="round" fill="none" filter="url(#softShadow)" />
 
-  {/* Leaf Motif at Bottom Center */}
-  <path d="M 140 330 C 100 350 110 395 185 400 C 165 365 145 335 140 330 Z" fill="url(#msGreenGrad)" filter="url(#shadow)" />
-  <path d="M 188 400 C 220 350 255 355 265 330 C 260 365 230 395 188 400 Z" fill="url(#msGoldGrad)" filter="url(#shadow)" />
+  <!-- Monogram MS -->
+  <!-- Forest Green M -->
+  <text x="75" y="325" font-family="'Playfair Display', Georgia, 'Times New Roman', serif" font-size="220" font-weight="800" fill="url(#greenGrad)" filter="url(#softShadow)" letter-spacing="-8">M</text>
+  <!-- Metallic Gold S -->
+  <text x="215" y="325" font-family="'Playfair Display', Georgia, 'Times New Roman', serif" font-size="225" font-weight="800" fill="url(#goldGrad)" filter="url(#softShadow)">S</text>
 
-  {/* Shopping Bag Icon on Right */}
-  <g transform="translate(300, 180) rotate(5)" filter="url(#shadow)">
-    {/* Front Panel */}
-    <path d="M 0 50 L 120 50 L 110 180 L 10 180 Z" fill="#FFFDF8" stroke="url(#msGreenGrad)" stroke-width="6" />
-    {/* Side Fold Panel */}
-    <path d="M 120 50 L 140 70 L 128 190 L 110 180 Z" fill="#EAE0C8" stroke="url(#msGreenGrad)" stroke-width="4" />
-    {/* Handles */}
-    <path d="M 30 50 C 30 15 55 15 55 50" fill="none" stroke="url(#msGreenGrad)" stroke-width="7" stroke-linecap="round" />
-    <path d="M 65 50 C 65 15 90 15 90 50" fill="none" stroke="url(#msGreenGrad)" stroke-width="7" stroke-linecap="round" />
-    
-    {/* Bag Inner Print */}
-    <circle cx="60" cy="110" r="30" fill="none" stroke="url(#msGreenGrad)" stroke-width="3" />
-    <text x="60" y="112" font-family="serif" font-size="20" font-weight="bold" fill="url(#msGreenGrad)" text-anchor="middle" dominant-baseline="central">MS</text>
-    <text x="60" y="145" font-family="serif" font-size="11" font-weight="bold" fill="url(#msGreenGrad)" text-anchor="middle" letter-spacing="1">TRADERS</text>
+  <!-- Leaf Motif at Bottom Left -->
+  <g filter="url(#softShadow)">
+    <path d="M 125 345 C 85 365 95 435 185 435 C 160 395 135 355 125 345 Z" fill="url(#greenGrad)" />
+    <path d="M 188 435 C 225 375 275 385 285 355 C 275 395 240 430 188 435 Z" fill="url(#goldGrad)" />
+  </g>
+
+  <!-- 3D Paper Shopping Bag on Right -->
+  <g transform="translate(295, 170) rotate(6)" filter="url(#softShadow)">
+    <!-- Main Bag Face -->
+    <path d="M 0 50 L 125 50 L 112 195 L 8 195 Z" fill="#FFFDF8" stroke="url(#greenGrad)" stroke-width="5" />
+    <!-- Side Gusset Fold -->
+    <path d="M 125 50 L 148 72 L 133 207 L 112 195 Z" fill="#E6D39E" stroke="url(#greenGrad)" stroke-width="4" />
+
+    <!-- Handles -->
+    <path d="M 32 50 C 32 12 58 12 58 50" fill="none" stroke="url(#greenGrad)" stroke-width="7" stroke-linecap="round" />
+    <path d="M 68 50 C 68 12 94 12 94 50" fill="none" stroke="url(#greenGrad)" stroke-width="7" stroke-linecap="round" />
+    <!-- Handle Eyelet Buttons -->
+    <circle cx="32" cy="50" r="4" fill="url(#goldGrad)" />
+    <circle cx="58" cy="50" r="4" fill="url(#goldGrad)" />
+    <circle cx="68" cy="50" r="4" fill="url(#goldGrad)" />
+    <circle cx="94" cy="50" r="4" fill="url(#goldGrad)" />
+
+    <!-- Print inside Shopping Bag -->
+    <circle cx="62" cy="115" r="32" fill="none" stroke="url(#greenGrad)" stroke-width="2.5" />
+    <text x="62" y="116" font-family="'Playfair Display', Georgia, serif" font-size="22" font-weight="800" fill="url(#greenGrad)" text-anchor="middle" dominant-baseline="central">MS</text>
+    <text x="62" y="152" font-family="'Inter', sans-serif" font-size="12" font-weight="900" fill="url(#greenGrad)" text-anchor="middle" letter-spacing="1.5">TRADERS</text>
+    <!-- Filigree ornament under TRADERS -->
+    <path d="M 42 163 Q 62 168 82 163" fill="none" stroke="url(#goldGrad)" stroke-width="2" />
   </g>
 </svg>

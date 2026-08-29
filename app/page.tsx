@@ -7,27 +7,27 @@ export default function HomePage() {
   return (
     <>
       {/* 1. HERO SECTION */}
-      <section className="relative overflow-hidden bg-brand-cream pb-16 pt-24 md:pb-24 md:pt-32">
+      <section className="relative overflow-hidden bg-brand-cream pb-12 pt-16 sm:pb-16 sm:pt-24 md:pb-24 md:pt-32">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
             <div className="max-w-2xl">
-              <span className="inline-block rounded-full bg-brand-green/10 px-4 py-1.5 text-sm font-semibold text-brand-green mb-6">
+              <span className="inline-block rounded-full bg-brand-green/10 px-3 py-1 sm:px-4 sm:py-1.5 text-xs sm:text-sm font-semibold text-brand-green mb-4 sm:mb-6">
                 Wholesale • Retail • Custom Printing • Nationwide Delivery
               </span>
-              <h1 className="font-heading text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-brand-charcoal leading-[1.1] mb-6">
-                BAGS THAT CARRY <br />
+              <h1 className="font-heading text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-brand-charcoal leading-[1.15] mb-4 sm:mb-6">
+                BAGS THAT CARRY <br className="hidden sm:block" />
                 <span className="text-brand-green">YOUR BRAND.</span>
               </h1>
-              <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-lg">
+              <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-6 sm:mb-8 max-w-lg">
                 Premium paper, non-woven and designer bags for businesses, brands and everyday shopping.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Button size="lg" asChild>
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                <Button size="lg" className="w-full sm:w-auto justify-center" asChild>
                   <Link href="/shop">
                     SHOP BAGS <ArrowRight className="ml-2 h-5 w-5" />
                   </Link>
                 </Button>
-                <Button size="lg" variant="outline" asChild>
+                <Button size="lg" variant="outline" className="w-full sm:w-auto justify-center" asChild>
                   <Link href="/customize">CUSTOMIZE YOUR BAG</Link>
                 </Button>
               </div>
@@ -212,7 +212,7 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 text-center">
             <div className="bg-white/10 backdrop-blur-xs p-6 rounded-xl border border-white/10">
               <div className="w-12 h-12 rounded-full bg-brand-gold/20 text-brand-gold mx-auto flex items-center justify-center font-bold text-xl mb-3">
                 ✓

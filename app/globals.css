@@ -38,6 +38,11 @@
     --foreground: var(--color-brand-charcoal);
   }
   
+  html, body {
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
+
   body {
     @apply bg-background text-foreground antialiased selection:bg-brand-gold selection:text-brand-charcoal;
   }

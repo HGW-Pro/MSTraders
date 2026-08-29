@@ -1,11 +1,16 @@
+'use client';
+
 import * as React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { MapPin, Phone, Mail, Clock } from 'lucide-react';
+import { useSettings } from '@/components/settings-provider';
 
 export default function ContactPage() {
+  const { settings } = useSettings();
+
   return (
     <div className="bg-background min-h-screen">
       {/* Header */}
@@ -34,8 +39,8 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <h3 className="font-semibold text-lg text-brand-charcoal mb-1">Phone & WhatsApp</h3>
-                      <p className="text-muted-foreground">+91 00000 00000</p>
-                      <p className="text-muted-foreground">+91 00000 00000 (Wholesale Inquiries)</p>
+                      <p className="text-muted-foreground">{settings.phone || '+91 91312 68724'}</p>
+                      <p className="text-muted-foreground">+{settings.whatsapp || '919131268724'} (Wholesale & Custom Printing Inquiries)</p>
                     </div>
                   </div>
                   
@@ -45,8 +50,7 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <h3 className="font-semibold text-lg text-brand-charcoal mb-1">Email</h3>
-                      <p className="text-muted-foreground">info@mstraders.com</p>
-                      <p className="text-muted-foreground">sales@mstraders.com</p>
+                      <p className="text-muted-foreground">{settings.email || 'contact@mstradersujjain.com'}</p>
                     </div>
                   </div>
                   
@@ -55,10 +59,10 @@ export default function ContactPage() {
                       <MapPin className="h-5 w-5 text-brand-green" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-lg text-brand-charcoal mb-1">Location</h3>
+                      <h3 className="font-semibold text-lg text-brand-charcoal mb-1">Factory Location</h3>
                       <p className="text-muted-foreground">
-                        123 Business Park, Industrial Area,<br />
-                        Mumbai, Maharashtra 400001,<br />
+                        {settings.address || '57, Kalasari, Dabripitha'},<br />
+                        {settings.city || 'Ujjain'}, {settings.state || 'Madhya Pradesh'} {settings.pincode || '456006'},<br />
                         India
                       </p>
                     </div>
@@ -70,7 +74,7 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <h3 className="font-semibold text-lg text-brand-charcoal mb-1">Business Hours</h3>
-                      <p className="text-muted-foreground">Monday - Saturday: 9:00 AM - 7:00 PM</p>
+                      <p className="text-muted-foreground">Monday - Saturday: 9:00 AM - 8:00 PM</p>
                       <p className="text-muted-foreground">Sunday: Closed</p>
                     </div>
                   </div>

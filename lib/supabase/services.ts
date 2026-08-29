@@ -15,11 +15,11 @@ import {
 // DEFAULT BUSINESS SETTINGS
 export const DEFAULT_SETTINGS: BusinessSettings = {
   business_name: 'MS TRADERS',
-  tagline: 'Wholesale & Retail Supplier of Paper Bags, Non-Woven Bags, Customized Bags & Designer Bags',
-  phone: '+91 91312 68724',
+  tagline: 'Wholesale & Retail Supplier of Paper Bags, Non-Woven Bags, Customized Bags, Designer Gift Bags & Envelopes',
+  phone: '+91 91312 68724 / +91 90094 46352',
   whatsapp: '919131268724',
   email: 'contact@mstradersujjain.com',
-  address: '57, Kalasari, Dabripitha',
+  address: '57 Kalalseri, Behind Power House, Dabri Pitha',
   city: 'Ujjain',
   state: 'Madhya Pradesh',
   pincode: '456006',
@@ -27,9 +27,9 @@ export const DEFAULT_SETTINGS: BusinessSettings = {
   social_facebook: 'https://facebook.com',
   social_instagram: 'https://instagram.com',
   social_linkedin: 'https://linkedin.com',
-  footer_about: 'MS TRADERS is a premier manufacturer and wholesale/retail supplier of customized paper bags, non-woven D-cut & W-cut bags, designer gift bags, and eco-friendly packaging in Ujjain, M.P.',
-  seo_title: 'MS TRADERS - Paper Bags, Non-Woven Bags & Custom Printing Manufacturer in Ujjain',
-  seo_description: 'Official manufacturer of eco-friendly brown paper bags, non-woven W-cut and D-cut bags, designer gift bags for weddings & festivals, and custom logo printed bags in Ujjain.'
+  footer_about: 'MS TRADERS is a premier wholesale & retail supplier of customized paper bags, W-cut & D-cut non-woven bags, designer gift bags, envelopes, and eco-friendly packaging in Ujjain (M.P).',
+  seo_title: 'MS TRADERS - Wholesale & Retail Paper Bags & Non-Woven Bags in Ujjain',
+  seo_description: 'Official wholesale & retail supplier of paper bags, non-woven W-cut and D-cut bags, customized printed bags, designer gift bags, and envelope pouches in Ujjain (M.P).'
 };
 
 // DEFAULT CATEGORIES
@@ -605,6 +605,8 @@ export async function createOrder(orderData: {
       notes: orderData.notes || null
     };
 
+    let finalOrderRecord: any = null;
+
     const { data: orderResult, error: orderErr } = await supabase
       .from('orders')
       .insert([newOrder])
@@ -612,34 +614,59 @@ export async function createOrder(orderData: {
       .single();
 
     if (orderErr) {
-      console.error('Order insert error:', orderErr);
+      // If error is PGRST204 or missing payment_method column in schema cache, retry without payment_method
+      if (orderErr.code === 'PGRST204' || orderErr.message?.includes('payment_method')) {
+        const { payment_method, ...cleanOrder } = newOrder;
+        const paymentNote = `Payment Method: ${orderData.payment_method || 'invoice'}`;
+        cleanOrder.notes = cleanOrder.notes ? `${cleanOrder.notes} | ${paymentNote}` : paymentNote;
+
+        const { data: retryData, error: retryErr } = await supabase
+          .from('orders')
+          .insert([cleanOrder])
+          .select()
+          .single();
+
+        if (!retryErr && retryData) {
+          finalOrderRecord = retryData;
+        } else {
+          console.warn('Fallback retry order insert error:', retryErr?.message || retryErr);
+        }
+      } else {
+        console.warn('Order insert warning:', orderErr.message || orderErr);
+      }
+    } else {
+      finalOrderRecord = orderResult;
+    }
+
+    if (finalOrderRecord) {
+      // Insert order items
+      const itemsToInsert = orderData.items.map((item) => ({
+        order_id: finalOrderRecord.id,
+        product_id: item.product_id,
+        product_name: item.product_name,
+        quantity: item.quantity,
+        unit_price: item.unit_price,
+        variant_details: item.variant_details || {},
+        total_price: item.total_price
+      }));
+
+      await supabase.from('order_items').insert(itemsToInsert);
+
       return {
-        id: `local-ord-${Date.now()}`,
-        created_at: new Date().toISOString(),
-        ...newOrder,
-        order_items: orderData.items.map((it, idx) => ({
-          id: `item-${idx}`,
-          ...it
-        }))
+        ...finalOrderRecord,
+        order_items: itemsToInsert
       } as Order;
     }
 
-    // Insert order items
-    const itemsToInsert = orderData.items.map((item) => ({
-      order_id: orderResult.id,
-      product_id: item.product_id,
-      product_name: item.product_name,
-      quantity: item.quantity,
-      unit_price: item.unit_price,
-      variant_details: item.variant_details || {},
-      total_price: item.total_price
-    }));
-
-    await supabase.from('order_items').insert(itemsToInsert);
-
+    // Local fallback if database insert fails or is offline
     return {
-      ...orderResult,
-      order_items: itemsToInsert
+      id: `local-ord-${Date.now()}`,
+      created_at: new Date().toISOString(),
+      ...newOrder,
+      order_items: orderData.items.map((it, idx) => ({
+        id: `item-${idx}`,
+        ...it
+      }))
     } as Order;
   } catch (err) {
     console.error('Error creating order request:', err);
