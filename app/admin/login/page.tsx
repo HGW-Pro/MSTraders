@@ -20,10 +20,10 @@ export default function AdminLoginPage() {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
         // Redirect to admin dashboard
-        window.location.href = '/admin';
+        router.push('/admin');
       }
     });
-  }, []);
+  }, [router]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,7 +34,7 @@ export default function AdminLoginPage() {
 
     setLoading(true);
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { error } = await supabase.auth.signInWithPassword({
         email: email.trim(),
         password,
       });
@@ -51,10 +51,8 @@ export default function AdminLoginPage() {
         return;
       }
 
-      toast.success('Signed in successfully! Redirecting...');
-      setTimeout(() => {
-        window.location.href = '/admin';
-      }, 300);
+      toast.success('Signed in successfully!');
+      router.push('/admin');
     } catch (err: any) {
       toast.error(err.message || 'An error occurred during sign in');
       setLoading(false);
@@ -63,7 +61,7 @@ export default function AdminLoginPage() {
 
   const handleDirectAdminAccess = () => {
     toast.success('Entering Admin Panel...');
-    window.location.href = '/admin';
+    router.push('/admin');
   };
 
   const handleCreateAdminDemoAccount = async () => {
