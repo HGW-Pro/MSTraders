@@ -188,6 +188,8 @@ export interface BusinessSettings {
   online_payment_enabled?: boolean;
   cod_enabled?: boolean;
   customer_accounts_enabled?: boolean;
+  enable_direct_cart_checkout?: boolean;
+  require_account_for_quotes?: boolean;
 }
 
 export interface Industry {

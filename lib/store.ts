@@ -21,44 +21,49 @@ export const useCartStore = create<CartState>()(
   persist(
     (set, get) => ({
       items: [],
+      subtotal: 0,
       addItem: (product, quantity) => {
         const currentItems = get().items;
         const existingItem = currentItems.find(item => item.product.id === product.id);
-        
+        let updatedItems: CartItem[];
         if (existingItem) {
-          set({
-            items: currentItems.map(item => 
-              item.product.id === product.id 
-                ? { ...item, quantity: item.quantity + quantity }
-                : item
-            )
-          });
+          updatedItems = currentItems.map(item => 
+            item.product.id === product.id 
+              ? { ...item, quantity: item.quantity + quantity }
+              : item
+          );
         } else {
-          set({ items: [...currentItems, { product, quantity }] });
+          updatedItems = [...currentItems, { product, quantity }];
         }
+        const newSubtotal = updatedItems.reduce((total, item) => {
+          const unitPrice = item.product.sale_price ?? item.product.price ?? 0;
+          return total + unitPrice * item.quantity;
+        }, 0);
+        set({ items: updatedItems, subtotal: newSubtotal });
       },
       removeItem: (productId) => {
-        set({ items: get().items.filter(item => item.product.id !== productId) });
+        const updatedItems = get().items.filter(item => item.product.id !== productId);
+        const newSubtotal = updatedItems.reduce((total, item) => {
+          const unitPrice = item.product.sale_price ?? item.product.price ?? 0;
+          return total + unitPrice * item.quantity;
+        }, 0);
+        set({ items: updatedItems, subtotal: newSubtotal });
       },
       updateQuantity: (productId, quantity) => {
         if (quantity <= 0) {
           get().removeItem(productId);
           return;
         }
-        set({
-          items: get().items.map(item => 
-            item.product.id === productId ? { ...item, quantity } : item
-          )
-        });
-      },
-      clearCart: () => set({ items: [] }),
-      get subtotal() {
-        return get().items.reduce((total, item) => {
-          // If a product doesn't have a price (bulk only), it's treated as 0 here, 
-          // but in the UI we will show it differently.
-          return total + (item.product.price || 0) * item.quantity;
+        const updatedItems = get().items.map(item => 
+          item.product.id === productId ? { ...item, quantity } : item
+        );
+        const newSubtotal = updatedItems.reduce((total, item) => {
+          const unitPrice = item.product.sale_price ?? item.product.price ?? 0;
+          return total + unitPrice * item.quantity;
         }, 0);
-      }
+        set({ items: updatedItems, subtotal: newSubtotal });
+      },
+      clearCart: () => set({ items: [], subtotal: 0 }),
     }),
     {
       name: 'ms-traders-cart',

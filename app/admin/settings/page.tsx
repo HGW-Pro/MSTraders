@@ -309,6 +309,41 @@ export default function AdminSettingsPage() {
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="flex items-center justify-between p-4 bg-emerald-50/60 border border-emerald-200 rounded-xl col-span-1 sm:col-span-2">
+              <div>
+                <Label className="font-bold text-sm text-emerald-950 flex items-center gap-2">
+                  Direct E-Commerce Cart & Instant Online Checkout
+                  {!settings.enable_direct_cart_checkout && (
+                    <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-300 font-bold">Read-Only / Quote Mode Active</span>
+                  )}
+                </Label>
+                <p className="text-xs text-emerald-800 mt-1 leading-relaxed">
+                  When <strong>OFF</strong> (Recommended for B2B Wholesale), cart & checkout operate in <strong>Read-Only / Quote Mode</strong>. Instant online purchases are disabled, transforming cart requests into Wholesale Quotations.
+                </p>
+              </div>
+              <input 
+                type="checkbox"
+                checked={settings.enable_direct_cart_checkout ?? false}
+                onChange={(e) => setSettingsData(prev => ({ ...prev, enable_direct_cart_checkout: e.target.checked }))}
+                className="h-5 w-5 accent-brand-green rounded cursor-pointer flex-shrink-0"
+              />
+            </div>
+
+            <div className="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-xl col-span-1 sm:col-span-2">
+              <div>
+                <Label className="font-bold text-sm text-slate-900">Mandatory Customer Sign-In for Quote Requests</Label>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Require customers to sign in or register before submitting quote requests, ensuring published quotes land directly in their Customer Portal.
+                </p>
+              </div>
+              <input 
+                type="checkbox"
+                checked={settings.require_account_for_quotes ?? true}
+                onChange={(e) => setSettingsData(prev => ({ ...prev, require_account_for_quotes: e.target.checked }))}
+                className="h-5 w-5 accent-brand-green rounded cursor-pointer flex-shrink-0"
+              />
+            </div>
+
             <div className="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-xl">
               <div>
                 <Label className="font-bold text-sm text-slate-900">Courier Integration (Shiprocket)</Label>

@@ -9,8 +9,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { CheckCircle2, Upload, FileText, ChevronRight, MessageSquare } from 'lucide-react';
 import { toast } from 'sonner';
-import { createQuote, uploadFileToSupabase } from '@/lib/supabase/services';
+import { createQuote, uploadFileToSupabase, getUserProfile } from '@/lib/supabase/services';
 import { useSettings } from '@/components/settings-provider';
+import { supabase } from '@/lib/supabase/client';
+import { useCartStore } from '@/lib/store';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 
 const STEPS = [
   'SELECT BAG TYPE',
@@ -24,15 +27,26 @@ function CustomizeForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialProduct = searchParams?.get('product') || '';
+  const fromCart = searchParams?.get('from_cart') === 'true';
   const { settings } = useSettings();
+  const cartItems = useCartStore(s => s.items);
 
   const [currentStep, setCurrentStep] = React.useState(0);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [isSuccess, setIsSuccess] = React.useState(false);
   const [quoteRef, setQuoteRef] = React.useState('');
+  const [currentUser, setCurrentUser] = React.useState<any>(null);
+
+  // Auth Dialog state if account is required
+  const [showAuthDialog, setShowAuthDialog] = React.useState(false);
+  const [authEmail, setAuthEmail] = React.useState('');
+  const [authPassword, setAuthPassword] = React.useState('');
+  const [authName, setAuthName] = React.useState('');
+  const [authMode, setAuthMode] = React.useState<'signin' | 'signup'>('signin');
+  const [authLoading, setAuthLoading] = React.useState(false);
 
   const [formData, setFormData] = React.useState({
-    bagType: initialProduct || 'paper-bags',
+    bagType: initialProduct || (fromCart ? 'cart-order' : 'paper-bags'),
     quantity: '1000',
     width: '',
     height: '',
@@ -47,10 +61,40 @@ function CustomizeForm() {
     whatsapp: '',
     email: '',
     city: '',
-    state: '',
+    state: 'Madhya Pradesh',
     pincode: '',
     message: '',
   });
+
+  // Pre-fill user profile and cart items if present
+  React.useEffect(() => {
+    let active = true;
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (session?.user && active) {
+        setCurrentUser(session.user);
+        const profile = await getUserProfile(session.user.id);
+        setFormData(prev => ({
+          ...prev,
+          fullName: prev.fullName || profile?.full_name || session.user.user_metadata?.full_name || '',
+          email: prev.email || session.user.email || '',
+          phone: prev.phone || profile?.phone || '',
+          businessName: prev.businessName || profile?.business_name || '',
+          city: prev.city || profile?.city || ''
+        }));
+      }
+    });
+
+    if (fromCart && cartItems.length > 0) {
+      const cartSummaryStr = cartItems.map(i => `- ${i.quantity}x ${i.product.name} (${i.product.material || 'Standard'})`).join('\n');
+      setFormData(prev => ({
+        ...prev,
+        bagType: 'cart-order',
+        message: prev.message ? prev.message : `Items requested from Cart:\n${cartSummaryStr}`
+      }));
+    }
+
+    return () => { active = false; };
+  }, [fromCart, cartItems]);
 
   const [file, setFile] = React.useState<File | null>(null);
 
@@ -202,6 +246,7 @@ function CustomizeForm() {
         : 'Standard Custom Sizing';
 
       const createdQuote = await createQuote({
+        customer_id: currentUser?.id || undefined,
         customer_name: formData.fullName,
         business_name: formData.businessName || undefined,
         email: formData.email,

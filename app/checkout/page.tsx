@@ -40,6 +40,32 @@ export default function CheckoutPage() {
 
   if (!mounted) return null;
 
+  if (!settings.enable_direct_cart_checkout) {
+    return (
+      <div className="bg-background min-h-screen pt-24 pb-32">
+        <div className="container mx-auto px-4 max-w-xl text-center">
+          <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-6 text-amber-800">
+            <FileCheck className="h-8 w-8" />
+          </div>
+          <h1 className="font-heading text-2xl font-bold text-brand-charcoal mb-3">
+            Direct Online Checkout Disabled
+          </h1>
+          <p className="text-muted-foreground text-sm mb-6 leading-relaxed">
+            MS TRADERS operates in B2B Wholesale & Custom Quote mode. Direct payment checkout is currently disabled by Admin settings. Please submit your cart items as a Wholesale Quotation Request.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Button asChild className="bg-brand-green text-white font-bold">
+              <Link href="/customize?from_cart=true">Submit Cart as Wholesale Quote</Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link href="/cart">Back to Cart</Link>
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));

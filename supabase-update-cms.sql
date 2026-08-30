@@ -133,6 +133,7 @@ INSERT INTO testimonials (customer_name, business_name, role, rating, review, di
 ON CONFLICT DO NOTHING;
 
 -- 10. QUOTATION WORKFLOW & ORDER CONVERSION COLUMNS
+ALTER TABLE quotes ADD COLUMN IF NOT EXISTS customer_id UUID REFERENCES profiles(id) ON DELETE SET NULL;
 ALTER TABLE quotes ADD COLUMN IF NOT EXISTS access_token TEXT DEFAULT gen_random_uuid()::text;
 ALTER TABLE quotes ADD COLUMN IF NOT EXISTS delivery_address TEXT;
 ALTER TABLE quotes ADD COLUMN IF NOT EXISTS unit_price NUMERIC(10,2);
@@ -157,6 +158,8 @@ ALTER TABLE settings ADD COLUMN IF NOT EXISTS courier_integration_enabled BOOLEA
 ALTER TABLE settings ADD COLUMN IF NOT EXISTS online_payment_enabled BOOLEAN DEFAULT false;
 ALTER TABLE settings ADD COLUMN IF NOT EXISTS cod_enabled BOOLEAN DEFAULT false;
 ALTER TABLE settings ADD COLUMN IF NOT EXISTS customer_accounts_enabled BOOLEAN DEFAULT true;
+ALTER TABLE settings ADD COLUMN IF NOT EXISTS enable_direct_cart_checkout BOOLEAN DEFAULT false;
+ALTER TABLE settings ADD COLUMN IF NOT EXISTS require_account_for_quotes BOOLEAN DEFAULT true;
 
 -- Ensure Quotes can be viewed via access_token or by quote_number + phone for guest users
 DROP POLICY IF EXISTS "Anyone can view quote by token or email" ON quotes;

@@ -33,7 +33,13 @@ export const DEFAULT_SETTINGS: BusinessSettings = {
   social_linkedin: '',
   footer_about: 'MS TRADERS is a premier wholesale & retail supplier of customized paper bags, W-cut & D-cut non-woven bags, designer gift bags, envelopes, and eco-friendly packaging in Ujjain (M.P).',
   seo_title: 'MS TRADERS - Wholesale & Retail Paper Bags & Non-Woven Bags in Ujjain',
-  seo_description: 'Official wholesale & retail supplier of paper bags, non-woven W-cut and D-cut bags, customized printed bags, designer gift bags, and envelope pouches in Ujjain (M.P).'
+  seo_description: 'Official wholesale & retail supplier of paper bags, non-woven W-cut and D-cut bags, customized printed bags, designer gift bags, and envelope pouches in Ujjain (M.P).',
+  courier_integration_enabled: false,
+  online_payment_enabled: false,
+  cod_enabled: false,
+  customer_accounts_enabled: true,
+  enable_direct_cart_checkout: false,
+  require_account_for_quotes: true
 };
 
 // DEFAULT CATEGORIES
@@ -454,6 +460,7 @@ export async function getCategories(): Promise<Category[]> {
 
 // --- QUOTES SERVICE ---
 export async function createQuote(quoteData: {
+  customer_id?: string;
   customer_name: string;
   business_name?: string;
   email: string;
@@ -479,6 +486,7 @@ export async function createQuote(quoteData: {
 
     const newQuote = {
       quote_number,
+      customer_id: quoteData.customer_id || null,
       customer_name: quoteData.customer_name,
       business_name: quoteData.business_name || null,
       email: quoteData.email,

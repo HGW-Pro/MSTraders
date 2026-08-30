@@ -6,17 +6,23 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useCartStore } from '@/lib/store';
 import { Button } from '@/components/ui/button';
-import { Trash2, Minus, Plus, ArrowRight, ShoppingBag } from 'lucide-react';
+import { Trash2, Minus, Plus, ArrowRight, ShoppingBag, ShieldAlert, FileText } from 'lucide-react';
 import { toast } from 'sonner';
+import { useSettings } from '@/components/settings-provider';
 
 export default function CartPage() {
   const { items, updateQuantity, removeItem, clearCart } = useCartStore();
+  const { settings } = useSettings();
   const mounted = React.useSyncExternalStore(() => () => {}, () => true, () => false);
 
   if (!mounted) return null; // Prevent hydration mismatch
 
-  const subtotal = items.reduce((total, item) => total + ((item.product.price || 0) * item.quantity), 0);
-  const hasItemsRequiringQuote = items.some(item => !item.product.price);
+  const subtotal = items.reduce((total, item) => {
+    const unitPrice = item.product.sale_price ?? item.product.price ?? 0;
+    return total + (unitPrice * item.quantity);
+  }, 0);
+  const isDirectCheckoutDisabled = !settings.enable_direct_cart_checkout;
+  const hasItemsRequiringQuote = items.some(item => !item.product.price) || isDirectCheckoutDisabled;
   
   if (items.length === 0) {
     return (
@@ -142,20 +148,29 @@ export default function CartPage() {
                 <span className="font-bold text-2xl text-brand-charcoal">₹{subtotal}</span>
               </div>
               
-              {hasItemsRequiringQuote ? (
+              {isDirectCheckoutDisabled ? (
+                 <div className="mb-6 p-4 bg-amber-50 rounded-xl border border-amber-200 text-xs text-amber-950 space-y-2">
+                    <p className="font-bold flex items-center gap-1.5 text-amber-900 text-sm">
+                       <FileText className="h-4 w-4 text-amber-700" /> B2B Wholesale Quotation Mode
+                    </p>
+                    <p className="leading-relaxed">
+                       Direct online order checkout is currently turned off. Click below to submit your cart items directly as a formal B2B Wholesale Quotation Request to MS TRADERS!
+                    </p>
+                 </div>
+              ) : hasItemsRequiringQuote ? (
                  <div className="mb-6 p-4 bg-white rounded-lg border border-border text-sm text-brand-charcoal">
                     <p className="font-semibold mb-1 flex items-center gap-2">
                        <ShoppingBag className="h-4 w-4 text-brand-gold" /> Bulk Items Included
                     </p>
-                    <p className="text-muted-foreground">
-                       Your cart contains items that require a custom quote. Proceeding will send a request to our team instead of instant checkout.
+                    <p className="text-muted-foreground text-xs leading-relaxed">
+                       Your cart contains custom bulk items. Proceeding will send a quote request directly to MS TRADERS sales team.
                     </p>
                  </div>
               ) : null}
 
-              <Button size="lg" className="w-full bg-brand-charcoal text-white hover:bg-brand-charcoal/90" asChild>
-                <Link href={hasItemsRequiringQuote ? "/customize" : "/checkout"}>
-                  {hasItemsRequiringQuote ? "REQUEST CART QUOTE" : "PROCEED TO CHECKOUT"} <ArrowRight className="ml-2 h-4 w-4" />
+              <Button size="lg" className="w-full bg-brand-green text-white hover:bg-brand-green/90 font-bold shadow-md" asChild>
+                <Link href={hasItemsRequiringQuote ? "/customize?from_cart=true" : "/checkout"}>
+                  {isDirectCheckoutDisabled ? "SUBMIT CART AS WHOLESALE QUOTE" : hasItemsRequiringQuote ? "REQUEST CART QUOTE" : "PROCEED TO CHECKOUT"} <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
             </div>

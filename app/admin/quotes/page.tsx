@@ -182,6 +182,20 @@ export default function AdminQuotesPage() {
     toast.success('Customer Quotation link copied to clipboard!');
   };
 
+  const handleWhatsAppShare = () => {
+    if (!selectedQuote) return;
+    const rawNum = (selectedQuote.whatsapp || selectedQuote.phone || '').replace(/\D/g, '');
+    const num = rawNum.length === 10 ? `91${rawNum}` : rawNum;
+    const link = `${window.location.origin}/quotes/${selectedQuote.id}`;
+    const totalVal = parseFloat(totalAmount) || selectedQuote.total_amount || selectedQuote.amount || 0;
+    const unitP = parseFloat(unitPrice) || selectedQuote.unit_price || 0;
+
+    const msg = `Dear ${selectedQuote.customer_name},\n\nMS TRADERS has issued your official quotation (${selectedQuote.quote_number})!\n\nBag Type: ${selectedQuote.bag_type.replace('-', ' ').toUpperCase()}\nQuantity: ${selectedQuote.quantity} units\nUnit Price: ₹${unitP}/pc\nTotal Quotation Value: ₹${totalVal}\n\nView full specifications, breakdown & approve online here:\n${link}\n\nThank you for choosing MS TRADERS!`;
+
+    window.open(`https://wa.me/${num}?text=${encodeURIComponent(msg)}`, '_blank');
+    toast.success('Opening WhatsApp message with customer quotation link...');
+  };
+
   const filteredQuotes = quotes.filter((q) => {
     const matchesSearch = 
       q.quote_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -610,9 +624,25 @@ export default function AdminQuotesPage() {
 
             {/* Modal Footer */}
             <div className="p-4 border-t border-border bg-slate-50 flex items-center justify-between gap-3 flex-wrap">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <Button variant="outline" size="sm" onClick={() => setSelectedQuote(null)}>
                   Close
+                </Button>
+                <Button 
+                  variant="outline"
+                  size="sm"
+                  onClick={handleCopyLink}
+                  className="border-slate-300 text-slate-800 hover:bg-slate-100 font-semibold text-xs"
+                >
+                  <Copy className="h-3.5 w-3.5 mr-1 text-slate-600" /> Copy Quote Link
+                </Button>
+                <Button 
+                  variant="outline"
+                  size="sm"
+                  onClick={handleWhatsAppShare}
+                  className="border-emerald-300 bg-emerald-50/80 text-emerald-950 hover:bg-emerald-100 font-bold text-xs"
+                >
+                  <MessageSquare className="h-3.5 w-3.5 mr-1 text-emerald-600" /> Send on WhatsApp
                 </Button>
                 {selectedQuote.status !== 'CONVERTED_TO_ORDER' && (
                   <Button 
@@ -620,9 +650,9 @@ export default function AdminQuotesPage() {
                     size="sm"
                     onClick={handleConvertToOrder}
                     disabled={isUpdating}
-                    className="border-emerald-300 bg-emerald-50 text-emerald-900 hover:bg-emerald-100 font-bold text-xs"
+                    className="border-amber-300 bg-amber-50 text-amber-950 hover:bg-amber-100 font-bold text-xs"
                   >
-                    <ShoppingCart className="h-3.5 w-3.5 mr-1 text-emerald-700" /> Convert to Order
+                    <ShoppingCart className="h-3.5 w-3.5 mr-1 text-amber-700" /> Convert to Order
                   </Button>
                 )}
               </div>
@@ -630,7 +660,7 @@ export default function AdminQuotesPage() {
               <Button 
                 onClick={handleSaveQuoteUpdate}
                 disabled={isUpdating}
-                className="bg-brand-green text-white hover:bg-brand-green/90 font-semibold text-xs h-9 px-5"
+                className="bg-brand-green text-white hover:bg-brand-green/90 font-bold text-xs h-9 px-6 shadow-sm"
               >
                 {isUpdating ? 'Saving Changes...' : 'Save & Publish Quote'}
               </Button>

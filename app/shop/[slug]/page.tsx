@@ -183,24 +183,57 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 mt-auto">
-               <Button 
-                size="lg" 
-                onClick={handleAddToCart}
-                className="bg-brand-green text-white hover:bg-brand-green/90 font-bold h-12 flex-1 shadow-xs"
-               >
-                 <ShoppingCart className="mr-2 h-5 w-5" /> Add {orderQty} Units to Order
-               </Button>
+              {!settings.enable_direct_cart_checkout ? (
+                <>
+                  <Button 
+                    size="lg" 
+                    className="bg-brand-green text-white hover:bg-brand-green/90 font-bold h-12 flex-1 shadow-md"
+                    asChild
+                  >
+                    <Link href={`/customize?product=${product.slug}&qty=${orderQty}`}>
+                      Request Wholesale Quote ({orderQty} Units)
+                    </Link>
+                  </Button>
 
-               <Button 
-                size="lg" 
-                variant="outline"
-                className="border-brand-charcoal text-brand-charcoal hover:bg-brand-charcoal hover:text-white font-bold h-12 flex-1" 
-                asChild
-               >
-                 <Link href={`/customize?product=${product.slug}`}>
-                    Request Custom Quote
-                 </Link>
-               </Button>
+                  <Button 
+                    size="lg" 
+                    variant="outline"
+                    className="border-emerald-700 text-emerald-800 hover:bg-emerald-50 font-bold h-12 flex-1" 
+                    asChild
+                  >
+                    <a 
+                      href={`https://wa.me/${settings.whatsapp}?text=${encodeURIComponent(`Hi MS TRADERS, I am interested in ordering ${orderQty} units of ${product.name} (${product.material || ''}). Please send price quotation.`)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2"
+                    >
+                      <MessageSquare className="h-5 w-5 text-emerald-600" />
+                      <span>Inquire on WhatsApp</span>
+                    </a>
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button 
+                    size="lg" 
+                    onClick={handleAddToCart}
+                    className="bg-brand-green text-white hover:bg-brand-green/90 font-bold h-12 flex-1 shadow-xs"
+                  >
+                    <ShoppingCart className="mr-2 h-5 w-5" /> Add {orderQty} Units to Cart
+                  </Button>
+
+                  <Button 
+                    size="lg" 
+                    variant="outline"
+                    className="border-brand-charcoal text-brand-charcoal hover:bg-brand-charcoal hover:text-white font-bold h-12 flex-1" 
+                    asChild
+                  >
+                    <Link href={`/customize?product=${product.slug}&qty=${orderQty}`}>
+                      Request Custom Quote
+                    </Link>
+                  </Button>
+                </>
+              )}
             </div>
             
             <div className="mt-6 flex items-start gap-3 bg-slate-50 p-4 rounded-xl border border-slate-200">
