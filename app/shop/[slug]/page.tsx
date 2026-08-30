@@ -137,7 +137,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
             </div>
             
             <p className="text-slate-600 text-base mb-8 leading-relaxed">
-              {product.description || 'Custom manufactured high quality bag solution.'}
+              {product.description || 'Wholesale high quality custom printed bag solution.'}
             </p>
 
             <div className="space-y-6 mb-8 border-t border-b border-border py-6">
@@ -206,8 +206,8 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
             <div className="mt-6 flex items-start gap-3 bg-slate-50 p-4 rounded-xl border border-slate-200">
               <Info className="h-5 w-5 text-brand-green flex-shrink-0 mt-0.5" />
               <p className="text-xs text-slate-600 leading-relaxed">
-                Need a specific size or custom logo printing? MS TRADERS manufactures bags exactly to your brand guidelines. 
-                Contact our factory directly on WhatsApp for sample dispatch.
+                Need a specific size or custom logo printing? MS TRADERS supplies custom bags tailored exactly to your brand guidelines. 
+                Contact our sales team directly on WhatsApp for sample dispatch.
               </p>
             </div>
           </div>

@@ -46,7 +46,7 @@ export default function IndustriesPage() {
           <span className="text-xs font-bold uppercase tracking-widest text-brand-gold mb-3 block">Industrial Solutions</span>
           <h1 className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold mb-6">Industries We Serve</h1>
           <p className="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto font-normal">
-            Custom manufactured eco-friendly paper bags, non-woven vest bags, and luxury boutique packaging tailored for your business sector.
+            Wholesale eco-friendly paper bags, non-woven vest bags, and luxury boutique packaging tailored for your business sector.
           </p>
         </div>
       </section>
@@ -104,7 +104,7 @@ export default function IndustriesPage() {
         <div className="container mx-auto px-4 text-center max-w-3xl">
           <h2 className="font-heading text-3xl md:text-4xl font-bold mb-4">Don&apos;t see your specific sector?</h2>
           <p className="text-slate-300 text-base mb-8">
-            As direct manufacturers, we produce bespoke paper, kraft, and non-woven carry bags in custom dimensions and GSM for any commercial application.
+            As a wholesale bag supplier, we provide custom paper, kraft, and non-woven carry bags in custom dimensions and GSM for any commercial application.
           </p>
           <Button size="lg" className="bg-brand-green text-white hover:bg-emerald-600 font-bold px-8" asChild>
             <Link href="/contact">Talk to Packaging Engineer</Link>

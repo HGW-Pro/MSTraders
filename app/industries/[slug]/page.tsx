@@ -44,7 +44,7 @@ export default function IndustryDetailPage({ params }: { params: Promise<{ slug:
   const slug = unwrappedParams.slug;
   const details = INDUSTRY_DETAILS[slug] || {
     title: `${slug.toUpperCase().replace('-', ' ')} Packaging Solutions`,
-    desc: 'Custom manufactured eco-friendly paper bags, non-woven bags, and retail packaging tailored specifically for your business.',
+    desc: 'Wholesale eco-friendly paper bags, non-woven bags, and retail packaging tailored specifically for your business.',
     bags: ['Custom Printed Kraft Bags', 'Non-Woven D-Cut Bags', 'Luxury Designer Bags', 'Wholesale Bulk Bags'],
     img: 'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=1000&q=80'
   };

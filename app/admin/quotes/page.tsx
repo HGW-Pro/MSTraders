@@ -1,8 +1,9 @@
 'use client';
 
 import * as React from 'react';
+import Link from 'next/link';
 import { Quote, QuoteStatus } from '@/types';
-import { getQuotes, updateQuoteStatus } from '@/lib/supabase/services';
+import { getQuotes, updateQuoteStatus, convertQuoteToOrder } from '@/lib/supabase/services';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -22,7 +23,11 @@ import {
   IndianRupee,
   Building2,
   Mail,
-  MapPin
+  MapPin,
+  Share2,
+  Copy,
+  ExternalLink,
+  ShoppingCart
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -37,10 +42,15 @@ export default function AdminQuotesPage() {
   const [isUpdating, setIsUpdating] = React.useState(false);
 
   // Quote editing fields
-  const [quoteAmount, setQuoteAmount] = React.useState<string>('0');
-  const [shippingAmount, setShippingAmount] = React.useState<string>('0');
+  const [unitPrice, setUnitPrice] = React.useState<string>('0');
+  const [subtotalAmount, setSubtotalAmount] = React.useState<string>('0');
+  const [customizationCharges, setCustomizationCharges] = React.useState<string>('0');
+  const [deliveryCharges, setDeliveryCharges] = React.useState<string>('0');
+  const [discountAmount, setDiscountAmount] = React.useState<string>('0');
   const [taxAmount, setTaxAmount] = React.useState<string>('0');
-  const [quoteNotes, setQuoteNotes] = React.useState<string>('');
+  const [totalAmount, setTotalAmount] = React.useState<string>('0');
+  const [validUntilDate, setValidUntilDate] = React.useState<string>('');
+  const [adminNotes, setAdminNotes] = React.useState<string>('');
   const [quoteStatus, setQuoteStatus] = React.useState<QuoteStatus>('NEW');
 
   const loadQuotes = React.useCallback(async () => {
@@ -67,11 +77,34 @@ export default function AdminQuotesPage() {
 
   const handleOpenDetail = (quote: Quote) => {
     setSelectedQuote(quote);
-    setQuoteAmount(quote.amount ? String(quote.amount) : '0');
-    setShippingAmount(quote.shipping_amount ? String(quote.shipping_amount) : '0');
-    setTaxAmount(quote.tax_amount ? String(quote.tax_amount) : '0');
-    setQuoteNotes(quote.notes || '');
+    const qty = quote.quantity || 1;
+    const sub = quote.subtotal || quote.amount || 0;
+    const uPrice = quote.unit_price || (sub > 0 ? sub / qty : 0);
+    
+    setUnitPrice(String(uPrice));
+    setSubtotalAmount(String(sub));
+    setCustomizationCharges(String(quote.customization_charges || 0));
+    setDeliveryCharges(String(quote.delivery_charges || quote.shipping_amount || 0));
+    setDiscountAmount(String(quote.discount || 0));
+    setTaxAmount(String(quote.tax_amount || 0));
+    setTotalAmount(String(quote.total_amount || quote.amount || 0));
+    setValidUntilDate(quote.valid_until ? quote.valid_until.slice(0, 10) : '');
+    setAdminNotes(quote.admin_notes || quote.notes || '');
     setQuoteStatus(quote.status);
+  };
+
+  const handleRecalculateTotal = (
+    uP: string, sub: string, cust: string, del: string, disc: string, tx: string, qty: number
+  ) => {
+    const unitP = parseFloat(uP) || 0;
+    const subT = parseFloat(sub) || (unitP * qty);
+    const cCharges = parseFloat(cust) || 0;
+    const dCharges = parseFloat(del) || 0;
+    const dAmount = parseFloat(disc) || 0;
+    const tAmount = parseFloat(tx) || 0;
+
+    const computedTotal = subT + cCharges + dCharges + tAmount - dAmount;
+    setTotalAmount(String(Math.max(0, computedTotal)));
   };
 
   const handleSaveQuoteUpdate = async () => {
@@ -79,22 +112,32 @@ export default function AdminQuotesPage() {
 
     setIsUpdating(true);
     try {
-      const amt = parseFloat(quoteAmount) || 0;
-      const ship = parseFloat(shippingAmount) || 0;
+      const uPrice = parseFloat(unitPrice) || 0;
+      const sub = parseFloat(subtotalAmount) || (uPrice * selectedQuote.quantity);
+      const cust = parseFloat(customizationCharges) || 0;
+      const del = parseFloat(deliveryCharges) || 0;
+      const disc = parseFloat(discountAmount) || 0;
       const tax = parseFloat(taxAmount) || 0;
-      const total = amt + ship + tax;
+      const tot = parseFloat(totalAmount) || (sub + cust + del + tax - disc);
 
       const success = await updateQuoteStatus(selectedQuote.id, {
         status: quoteStatus,
-        amount: amt,
-        shipping_amount: ship,
+        unit_price: uPrice,
+        subtotal: sub,
+        customization_charges: cust,
+        delivery_charges: del,
+        discount: disc,
         tax_amount: tax,
-        total_amount: total,
-        notes: quoteNotes
+        total_amount: tot,
+        amount: sub,
+        shipping_amount: del,
+        valid_until: validUntilDate ? new Date(validUntilDate).toISOString() : null,
+        admin_notes: adminNotes,
+        notes: adminNotes
       });
 
       if (success) {
-        toast.success(`Quote ${selectedQuote.quote_number} updated successfully`);
+        toast.success(`Quote ${selectedQuote.quote_number} updated & saved`);
         setSelectedQuote(null);
         loadQuotes();
       } else {
@@ -105,6 +148,38 @@ export default function AdminQuotesPage() {
     } finally {
       setIsUpdating(false);
     }
+  };
+
+  const handleConvertToOrder = async () => {
+    if (!selectedQuote) return;
+    if (!confirm(`Convert Quote ${selectedQuote.quote_number} directly to a confirmed Order?`)) return;
+
+    setIsUpdating(true);
+    try {
+      const order = await convertQuoteToOrder(selectedQuote.id, {
+        payment_method: 'Quotation Billing',
+        delivery_notes: 'Converted by Admin from Quotes Panel'
+      });
+
+      if (order) {
+        toast.success(`Order ${order.order_number} created successfully!`);
+        setSelectedQuote(null);
+        loadQuotes();
+      } else {
+        toast.error('Failed to convert quote to order.');
+      }
+    } catch (err) {
+      toast.error('Error converting quote to order');
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleCopyLink = () => {
+    if (!selectedQuote) return;
+    const link = `${window.location.origin}/quotes/${selectedQuote.id}`;
+    navigator.clipboard.writeText(link);
+    toast.success('Customer Quotation link copied to clipboard!');
   };
 
   const filteredQuotes = quotes.filter((q) => {
@@ -121,19 +196,20 @@ export default function AdminQuotesPage() {
   const getStatusBadge = (status: QuoteStatus) => {
     switch (status) {
       case 'NEW':
+      case 'SUBMITTED':
         return <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 border border-blue-200">NEW</span>;
-      case 'CONTACTED':
-        return <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-800 border border-purple-200">CONTACTED</span>;
-      case 'REVIEWING':
-        return <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200">REVIEWING</span>;
-      case 'QUOTE_SENT':
+      case 'UNDER_REVIEW':
+        return <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200">UNDER REVIEW</span>;
+      case 'QUOTED':
         return <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-cyan-100 text-cyan-800 border border-cyan-200">QUOTE SENT</span>;
+      case 'CHANGES_REQUESTED':
+        return <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-900 border border-amber-300">REVISION REQUESTED</span>;
       case 'APPROVED':
         return <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">APPROVED</span>;
+      case 'CONVERTED_TO_ORDER':
+        return <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-700 text-white">CONVERTED TO ORDER</span>;
       case 'REJECTED':
         return <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-800 border border-rose-200">REJECTED</span>;
-      case 'COMPLETED':
-        return <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-slate-800 text-white">COMPLETED</span>;
       default:
         return <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-700">{status}</span>;
     }
@@ -359,49 +435,141 @@ export default function AdminQuotesPage() {
                 </div>
               )}
 
+              {/* Customer Share & Action Links */}
+              <div className="flex flex-wrap items-center justify-between gap-3 p-3 bg-slate-100 rounded-xl border border-slate-200">
+                <div className="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
+                  <Share2 className="h-4 w-4 text-brand-green" /> Customer Link:
+                  <span className="font-mono text-[11px] text-slate-600 underline">/quotes/{selectedQuote.id}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button size="sm" variant="outline" onClick={handleCopyLink} className="h-7 text-[11px] bg-white">
+                    <Copy className="h-3 w-3 mr-1" /> Copy Link
+                  </Button>
+                  <Button size="sm" variant="outline" asChild className="h-7 text-[11px] bg-white">
+                    <Link href={`/quotes/${selectedQuote.id}`} target="_blank">
+                      <ExternalLink className="h-3 w-3 mr-1" /> Open Portal
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+
               {/* Financial Quoting Form */}
               <div className="p-4 bg-emerald-50/70 border border-emerald-200 rounded-xl space-y-4">
-                <h3 className="text-sm font-bold text-emerald-900 flex items-center gap-1.5">
-                  <IndianRupee className="h-4 w-4 text-emerald-700" /> Commercial Quotation Builder
-                </h3>
+                <div className="flex items-center justify-between border-b border-emerald-200 pb-2">
+                  <h3 className="text-sm font-bold text-emerald-900 flex items-center gap-1.5">
+                    <IndianRupee className="h-4 w-4 text-emerald-700" /> Commercial Quotation Builder
+                  </h3>
+                  <span className="text-xs text-emerald-700 font-semibold">Qty: {selectedQuote.quantity} units</span>
+                </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   <div>
-                    <Label className="text-xs text-slate-700 font-semibold">Production Amount (₹)</Label>
+                    <Label className="text-[11px] text-slate-700 font-semibold">Unit Price (₹)</Label>
                     <Input 
                       type="number"
                       step="0.01"
-                      value={quoteAmount}
-                      onChange={(e) => setQuoteAmount(e.target.value)}
-                      className="mt-1 font-bold bg-white"
+                      value={unitPrice}
+                      onChange={(e) => {
+                        setUnitPrice(e.target.value);
+                        handleRecalculateTotal(e.target.value, subtotalAmount, customizationCharges, deliveryCharges, discountAmount, taxAmount, selectedQuote.quantity);
+                      }}
+                      className="mt-1 font-bold bg-white text-xs h-9"
                     />
                   </div>
                   <div>
-                    <Label className="text-xs text-slate-700 font-semibold">Shipping / Logistics (₹)</Label>
+                    <Label className="text-[11px] text-slate-700 font-semibold">Subtotal (₹)</Label>
                     <Input 
                       type="number"
                       step="0.01"
-                      value={shippingAmount}
-                      onChange={(e) => setShippingAmount(e.target.value)}
-                      className="mt-1 bg-white"
+                      value={subtotalAmount}
+                      onChange={(e) => {
+                        setSubtotalAmount(e.target.value);
+                        handleRecalculateTotal(unitPrice, e.target.value, customizationCharges, deliveryCharges, discountAmount, taxAmount, selectedQuote.quantity);
+                      }}
+                      className="mt-1 bg-white text-xs h-9"
                     />
                   </div>
                   <div>
-                    <Label className="text-xs text-slate-700 font-semibold">GST / Tax (₹)</Label>
+                    <Label className="text-[11px] text-slate-700 font-semibold">Custom Print Setup (₹)</Label>
+                    <Input 
+                      type="number"
+                      step="0.01"
+                      value={customizationCharges}
+                      onChange={(e) => {
+                        setCustomizationCharges(e.target.value);
+                        handleRecalculateTotal(unitPrice, subtotalAmount, e.target.value, deliveryCharges, discountAmount, taxAmount, selectedQuote.quantity);
+                      }}
+                      className="mt-1 bg-white text-xs h-9"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-[11px] text-slate-700 font-semibold">Delivery Charge (₹)</Label>
+                    <Input 
+                      type="number"
+                      step="0.01"
+                      value={deliveryCharges}
+                      onChange={(e) => {
+                        setDeliveryCharges(e.target.value);
+                        handleRecalculateTotal(unitPrice, subtotalAmount, customizationCharges, e.target.value, discountAmount, taxAmount, selectedQuote.quantity);
+                      }}
+                      className="mt-1 bg-white text-xs h-9"
+                    />
+                  </div>
+
+                  <div>
+                    <Label className="text-[11px] text-slate-700 font-semibold">Special Discount (₹)</Label>
+                    <Input 
+                      type="number"
+                      step="0.01"
+                      value={discountAmount}
+                      onChange={(e) => {
+                        setDiscountAmount(e.target.value);
+                        handleRecalculateTotal(unitPrice, subtotalAmount, customizationCharges, deliveryCharges, e.target.value, taxAmount, selectedQuote.quantity);
+                      }}
+                      className="mt-1 bg-white text-xs h-9 text-emerald-800 font-semibold"
+                    />
+                  </div>
+
+                  <div>
+                    <Label className="text-[11px] text-slate-700 font-semibold">GST / Tax Amount (₹)</Label>
                     <Input 
                       type="number"
                       step="0.01"
                       value={taxAmount}
-                      onChange={(e) => setTaxAmount(e.target.value)}
-                      className="mt-1 bg-white"
+                      onChange={(e) => {
+                        setTaxAmount(e.target.value);
+                        handleRecalculateTotal(unitPrice, subtotalAmount, customizationCharges, deliveryCharges, discountAmount, e.target.value, selectedQuote.quantity);
+                      }}
+                      className="mt-1 bg-white text-xs h-9"
+                    />
+                  </div>
+
+                  <div>
+                    <Label className="text-[11px] text-slate-700 font-semibold">Total Price (₹)</Label>
+                    <Input 
+                      type="number"
+                      step="0.01"
+                      value={totalAmount}
+                      onChange={(e) => setTotalAmount(e.target.value)}
+                      className="mt-1 bg-white font-bold text-brand-green text-xs h-9"
+                    />
+                  </div>
+
+                  <div>
+                    <Label className="text-[11px] text-slate-700 font-semibold">Quote Valid Until</Label>
+                    <Input 
+                      type="date"
+                      value={validUntilDate}
+                      onChange={(e) => setValidUntilDate(e.target.value)}
+                      className="mt-1 bg-white text-xs h-9"
                     />
                   </div>
                 </div>
 
                 <div className="pt-2 border-t border-emerald-200 flex items-center justify-between">
-                  <span className="text-xs font-bold text-emerald-900 uppercase">Calculated Total Quote Amount:</span>
-                  <span className="text-lg font-extrabold text-brand-green">
-                    ₹{((parseFloat(quoteAmount) || 0) + (parseFloat(shippingAmount) || 0) + (parseFloat(taxAmount) || 0)).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                  <span className="text-xs font-bold text-emerald-900 uppercase">Calculated Grand Total Amount:</span>
+                  <span className="text-lg font-extrabold text-brand-green font-mono">
+                    ₹{Number(totalAmount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                   </span>
                 </div>
               </div>
@@ -409,31 +577,31 @@ export default function AdminQuotesPage() {
               {/* Status Update & Internal Notes */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <Label htmlFor="q-status" className="font-bold">Inquiry Pipeline Status</Label>
+                  <Label htmlFor="q-status" className="font-bold text-xs">Inquiry Pipeline Status</Label>
                   <select 
                     id="q-status"
                     value={quoteStatus}
                     onChange={(e) => setQuoteStatus(e.target.value as QuoteStatus)}
-                    className="w-full h-10 px-3 py-2 rounded-md border border-input bg-background text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-green"
+                    className="w-full h-9 px-3 py-1.5 rounded-md border border-input bg-background text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-green"
                   >
                     <option value="NEW">NEW - Newly Received</option>
-                    <option value="CONTACTED">CONTACTED - Customer Spoken To</option>
-                    <option value="REVIEWING">REVIEWING - Engineering Specs</option>
-                    <option value="QUOTE_SENT">QUOTE SENT - Pricing Issued</option>
-                    <option value="APPROVED">APPROVED - Order Confirmed</option>
+                    <option value="UNDER_REVIEW">UNDER_REVIEW - Reviewing Specs</option>
+                    <option value="QUOTED">QUOTED - Official Price Issued</option>
+                    <option value="CHANGES_REQUESTED">CHANGES_REQUESTED - Customer Requested Edits</option>
+                    <option value="APPROVED">APPROVED - Approved by Customer</option>
+                    <option value="CONVERTED_TO_ORDER">CONVERTED_TO_ORDER - Order Generated</option>
                     <option value="REJECTED">REJECTED - Declined / Cancelled</option>
-                    <option value="COMPLETED">COMPLETED - Order Delivered</option>
                   </select>
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="q-notes" className="font-bold">Internal Staff Notes</Label>
+                  <Label htmlFor="q-notes" className="font-bold text-xs">Admin Commitment & Notes for Customer</Label>
                   <Textarea 
                     id="q-notes"
                     rows={2}
-                    value={quoteNotes}
-                    onChange={(e) => setQuoteNotes(e.target.value)}
-                    placeholder="Enter production notes, lead time commitments..."
+                    value={adminNotes}
+                    onChange={(e) => setAdminNotes(e.target.value)}
+                    placeholder="Enter fulfillment commitments, lead-time notes, sample instructions..."
                     className="text-xs"
                   />
                 </div>
@@ -441,17 +609,30 @@ export default function AdminQuotesPage() {
             </div>
 
             {/* Modal Footer */}
-            <div className="p-4 border-t border-border bg-slate-50 flex items-center justify-between">
-              <Button variant="outline" onClick={() => setSelectedQuote(null)}>
-                Close
-              </Button>
+            <div className="p-4 border-t border-border bg-slate-50 flex items-center justify-between gap-3 flex-wrap">
+              <div className="flex items-center gap-2">
+                <Button variant="outline" size="sm" onClick={() => setSelectedQuote(null)}>
+                  Close
+                </Button>
+                {selectedQuote.status !== 'CONVERTED_TO_ORDER' && (
+                  <Button 
+                    variant="outline"
+                    size="sm"
+                    onClick={handleConvertToOrder}
+                    disabled={isUpdating}
+                    className="border-emerald-300 bg-emerald-50 text-emerald-900 hover:bg-emerald-100 font-bold text-xs"
+                  >
+                    <ShoppingCart className="h-3.5 w-3.5 mr-1 text-emerald-700" /> Convert to Order
+                  </Button>
+                )}
+              </div>
 
               <Button 
                 onClick={handleSaveQuoteUpdate}
                 disabled={isUpdating}
-                className="bg-brand-green text-white hover:bg-brand-green/90 font-semibold"
+                className="bg-brand-green text-white hover:bg-brand-green/90 font-semibold text-xs h-9 px-5"
               >
-                {isUpdating ? 'Saving Changes...' : 'Save & Update Quote'}
+                {isUpdating ? 'Saving Changes...' : 'Save & Publish Quote'}
               </Button>
             </div>
           </div>

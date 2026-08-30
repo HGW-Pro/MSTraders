@@ -131,3 +131,39 @@ INSERT INTO testimonials (customer_name, business_name, role, rating, review, di
 ('Sunita Sharma', 'Ujjain Sweet House', 'Store Manager', 5, 'We ordered custom W-Cut non-woven bags for our festival rush. High load capacity and beautiful design. Highly recommended!', 2, 'published'),
 ('Vikram Singh', 'Hotel Crown Palace', 'General Manager', 5, 'Top-tier luxury gift bags for our VIP guest amenities. Excellent paper GSM and ribbon handles.', 3, 'published')
 ON CONFLICT DO NOTHING;
+
+-- 10. QUOTATION WORKFLOW & ORDER CONVERSION COLUMNS
+ALTER TABLE quotes ADD COLUMN IF NOT EXISTS access_token TEXT DEFAULT gen_random_uuid()::text;
+ALTER TABLE quotes ADD COLUMN IF NOT EXISTS delivery_address TEXT;
+ALTER TABLE quotes ADD COLUMN IF NOT EXISTS unit_price NUMERIC(10,2);
+ALTER TABLE quotes ADD COLUMN IF NOT EXISTS subtotal NUMERIC(10,2);
+ALTER TABLE quotes ADD COLUMN IF NOT EXISTS customization_charges NUMERIC(10,2) DEFAULT 0;
+ALTER TABLE quotes ADD COLUMN IF NOT EXISTS delivery_charges NUMERIC(10,2) DEFAULT 0;
+ALTER TABLE quotes ADD COLUMN IF NOT EXISTS discount NUMERIC(10,2) DEFAULT 0;
+ALTER TABLE quotes ADD COLUMN IF NOT EXISTS valid_until TIMESTAMPTZ;
+ALTER TABLE quotes ADD COLUMN IF NOT EXISTS admin_notes TEXT;
+ALTER TABLE quotes ADD COLUMN IF NOT EXISTS customer_notes TEXT;
+ALTER TABLE quotes ADD COLUMN IF NOT EXISTS order_id UUID REFERENCES orders(id) ON DELETE SET NULL;
+
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS quote_id UUID REFERENCES quotes(id) ON DELETE SET NULL;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS delivery_method TEXT DEFAULT 'INTERNAL_DELIVERY';
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS delivery_notes TEXT;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS payment_status TEXT DEFAULT 'PENDING';
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS customization_charges NUMERIC(10,2) DEFAULT 0;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS delivery_charges NUMERIC(10,2) DEFAULT 0;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS discount NUMERIC(10,2) DEFAULT 0;
+
+ALTER TABLE settings ADD COLUMN IF NOT EXISTS courier_integration_enabled BOOLEAN DEFAULT false;
+ALTER TABLE settings ADD COLUMN IF NOT EXISTS online_payment_enabled BOOLEAN DEFAULT false;
+ALTER TABLE settings ADD COLUMN IF NOT EXISTS cod_enabled BOOLEAN DEFAULT false;
+ALTER TABLE settings ADD COLUMN IF NOT EXISTS customer_accounts_enabled BOOLEAN DEFAULT true;
+
+-- Ensure Quotes can be viewed via access_token or by quote_number + phone for guest users
+DROP POLICY IF EXISTS "Anyone can view quote by token or email" ON quotes;
+CREATE POLICY "Anyone can view quote by token or email" ON quotes
+  FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Customers can update their quotes" ON quotes;
+CREATE POLICY "Customers can update their quotes" ON quotes
+  FOR UPDATE USING (true);
+

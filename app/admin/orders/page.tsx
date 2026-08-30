@@ -93,12 +93,12 @@ export default function AdminOrdersPage() {
         return <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200">PENDING</span>;
       case 'CONFIRMED':
         return <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 border border-blue-200">CONFIRMED</span>;
-      case 'PROCESSING':
-        return <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-800 border border-purple-200">PROCESSING</span>;
-      case 'READY_TO_SHIP':
-        return <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-cyan-100 text-cyan-800 border border-cyan-200">READY TO SHIP</span>;
-      case 'SHIPPED':
-        return <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-indigo-100 text-indigo-800 border border-indigo-200">SHIPPED</span>;
+      case 'PREPARING':
+        return <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-800 border border-purple-200">PREPARING</span>;
+      case 'READY_FOR_DELIVERY':
+        return <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-cyan-100 text-cyan-800 border border-cyan-200">READY FOR DISPATCH</span>;
+      case 'OUT_FOR_DELIVERY':
+        return <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-indigo-100 text-indigo-800 border border-indigo-200">OUT FOR DELIVERY</span>;
       case 'DELIVERED':
         return <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">DELIVERED</span>;
       case 'CANCELLED':
@@ -113,7 +113,7 @@ export default function AdminOrdersPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="font-heading text-2xl font-bold text-brand-charcoal">Customer Orders</h1>
-          <p className="text-sm text-muted-foreground">Manage purchase orders and order fulfillment requests</p>
+          <p className="text-sm text-muted-foreground">Manage purchase orders and local delivery fulfillment</p>
         </div>
       </div>
 
@@ -139,9 +139,9 @@ export default function AdminOrdersPage() {
             <option value="ALL">All Orders</option>
             <option value="PENDING">Pending Approval</option>
             <option value="CONFIRMED">Confirmed</option>
-            <option value="PROCESSING">Processing Batch</option>
-            <option value="READY_TO_SHIP">Ready To Ship</option>
-            <option value="SHIPPED">Shipped</option>
+            <option value="PREPARING">Preparing Goods</option>
+            <option value="READY_FOR_DELIVERY">Ready for Delivery</option>
+            <option value="OUT_FOR_DELIVERY">Out for Delivery</option>
             <option value="DELIVERED">Delivered</option>
             <option value="CANCELLED">Cancelled</option>
           </select>
@@ -248,12 +248,16 @@ export default function AdminOrdersPage() {
                 <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-1 text-xs">
                   <h4 className="font-bold text-slate-800 text-sm mb-2">Shipping Destination</h4>
                   {selectedOrder.shipping_address ? (
-                    <div className="text-slate-800 leading-relaxed">
-                      <p className="font-semibold">{selectedOrder.shipping_address.firstName} {selectedOrder.shipping_address.lastName}</p>
-                      <p>{selectedOrder.shipping_address.address} {selectedOrder.shipping_address.apartment}</p>
-                      <p>{selectedOrder.shipping_address.city}, {selectedOrder.shipping_address.state} - {selectedOrder.shipping_address.postalCode}</p>
-                      <p className="mt-1 font-mono text-slate-600">Phone: {selectedOrder.shipping_address.phone}</p>
-                    </div>
+                    typeof selectedOrder.shipping_address === 'string' ? (
+                      <p className="text-slate-800 font-medium">{selectedOrder.shipping_address}</p>
+                    ) : (
+                      <div className="text-slate-800 leading-relaxed">
+                        <p className="font-semibold">{selectedOrder.shipping_address.firstName} {selectedOrder.shipping_address.lastName}</p>
+                        <p>{selectedOrder.shipping_address.address} {selectedOrder.shipping_address.apartment}</p>
+                        <p>{selectedOrder.shipping_address.city}, {selectedOrder.shipping_address.state} - {selectedOrder.shipping_address.postalCode}</p>
+                        <p className="mt-1 font-mono text-slate-600">Phone: {selectedOrder.shipping_address.phone}</p>
+                      </div>
+                    )
                   ) : (
                     <p className="text-slate-500">Standard business delivery address</p>
                   )}
@@ -326,9 +330,9 @@ export default function AdminOrdersPage() {
                 >
                   <option value="PENDING">PENDING - Order Placed</option>
                   <option value="CONFIRMED">CONFIRMED - Order Accepted</option>
-                  <option value="PROCESSING">PROCESSING - In Production Batch</option>
-                  <option value="READY_TO_SHIP">READY TO SHIP - Packed</option>
-                  <option value="SHIPPED">SHIPPED - In Transit</option>
+                  <option value="PREPARING">PREPARING - Preparing Goods & Packaging</option>
+                  <option value="READY_FOR_DELIVERY">READY FOR DELIVERY - Ready for Dispatch</option>
+                  <option value="OUT_FOR_DELIVERY">OUT FOR DELIVERY - In Local Transport</option>
                   <option value="DELIVERED">DELIVERED - Completed</option>
                   <option value="CANCELLED">CANCELLED - Voided</option>
                 </select>

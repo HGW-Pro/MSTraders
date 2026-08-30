@@ -6,8 +6,8 @@ import { Toaster } from 'sonner';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'MS TRADERS - Eco-Friendly Bag Manufacturers & Printing Specialists',
-  description: 'Premier Indian manufacturer of custom kraft bags, paper bags, non-woven D-cut/W-cut bags, and luxury designer gift bags.',
+  title: 'MS TRADERS - Wholesale & Retail Bag Supplier & Custom Printing',
+  description: 'Premier wholesale & retail supplier of custom kraft bags, paper bags, non-woven D-cut/W-cut bags, and luxury designer gift bags in Ujjain.',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

@@ -2,7 +2,7 @@ import * as React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Leaf, ShieldCheck, Factory, Truck } from 'lucide-react';
+import { ArrowRight, Leaf, ShieldCheck, Sparkles, Truck } from 'lucide-react';
 
 export default function AboutPage() {
   return (
@@ -15,7 +15,7 @@ export default function AboutPage() {
               Packaging that protects your product and your brand.
             </h1>
             <p className="text-xl text-muted-foreground">
-              MS Traders is a premium manufacturer and supplier of high-quality paper, kraft, and non-woven bags based in India.
+              MS TRADERS is a premier wholesale and retail bag supplier specializing in custom paper, kraft, non-woven bags, and branded packaging based in Ujjain (M.P).
             </p>
           </div>
         </div>
@@ -28,7 +28,7 @@ export default function AboutPage() {
             <div className="relative aspect-square md:aspect-[4/3] lg:aspect-square rounded-2xl overflow-hidden shadow-xl">
               <Image 
                 src="https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=1000&q=80" 
-                alt="MS TRADERS Paper Bag Manufacturing"
+                alt="MS TRADERS Wholesale Bag Supply"
                 fill
                 className="object-cover"
                 referrerPolicy="no-referrer"
@@ -40,10 +40,10 @@ export default function AboutPage() {
                 Our Commitment to Quality
               </h2>
               <p className="text-lg text-muted-foreground leading-relaxed">
-                We understand that a bag is more than just a carrier; it&apos;s a mobile billboard for your brand. That&apos;s why every product that leaves our facility is crafted with precision, using premium materials that reflect the quality of your business.
+                We understand that a bag is more than just a carrier; it&apos;s a mobile billboard for your brand. That&apos;s why every batch that leaves our warehouse is selected with precision, using premium materials that reflect the quality of your business.
               </p>
               <p className="text-lg text-muted-foreground leading-relaxed">
-                From luxury retail boutiques and upscale hotels to everyday supermarkets and pharmacies, we provide customized solutions that meet specific requirements across sizes, materials, and printing techniques.
+                From luxury retail boutiques and upscale hotels to everyday supermarkets and pharmacies, we supply customized solutions that meet specific requirements across sizes, materials, and printing techniques.
               </p>
               
               <div className="grid grid-cols-2 gap-6 pt-6">
@@ -66,15 +66,15 @@ export default function AboutPage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
           <div className="text-center mb-16">
             <h2 className="font-heading text-3xl md:text-4xl font-bold mb-4 text-brand-gold">Why Choose Us</h2>
-            <p className="text-gray-400 max-w-2xl mx-auto">The principles that drive our manufacturing and service.</p>
+            <p className="text-gray-400 max-w-2xl mx-auto">The principles that drive our wholesale supply and custom printing service.</p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
-              { icon: ShieldCheck, title: 'Premium Quality', desc: 'Strict quality control ensuring durability and perfect finish.' },
-              { icon: Factory, title: 'Custom Manufacturing', desc: 'Made to your exact specifications, colors, and sizes.' },
-              { icon: Leaf, title: 'Eco-Friendly Options', desc: 'Sustainable kraft and paper alternatives to plastic.' },
-              { icon: Truck, title: 'Reliable Supply', desc: 'Consistent fulfillment and nationwide delivery.' }
+              { icon: ShieldCheck, title: 'Premium Quality', desc: 'Strict quality inspection ensuring high load durability and clean finish.' },
+              { icon: Sparkles, title: 'Custom Printing', desc: 'Customized with your logo, brand colors, and precise dimensions.' },
+              { icon: Leaf, title: 'Eco-Friendly Options', desc: 'Sustainable kraft, paper, and reusable non-woven alternatives to plastic.' },
+              { icon: Truck, title: 'Reliable Wholesale Supply', desc: 'Consistent bulk fulfillment with guaranteed on-time delivery.' }
             ].map((val, i) => (
               <div key={i} className="bg-white/5 p-8 rounded-2xl border border-white/10 hover:bg-white/10 transition-colors">
                 <val.icon className="h-10 w-10 text-brand-gold mb-6" />

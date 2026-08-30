@@ -34,7 +34,7 @@ export default function AdminDashboardPage() {
   }, []);
 
   const totalRevenue = orders.reduce((sum, o) => sum + (o.total || 0), 0);
-  const activeQuotesCount = quotes.filter(q => q.status === 'NEW' || q.status === 'REVIEWING').length;
+  const activeQuotesCount = quotes.filter(q => q.status === 'NEW' || q.status === 'SUBMITTED' || q.status === 'UNDER_REVIEW' || q.status === 'CHANGES_REQUESTED').length;
 
   return (
     <div className="space-y-8">

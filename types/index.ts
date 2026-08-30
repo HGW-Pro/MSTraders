@@ -35,20 +35,33 @@ export interface Category {
   is_active?: boolean;
 }
 
-export type QuoteStatus = 'NEW' | 'CONTACTED' | 'REVIEWING' | 'QUOTE_SENT' | 'APPROVED' | 'REJECTED' | 'COMPLETED';
+export type QuoteStatus = 
+  | 'DRAFT' 
+  | 'NEW'
+  | 'SUBMITTED' 
+  | 'UNDER_REVIEW' 
+  | 'QUOTED' 
+  | 'CUSTOMER_VIEWED' 
+  | 'CHANGES_REQUESTED' 
+  | 'APPROVED' 
+  | 'REJECTED' 
+  | 'EXPIRED' 
+  | 'CONVERTED_TO_ORDER';
 
 export interface Quote {
   id: string;
   created_at: string;
   updated_at?: string;
   quote_number: string;
+  access_token?: string | null;
   customer_id?: string | null;
   customer_name: string;
-  business_name: string | null;
+  business_name?: string | null;
   email: string;
   phone: string;
   whatsapp?: string | null;
   city?: string | null;
+  delivery_address?: string | null;
   status: QuoteStatus;
   bag_type: string;
   quantity: number;
@@ -58,14 +71,31 @@ export interface Quote {
   size?: string | null;
   requirements: Record<string, any>;
   attachments: string[];
-  notes?: string | null;
-  amount?: number | null;
-  shipping_amount?: number | null;
+  unit_price?: number | null;
+  subtotal?: number | null;
+  customization_charges?: number | null;
+  delivery_charges?: number | null;
+  discount?: number | null;
   tax_amount?: number | null;
   total_amount?: number | null;
+  valid_until?: string | null;
+  notes?: string | null;
+  admin_notes?: string | null;
+  customer_notes?: string | null;
+  order_id?: string | null;
+  amount?: number | null;
+  shipping_amount?: number | null;
 }
 
-export type OrderStatus = 'PENDING' | 'CONFIRMED' | 'PROCESSING' | 'READY_TO_SHIP' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
+export type OrderStatus = 
+  | 'PENDING' 
+  | 'CONFIRMED' 
+  | 'PREPARING' 
+  | 'READY_FOR_DELIVERY' 
+  | 'OUT_FOR_DELIVERY' 
+  | 'SHIPPED' 
+  | 'DELIVERED' 
+  | 'CANCELLED';
 
 export interface ShippingAddress {
   firstName: string;
@@ -91,6 +121,7 @@ export interface OrderItem {
     handle?: string;
     color?: string;
     material?: string;
+    printing?: string;
   };
   total_price: number;
 }
@@ -100,18 +131,25 @@ export interface Order {
   created_at: string;
   updated_at?: string;
   order_number: string;
+  quote_id?: string | null;
   customer_id?: string | null;
   customer_name: string;
   company_name?: string | null;
   email: string;
   phone: string;
-  shipping_address: ShippingAddress;
+  shipping_address: ShippingAddress | string;
   status: OrderStatus;
   payment_method?: string | null;
+  payment_status?: 'PENDING' | 'PAID' | 'COLLECTED' | 'FAILED' | 'REFUNDED';
   subtotal: number;
+  customization_charges?: number;
+  delivery_charges?: number;
+  discount?: number;
   tax: number;
   shipping_fee: number;
   total: number;
+  delivery_method?: 'LOCAL_DELIVERY' | 'INTERNAL_DELIVERY' | 'CUSTOMER_PICKUP' | 'OTHER';
+  delivery_notes?: string | null;
   notes?: string | null;
   order_items?: OrderItem[];
 }
@@ -146,6 +184,10 @@ export interface BusinessSettings {
   seo_title?: string;
   seo_description?: string;
   logo_url?: string;
+  courier_integration_enabled?: boolean;
+  online_payment_enabled?: boolean;
+  cod_enabled?: boolean;
+  customer_accounts_enabled?: boolean;
 }
 
 export interface Industry {

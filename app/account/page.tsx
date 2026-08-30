@@ -472,8 +472,8 @@ export default function CustomerAccountPage() {
                           <span className={cn(
                             "px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border",
                             ord.status === 'DELIVERED' && "bg-emerald-50 text-emerald-800 border-emerald-300",
-                            ord.status === 'SHIPPED' && "bg-blue-50 text-blue-800 border-blue-300",
-                            ord.status === 'PROCESSING' && "bg-amber-50 text-amber-800 border-amber-300",
+                            (ord.status === 'OUT_FOR_DELIVERY' || ord.status === 'READY_FOR_DELIVERY') && "bg-blue-50 text-blue-800 border-blue-300",
+                            (ord.status === 'PREPARING' || ord.status === 'CONFIRMED') && "bg-amber-50 text-amber-800 border-amber-300",
                             ord.status === 'PENDING' && "bg-slate-100 text-slate-800 border-slate-300",
                             ord.status === 'CANCELLED' && "bg-red-50 text-red-800 border-red-300"
                           )}>
@@ -565,7 +565,7 @@ export default function CustomerAccountPage() {
                 <div className="text-center py-12 border-2 border-dashed border-slate-200 rounded-xl space-y-3">
                   <MapPin className="h-10 w-10 text-muted-foreground mx-auto" />
                   <p className="text-sm font-bold text-slate-700">No Saved Addresses</p>
-                  <p className="text-xs text-muted-foreground">Save your store or factory address for faster bulk checkout.</p>
+                  <p className="text-xs text-muted-foreground">Save your business or store address for faster bulk checkout.</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

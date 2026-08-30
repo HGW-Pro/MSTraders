@@ -122,7 +122,7 @@ export default function AdminGalleryPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="font-heading text-2xl font-bold text-brand-charcoal">Gallery & Portfolio Showcase</h1>
-          <p className="text-sm text-muted-foreground">Manage photographs of completed custom bag manufacturing projects</p>
+          <p className="text-sm text-muted-foreground">Manage photographs of completed custom bag supply and logo printing projects</p>
         </div>
         <Button 
           onClick={() => {

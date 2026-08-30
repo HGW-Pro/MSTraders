@@ -535,16 +535,39 @@ export async function getQuotes(statusFilter?: string): Promise<Quote[]> {
   }
 }
 
+export async function getQuoteById(id: string): Promise<Quote | null> {
+  try {
+    const { data, error } = await supabase
+      .from('quotes')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error || !data) return null;
+    return data as Quote;
+  } catch (err) {
+    return null;
+  }
+}
+
+export async function getQuoteByNumber(quoteNumber: string): Promise<Quote | null> {
+  try {
+    const { data, error } = await supabase
+      .from('quotes')
+      .select('*')
+      .eq('quote_number', quoteNumber.trim().toUpperCase())
+      .single();
+
+    if (error || !data) return null;
+    return data as Quote;
+  } catch (err) {
+    return null;
+  }
+}
+
 export async function updateQuoteStatus(
   id: string, 
-  updates: {
-    status?: QuoteStatus;
-    amount?: number;
-    shipping_amount?: number;
-    tax_amount?: number;
-    total_amount?: number;
-    notes?: string;
-  }
+  updates: Partial<Quote>
 ): Promise<boolean> {
   try {
     const { error } = await supabase
@@ -557,6 +580,110 @@ export async function updateQuoteStatus(
   } catch (err) {
     console.error('Error updating quote:', err);
     return false;
+  }
+}
+
+export async function convertQuoteToOrder(
+  quoteId: string, 
+  customOptions?: { 
+    payment_method?: string; 
+    delivery_notes?: string;
+    customer_notes?: string;
+  }
+): Promise<Order | null> {
+  try {
+    const quote = await getQuoteById(quoteId);
+    if (!quote) throw new Error('Quote not found');
+
+    const now = new Date();
+    const dateStr = now.toISOString().slice(0, 10).replace(/-/g, '');
+    const randomSuffix = Math.floor(1000 + Math.random() * 9000);
+    const order_number = `MST-ORD-${dateStr}-${randomSuffix}`;
+
+    const subtotal = quote.subtotal || quote.amount || 0;
+    const delivery_fee = quote.delivery_charges || quote.shipping_amount || 0;
+    const tax = quote.tax_amount || 0;
+    const total = quote.total_amount || (subtotal + delivery_fee + tax);
+
+    const shippingAddress = {
+      firstName: quote.customer_name.split(' ')[0] || quote.customer_name,
+      lastName: quote.customer_name.split(' ').slice(1).join(' ') || '',
+      company: quote.business_name || '',
+      address: quote.delivery_address || 'Customer Location',
+      city: quote.city || 'Ujjain',
+      state: 'Madhya Pradesh',
+      postalCode: '456006',
+      phone: quote.phone
+    };
+
+    const newOrder = {
+      order_number,
+      quote_id: quote.id,
+      customer_id: quote.customer_id || null,
+      customer_name: quote.customer_name,
+      company_name: quote.business_name || null,
+      email: quote.email,
+      phone: quote.phone,
+      shipping_address: shippingAddress,
+      status: 'CONFIRMED' as OrderStatus,
+      payment_method: customOptions?.payment_method || 'Invoice / Pay on Delivery',
+      payment_status: 'PENDING',
+      subtotal,
+      customization_charges: quote.customization_charges || 0,
+      delivery_charges: delivery_fee,
+      discount: quote.discount || 0,
+      tax,
+      shipping_fee: delivery_fee,
+      total,
+      delivery_method: 'INTERNAL_DELIVERY',
+      delivery_notes: customOptions?.delivery_notes || quote.notes || null,
+      notes: `Converted from Quote ${quote.quote_number}${customOptions?.customer_notes ? ` | Customer Note: ${customOptions.customer_notes}` : ''}`
+    };
+
+    const { data: orderData, error: orderErr } = await supabase
+      .from('orders')
+      .insert([newOrder])
+      .select()
+      .single();
+
+    if (orderErr) {
+      console.error('Failed to insert order from quote:', orderErr);
+      return null;
+    }
+
+    // Insert order item for the quote
+    const itemUnitPrice = quote.unit_price || (total > 0 && quote.quantity > 0 ? total / quote.quantity : 0);
+    const orderItem = {
+      order_id: orderData.id,
+      product_id: 'custom-quote-product',
+      product_name: `Custom ${quote.bag_type} (${quote.size || 'Custom Dimensions'})`,
+      quantity: quote.quantity,
+      unit_price: itemUnitPrice,
+      variant_details: {
+        material: quote.material || 'Standard Kraft/Non-Woven',
+        printing: quote.printing || 'Custom Print',
+        handle: quote.handle_type || 'Standard Handle',
+        size: quote.size || 'Custom'
+      },
+      total_price: total
+    };
+
+    await supabase.from('order_items').insert([orderItem]);
+
+    // Update Quote Status to CONVERTED_TO_ORDER & set order_id
+    await supabase
+      .from('quotes')
+      .update({
+        status: 'CONVERTED_TO_ORDER',
+        order_id: orderData.id,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', quote.id);
+
+    return orderData as Order;
+  } catch (err) {
+    console.error('Error converting quote to order:', err);
+    return null;
   }
 }
 
@@ -1027,7 +1154,7 @@ export const DEFAULT_HOMEPAGE_SECTIONS: Record<string, HomepageSection> = {
     section_key: 'hero',
     title: 'Customized Paper Bags & Non-Woven Carry Bags',
     subtitle: 'WHOLESALE & RETAIL SUPPLIER IN UJJAIN',
-    description: 'Premier manufacturer & bulk supplier of high-quality paper bags, W-cut vest bags, D-cut punch bags, luxury laminated boutique gift bags, and envelope pouches.',
+    description: 'Wholesale & retail supplier of high-quality paper bags, W-cut vest bags, D-cut punch bags, luxury laminated boutique gift bags, and envelope pouches in Ujjain.',
     image_url: 'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=1200&q=80',
     primary_cta_text: 'GET CUSTOM QUOTE',
     primary_cta_link: '/customize',
@@ -1048,9 +1175,9 @@ export const DEFAULT_HOMEPAGE_SECTIONS: Record<string, HomepageSection> = {
   customization: {
     id: 'sec-customization',
     section_key: 'customization',
-    title: 'Tailor-Made Wholesale Bag Manufacturing',
+    title: 'Tailor-Made Wholesale Bag Supply & Custom Printing',
     subtitle: 'CUSTOM BRANDING & PRINTS',
-    description: 'Select your preferred paper GSM, handles, screen/flexo multi-color printing, and custom dimensions.',
+    description: 'Select your preferred paper GSM, handles, multi-color logo printing, and custom dimensions.',
     image_url: 'https://images.unsplash.com/photo-1572021335469-31706a17aaef?auto=format&fit=crop&w=800&q=80',
     primary_cta_text: 'START CUSTOM ORDER',
     primary_cta_link: '/customize',
@@ -1062,7 +1189,7 @@ export const DEFAULT_HOMEPAGE_SECTIONS: Record<string, HomepageSection> = {
     section_key: 'industries',
     title: 'Specialized Packaging For Every Industry',
     subtitle: 'INDUSTRIES WE SERVE',
-    description: 'Engineered for supermarkets, retail fashion, hotels, restaurants, and medical establishments.',
+    description: 'Tailored solutions for supermarkets, retail fashion, hotels, restaurants, and medical establishments.',
     enabled: true,
     display_order: 4
   },
@@ -1077,8 +1204,8 @@ export const DEFAULT_HOMEPAGE_SECTIONS: Record<string, HomepageSection> = {
     metadata: {
       steps: [
         { step: '01', title: 'Submit Requirements', desc: 'Specify bag type, dimensions, quantity, and print requirements.' },
-        { step: '02', title: 'Instant Quote & Sample', desc: 'Receive wholesale pricing breakdown and artwork proofing.' },
-        { step: '03', title: 'Precision Manufacturing', desc: 'High-speed automated production with quality inspection.' },
+        { step: '02', title: 'Instant Formal Quote', desc: 'Receive custom pricing breakdown and artwork proofing.' },
+        { step: '03', title: 'Approve & Prepare', desc: 'Custom logo printing and rigorous quality inspection.' },
         { step: '04', title: 'Fast Delivery', desc: 'Secure packaging and dispatch across Ujjain and surrounding regions.' }
       ]
     }
@@ -1088,12 +1215,12 @@ export const DEFAULT_HOMEPAGE_SECTIONS: Record<string, HomepageSection> = {
     section_key: 'why_us',
     title: 'Why Choose MS TRADERS',
     subtitle: 'OUR PROMISE',
-    description: 'Trusted wholesale manufacturer delivering precision quality and reliable bulk fulfillment.',
+    description: 'Trusted wholesale supplier delivering precision quality and reliable bulk fulfillment.',
     enabled: true,
     display_order: 6,
     metadata: {
       features: [
-        { title: 'Factory Direct Wholesale', desc: 'Competitive bulk tier pricing straight from manufacturing units.' },
+        { title: 'Wholesale Bulk Supply', desc: 'Competitive bulk tier pricing for retail & commercial clients.' },
         { title: 'Custom Multi-Color Printing', desc: 'Precision flexo, offset, and screen printing with your logo.' },
         { title: 'Durable Quality Standard', desc: 'High tear strength, reinforced handles, and clean seam sealing.' },
         { title: 'On-Time Dispatch', desc: 'Reliable order processing and fulfillment for retail schedules.' }
@@ -1103,7 +1230,7 @@ export const DEFAULT_HOMEPAGE_SECTIONS: Record<string, HomepageSection> = {
   our_work: {
     id: 'sec-our_work',
     section_key: 'our_work',
-    title: 'Recent Manufactured Batches',
+    title: 'Recent Customized Supply Batches',
     subtitle: 'PORTFOLIO & CRAFTSMANSHIP',
     description: 'Explore custom printed carry bags completed for boutiques, supermarkets, and corporate clients.',
     enabled: true,

@@ -51,7 +51,7 @@ export default function ShopPage() {
           <div>
             <span className="text-xs font-bold uppercase tracking-widest text-brand-green mb-1 block">Product Catalog</span>
             <h1 className="font-heading text-3xl sm:text-4xl font-bold text-brand-charcoal">Eco-Friendly Bag Collection</h1>
-            <p className="text-muted-foreground text-sm mt-1">Direct factory pricing for bulk custom printed carry bags & luxury packaging.</p>
+            <p className="text-muted-foreground text-sm mt-1">Wholesale pricing for bulk custom printed carry bags & luxury packaging.</p>
           </div>
           
           <div className="w-full md:w-auto flex flex-col sm:flex-row gap-3">

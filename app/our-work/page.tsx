@@ -39,9 +39,9 @@ export default function OurWorkPage() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
         <div className="text-center mb-12">
           <span className="text-xs font-bold uppercase tracking-widest text-brand-green mb-2 block">Portfolio Showcase</span>
-          <h1 className="font-heading text-4xl md:text-5xl font-bold text-brand-charcoal mb-4">Our Manufacturing Portfolio</h1>
+          <h1 className="font-heading text-4xl md:text-5xl font-bold text-brand-charcoal mb-4">Our Customized Packaging Portfolio</h1>
           <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
-            A showcase of custom printed paper bags, non-woven bags, and luxury boutique packaging manufactured for clients across India.
+            A showcase of custom printed paper bags, non-woven bags, and luxury boutique packaging supplied for clients across India.
           </p>
         </div>
 

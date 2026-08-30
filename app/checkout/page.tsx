@@ -345,7 +345,7 @@ export default function CheckoutPage() {
                       {
                         id: 'cod',
                         title: 'Cash / Pay on Delivery / Pickup',
-                        desc: 'Pay cash upon delivery or factory dispatch inspection.'
+                        desc: 'Pay cash upon local delivery or store dispatch inspection.'
                       },
                       {
                         id: 'whatsapp',

@@ -13,10 +13,10 @@ import { cn } from '@/lib/utils';
 
 const STATUS_STEPS: { status: OrderStatus; label: string; desc: string }[] = [
   { status: 'PENDING', label: 'Order Placed', desc: 'Order request received' },
-  { status: 'CONFIRMED', label: 'Confirmed', desc: 'Verified by MS TRADERS sales team' },
-  { status: 'PROCESSING', label: 'In Production', desc: 'Paper cutting & custom printing' },
-  { status: 'READY_TO_SHIP', label: 'Ready for Dispatch', desc: 'Quality inspected & packed' },
-  { status: 'SHIPPED', label: 'In Transit', desc: 'Handed over to transport/courier' },
+  { status: 'CONFIRMED', label: 'Confirmed', desc: 'Verified by MS TRADERS team' },
+  { status: 'PREPARING', label: 'Goods Preparation', desc: 'Stock allocation & custom print setup' },
+  { status: 'READY_FOR_DELIVERY', label: 'Ready for Dispatch', desc: 'Inspected, packed & bundled' },
+  { status: 'OUT_FOR_DELIVERY', label: 'Out for Local Delivery', desc: 'In MS TRADERS local transport' },
   { status: 'DELIVERED', label: 'Delivered', desc: 'Successfully fulfilled' },
 ];
 
@@ -78,7 +78,7 @@ export default function TrackOrderPage() {
             Track Wholesale Order Status
           </h1>
           <p className="text-muted-foreground text-sm max-w-lg mx-auto">
-            Check the real-time production, custom printing, or dispatch status of your paper and non-woven bag orders.
+            Check the real-time processing, custom printing, or dispatch status of your paper and non-woven bag orders.
           </p>
         </div>
 
@@ -142,8 +142,8 @@ export default function TrackOrderPage() {
                 <span className={cn(
                   "inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold border",
                   order.status === 'DELIVERED' && "bg-emerald-50 text-emerald-800 border-emerald-300",
-                  order.status === 'SHIPPED' && "bg-blue-50 text-blue-800 border-blue-300",
-                  order.status === 'PROCESSING' && "bg-amber-50 text-amber-800 border-amber-300",
+                  (order.status === 'OUT_FOR_DELIVERY' || order.status === 'READY_FOR_DELIVERY') && "bg-blue-50 text-blue-800 border-blue-300",
+                  order.status === 'PREPARING' && "bg-amber-50 text-amber-800 border-amber-300",
                   order.status === 'CONFIRMED' && "bg-teal-50 text-teal-800 border-teal-300",
                   order.status === 'PENDING' && "bg-slate-100 text-slate-800 border-slate-300",
                   order.status === 'CANCELLED' && "bg-red-50 text-red-800 border-red-300",
@@ -247,14 +247,18 @@ export default function TrackOrderPage() {
                   <MapPin className="h-3.5 w-3.5 text-brand-green" /> Shipping Address
                 </p>
                 {order.shipping_address ? (
-                  <div className="text-muted-foreground leading-relaxed">
-                    <p className="font-medium text-slate-800">
-                      {order.shipping_address.firstName} {order.shipping_address.lastName}
-                    </p>
-                    <p>{order.shipping_address.address} {order.shipping_address.apartment}</p>
-                    <p>{order.shipping_address.city}, {order.shipping_address.state} - {order.shipping_address.postalCode}</p>
-                    <p>Phone: {order.shipping_address.phone}</p>
-                  </div>
+                  typeof order.shipping_address === 'string' ? (
+                    <p className="text-slate-800 font-medium">{order.shipping_address}</p>
+                  ) : (
+                    <div className="text-muted-foreground leading-relaxed">
+                      <p className="font-medium text-slate-800">
+                        {order.shipping_address.firstName} {order.shipping_address.lastName}
+                      </p>
+                      <p>{order.shipping_address.address} {order.shipping_address.apartment}</p>
+                      <p>{order.shipping_address.city}, {order.shipping_address.state} - {order.shipping_address.postalCode}</p>
+                      <p>Phone: {order.shipping_address.phone}</p>
+                    </div>
+                  )
                 ) : (
                   <p className="text-muted-foreground italic">No physical shipping address recorded</p>
                 )}

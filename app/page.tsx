@@ -38,7 +38,7 @@ export default function HomePage() {
   const hero = sections.hero || {
     title: 'Customized Paper Bags & Non-Woven Carry Bags',
     subtitle: 'WHOLESALE & RETAIL SUPPLIER IN UJJAIN',
-    description: 'Premier manufacturer & bulk supplier of high-quality paper bags, W-cut vest bags, D-cut punch bags, luxury laminated boutique gift bags, and envelope pouches.',
+    description: 'Wholesale & retail supplier of high-quality paper bags, W-cut vest bags, D-cut punch bags, luxury laminated boutique gift bags, and envelope pouches in Ujjain.',
     image_url: 'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=1200&q=80',
     primary_cta_text: 'GET CUSTOM QUOTE',
     primary_cta_link: '/customize',
@@ -380,11 +380,11 @@ export default function HomePage() {
 
             <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
               {[
-                { num: '01', title: 'TELL US WHAT YOU NEED', desc: 'Choose your bag type, size, quantity and requirements.' },
-                { num: '02', title: 'SHARE YOUR DESIGN', desc: 'Upload your logo or artwork.' },
-                { num: '03', title: 'GET YOUR QUOTE', desc: 'Our team reviews your requirements and provides pricing.' },
-                { num: '04', title: 'APPROVE & PRODUCE', desc: 'Production begins immediately after approval.' },
-                { num: '05', title: 'DELIVERY', desc: 'Your order is safely delivered to your location.' }
+                { num: '01', title: 'CHOOSE YOUR BAG', desc: 'Select your bag category, size, quantity and material requirements.' },
+                { num: '02', title: 'ADD YOUR BRAND', desc: 'Upload your logo or artwork design for custom printing.' },
+                { num: '03', title: 'GET YOUR QUOTE', desc: 'Our team reviews your specs and sends an instant formal quote.' },
+                { num: '04', title: 'APPROVE & PREPARE', desc: 'Once approved, we prepare and print your branded bags.' },
+                { num: '05', title: 'SAFE DELIVERY', desc: 'Your finished order is safely delivered to your doorstep.' }
               ].map((step, i) => (
                 <div key={step.num} className="relative">
                   {i !== 4 && (

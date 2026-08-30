@@ -28,21 +28,25 @@ export default function AdminSettingsPage() {
   const [isSaving, setIsSaving] = React.useState(false);
   const [settings, setSettingsData] = React.useState<BusinessSettings>({
     business_name: 'MS TRADERS',
-    tagline: 'Premier Bag Manufacturers & Printing Specialists in India',
-    phone: '+91 98765 43210',
-    whatsapp: '919876543210',
-    email: 'info@mstradersbags.com',
-    address: 'Plot No. 42, Industrial Area, Sector 5',
-    city: 'Ahmedabad',
-    state: 'Gujarat',
-    pincode: '380015',
-    business_hours: 'Mon - Sat: 9:00 AM - 7:00 PM',
-    social_facebook: 'https://facebook.com',
-    social_instagram: 'https://instagram.com',
-    social_linkedin: 'https://linkedin.com',
-    footer_about: 'MS TRADERS is a premier manufacturer and bulk exporter of custom printed eco-friendly paper bags, non-woven bags, kraft bags, and luxury packaging solutions.',
-    seo_title: 'MS TRADERS - Eco-Friendly Custom Bag Manufacturers & Bulk Exporters',
-    seo_description: 'Custom paper bags, kraft bags, non-woven D-cut/W-cut bags, and designer gift bags manufactured with high-precision printing for your brand.'
+    tagline: 'Wholesale & Retail Bag Supplier in Ujjain (M.P)',
+    phone: '+91 91312 68724 / +91 90094 46352',
+    whatsapp: '919131268724',
+    email: 'contact@mstradersujjain.com',
+    address: '57 Kalalseri, Behind Power House, Dabri Pitha',
+    city: 'Ujjain',
+    state: 'Madhya Pradesh',
+    pincode: '456006',
+    business_hours: 'Mon - Sat: 9:30 AM - 8:30 PM',
+    social_facebook: '',
+    social_instagram: '',
+    social_linkedin: '',
+    footer_about: 'MS TRADERS is a premier wholesale & retail supplier of customized paper bags, W-cut & D-cut non-woven bags, designer gift bags, envelopes, and eco-friendly packaging in Ujjain (M.P).',
+    seo_title: 'MS TRADERS - Wholesale & Retail Paper Bags & Non-Woven Bags in Ujjain',
+    seo_description: 'Official wholesale & retail supplier of paper bags, non-woven W-cut and D-cut bags, customized printed bags, designer gift bags, and envelope pouches in Ujjain (M.P).',
+    courier_integration_enabled: false,
+    online_payment_enabled: false,
+    cod_enabled: false,
+    customer_accounts_enabled: true
   });
 
   const loadCurrentSettings = React.useCallback(async () => {
@@ -292,6 +296,70 @@ export default function AdminSettingsPage() {
               value={settings.seo_description || ''} 
               onChange={(e) => handleChange('seo_description', e.target.value)}
             />
+          </div>
+        </div>
+
+        {/* Feature Flags & System Integrations */}
+        <div className="bg-white border border-border rounded-xl p-6 shadow-xs space-y-4">
+          <h2 className="font-bold text-base text-brand-charcoal flex items-center gap-2 border-b border-border pb-3">
+            <Globe className="h-5 w-5 text-brand-green" /> Application Feature Flags & Integrations
+          </h2>
+          <p className="text-xs text-muted-foreground mb-4">
+            Toggle optional integrations and customer features. MS TRADERS operates primarily with direct internal delivery and offline/invoice quotation billing.
+          </p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-xl">
+              <div>
+                <Label className="font-bold text-sm text-slate-900">Courier Integration (Shiprocket)</Label>
+                <p className="text-xs text-slate-500">Enable automated external courier API tracking & booking</p>
+              </div>
+              <input 
+                type="checkbox"
+                checked={settings.courier_integration_enabled ?? false}
+                onChange={(e) => setSettingsData(prev => ({ ...prev, courier_integration_enabled: e.target.checked }))}
+                className="h-5 w-5 accent-brand-green rounded cursor-pointer"
+              />
+            </div>
+
+            <div className="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-xl">
+              <div>
+                <Label className="font-bold text-sm text-slate-900">Online Payment Gateway</Label>
+                <p className="text-xs text-slate-500">Enable credit card / netbanking checkout gateway</p>
+              </div>
+              <input 
+                type="checkbox"
+                checked={settings.online_payment_enabled ?? false}
+                onChange={(e) => setSettingsData(prev => ({ ...prev, online_payment_enabled: e.target.checked }))}
+                className="h-5 w-5 accent-brand-green rounded cursor-pointer"
+              />
+            </div>
+
+            <div className="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-xl">
+              <div>
+                <Label className="font-bold text-sm text-slate-900">Cash On Delivery (COD)</Label>
+                <p className="text-xs text-slate-500">Enable Cash on Delivery option during checkout</p>
+              </div>
+              <input 
+                type="checkbox"
+                checked={settings.cod_enabled ?? false}
+                onChange={(e) => setSettingsData(prev => ({ ...prev, cod_enabled: e.target.checked }))}
+                className="h-5 w-5 accent-brand-green rounded cursor-pointer"
+              />
+            </div>
+
+            <div className="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-xl">
+              <div>
+                <Label className="font-bold text-sm text-slate-900">Customer Accounts Portal</Label>
+                <p className="text-xs text-slate-500">Allow customers to register accounts and track order history</p>
+              </div>
+              <input 
+                type="checkbox"
+                checked={settings.customer_accounts_enabled ?? true}
+                onChange={(e) => setSettingsData(prev => ({ ...prev, customer_accounts_enabled: e.target.checked }))}
+                className="h-5 w-5 accent-brand-green rounded cursor-pointer"
+              />
+            </div>
           </div>
         </div>
 
