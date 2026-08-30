@@ -107,7 +107,7 @@ export default function AdminQuotesPage() {
     setTotalAmount(String(Math.max(0, computedTotal)));
   };
 
-  const handleSaveQuoteUpdate = async () => {
+  const handleSaveQuoteUpdate = async (overrideStatus?: QuoteStatus) => {
     if (!selectedQuote) return;
 
     setIsUpdating(true);
@@ -120,8 +120,15 @@ export default function AdminQuotesPage() {
       const tax = parseFloat(taxAmount) || 0;
       const tot = parseFloat(totalAmount) || (sub + cust + del + tax - disc);
 
+      // Auto-promote status to QUOTED if pricing is supplied and status is still NEW/UNDER_REVIEW
+      let targetStatus = overrideStatus || quoteStatus;
+      if (!overrideStatus && (tot > 0 || uPrice > 0) && (quoteStatus === 'NEW' || quoteStatus === 'SUBMITTED' || quoteStatus === 'UNDER_REVIEW')) {
+        targetStatus = 'QUOTED';
+        setQuoteStatus('QUOTED');
+      }
+
       const success = await updateQuoteStatus(selectedQuote.id, {
-        status: quoteStatus,
+        status: targetStatus,
         unit_price: uPrice,
         subtotal: sub,
         customization_charges: cust,
@@ -137,7 +144,7 @@ export default function AdminQuotesPage() {
       });
 
       if (success) {
-        toast.success(`Quote ${selectedQuote.quote_number} updated & saved`);
+        toast.success(`Quote ${selectedQuote.quote_number} published & saved successfully!`);
         setSelectedQuote(null);
         loadQuotes();
       } else {
@@ -658,7 +665,7 @@ export default function AdminQuotesPage() {
               </div>
 
               <Button 
-                onClick={handleSaveQuoteUpdate}
+                onClick={() => handleSaveQuoteUpdate()}
                 disabled={isUpdating}
                 className="bg-brand-green text-white hover:bg-brand-green/90 font-bold text-xs h-9 px-6 shadow-sm"
               >
