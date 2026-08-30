@@ -578,6 +578,17 @@ export async function updateQuoteStatus(
   updates: Partial<Quote>
 ): Promise<boolean> {
   try {
+    // If customer_id is missing on quote, try linking with profile by email
+    if (!updates.customer_id) {
+      const { data: quoteData } = await supabase.from('quotes').select('email, customer_id').eq('id', id).single();
+      if (quoteData && quoteData.email && !quoteData.customer_id) {
+        const { data: profile } = await supabase.from('profiles').select('id').ilike('email', quoteData.email.trim()).maybeSingle();
+        if (profile) {
+          updates.customer_id = profile.id;
+        }
+      }
+    }
+
     const { error } = await supabase
       .from('quotes')
       .update(updates)
@@ -1050,34 +1061,75 @@ export async function updateUserProfile(userId: string, updates: Partial<UserPro
   }
 }
 
+export async function syncCustomerRecords(userId: string, email: string): Promise<void> {
+  try {
+    const cleanEmail = (email || '').trim().toLowerCase();
+    if (!cleanEmail || !userId) return;
+
+    // Auto-link unlinked quotes matching customer email
+    await supabase
+      .from('quotes')
+      .update({ customer_id: userId })
+      .ilike('email', cleanEmail)
+      .is('customer_id', null);
+
+    // Auto-link unlinked orders matching customer email
+    await supabase
+      .from('orders')
+      .update({ customer_id: userId })
+      .ilike('email', cleanEmail)
+      .is('customer_id', null);
+  } catch (err) {
+    console.error('Error syncing customer records:', err);
+  }
+}
+
 export async function getCustomerOrders(email: string, userId?: string): Promise<Order[]> {
   try {
+    const cleanEmail = (email || '').trim().toLowerCase();
     let query = supabase.from('orders').select('*, order_items(*)');
-    if (userId) {
-      query = query.or(`customer_id.eq.${userId},email.ilike.${email.trim()}`);
-    } else {
-      query = query.ilike('email', email.trim());
+    
+    if (userId && cleanEmail) {
+      query = query.or(`customer_id.eq.${userId},email.ilike."${cleanEmail}"`);
+    } else if (userId) {
+      query = query.eq('customer_id', userId);
+    } else if (cleanEmail) {
+      query = query.ilike('email', cleanEmail);
     }
+
     const { data, error } = await query.order('created_at', { ascending: false });
-    if (error || !data) return [];
-    return data as Order[];
+    if (error) {
+      console.error('Supabase fetch customer orders error:', error);
+      return [];
+    }
+    return (data || []) as Order[];
   } catch (err) {
+    console.error('Error fetching customer orders:', err);
     return [];
   }
 }
 
 export async function getCustomerQuotes(email: string, userId?: string): Promise<Quote[]> {
   try {
+    const cleanEmail = (email || '').trim().toLowerCase();
     let query = supabase.from('quotes').select('*');
-    if (userId) {
-      query = query.or(`customer_id.eq.${userId},email.ilike.${email.trim()}`);
-    } else {
-      query = query.ilike('email', email.trim());
+    
+    if (userId && cleanEmail) {
+      query = query.or(`customer_id.eq.${userId},email.ilike."${cleanEmail}"`);
+    } else if (userId) {
+      query = query.eq('customer_id', userId);
+    } else if (cleanEmail) {
+      query = query.ilike('email', cleanEmail);
     }
+
     const { data, error } = await query.order('created_at', { ascending: false });
-    if (error || !data) return [];
-    return data as Quote[];
+    if (error) {
+      console.error('Supabase fetch customer quotes error:', error);
+      return [];
+    }
+    return (data || []) as Quote[];
   } catch (err) {
+    console.error('Error fetching customer quotes:', err);
     return [];
   }
 }
