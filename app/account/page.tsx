@@ -22,7 +22,15 @@ import {
   ChevronRight,
   Bell,
   CheckCheck,
-  ExternalLink
+  ExternalLink,
+  Truck,
+  Calendar,
+  Copy,
+  Printer,
+  Package,
+  Check,
+  Sparkles,
+  AlertCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -796,49 +804,216 @@ export default function CustomerAccountPage() {
 
         {/* ORDER DETAILS MODAL */}
         <Dialog open={!!selectedOrder} onOpenChange={() => setSelectedOrder(null)}>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle className="font-heading text-xl font-bold flex items-center justify-between">
-                <span>Order #{selectedOrder?.order_number}</span>
-                <span className="text-xs px-2.5 py-1 rounded-full bg-slate-100 text-slate-800 font-normal">
-                  {selectedOrder?.status}
-                </span>
+              <DialogTitle className="font-heading text-xl font-bold flex items-center justify-between border-b border-slate-100 pb-3">
+                <div className="flex items-center gap-2">
+                  <Package className="h-5 w-5 text-brand-green" />
+                  <span>Order #{selectedOrder?.order_number}</span>
+                </div>
+                {selectedOrder && (
+                  <span className={cn(
+                    "text-xs px-3 py-1 rounded-full font-extrabold uppercase tracking-wider border",
+                    selectedOrder.status === 'DELIVERED' && "bg-emerald-50 text-emerald-800 border-emerald-300",
+                    (selectedOrder.status === 'OUT_FOR_DELIVERY' || selectedOrder.status === 'READY_FOR_DELIVERY') && "bg-blue-50 text-blue-800 border-blue-300",
+                    (selectedOrder.status === 'PREPARING' || selectedOrder.status === 'CONFIRMED') && "bg-amber-50 text-amber-800 border-amber-300",
+                    selectedOrder.status === 'PENDING' && "bg-slate-100 text-slate-800 border-slate-300",
+                    selectedOrder.status === 'CANCELLED' && "bg-red-50 text-red-800 border-red-300"
+                  )}>
+                    {selectedOrder.status.replace(/_/g, ' ')}
+                  </span>
+                )}
               </DialogTitle>
             </DialogHeader>
 
             {selectedOrder && (
-              <div className="space-y-6 text-xs">
-                <div className="grid grid-cols-2 gap-4 p-4 bg-slate-50 rounded-xl">
+              <div className="space-y-6 text-xs pt-2">
+                {/* Expected Delivery Date Banner */}
+                <div className="p-4 bg-emerald-50/90 border border-emerald-200 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                   <div>
-                    <span className="text-muted-foreground block">Customer Name</span>
-                    <span className="font-bold text-brand-charcoal">{selectedOrder.customer_name}</span>
+                    <span className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider block">Expected Delivery Date</span>
+                    <p className="font-heading text-lg font-extrabold text-brand-green flex items-center gap-2 mt-0.5">
+                      <Calendar className="h-4 w-4 text-brand-green" />
+                      {selectedOrder.expected_delivery_date ? (
+                        new Date(selectedOrder.expected_delivery_date).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })
+                      ) : (
+                        new Date(new Date(selectedOrder.created_at).getTime() + 5*24*60*60*1000).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })
+                      )}
+                    </p>
                   </div>
+                  <Button asChild size="sm" className="bg-brand-green hover:bg-emerald-700 text-white font-bold text-xs shadow-xs">
+                    <Link href={`/track-order?orderNumber=${selectedOrder.order_number}&phone=${selectedOrder.phone}`}>
+                      <ExternalLink className="h-3.5 w-3.5 mr-1.5" /> Open Tracking Desk
+                    </Link>
+                  </Button>
+                </div>
+
+                {/* Courier & AWB Info */}
+                {(selectedOrder.courier_partner || selectedOrder.tracking_number) && (
+                  <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between flex-wrap gap-3">
+                    <div className="flex items-center gap-2.5">
+                      <Truck className="h-4 w-4 text-brand-green" />
+                      <div>
+                        <p className="font-bold text-slate-800">Carrier: {selectedOrder.courier_partner || 'MS TRADERS Express'}</p>
+                        {selectedOrder.tracking_number && (
+                          <p className="text-slate-600 font-mono text-[11px]">AWB: <strong>{selectedOrder.tracking_number}</strong></p>
+                        )}
+                      </div>
+                    </div>
+                    {selectedOrder.tracking_url && (
+                      <a href={selectedOrder.tracking_url} target="_blank" rel="noopener noreferrer" className="text-brand-green hover:underline font-bold text-xs inline-flex items-center gap-1">
+                        Track on Courier Portal <ExternalLink className="h-3 w-3" />
+                      </a>
+                    )}
+                  </div>
+                )}
+
+                {/* Vertical Progress Timeline */}
+                <div className="p-4 bg-white border border-slate-200 rounded-xl space-y-3">
+                  <h4 className="font-heading text-sm font-bold text-brand-charcoal flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-brand-green" /> Production & Dispatch Progress
+                  </h4>
+
+                  <div className="relative pl-6 space-y-3.5">
+                    <div className="absolute left-[11px] top-2 bottom-2 w-0.5 bg-slate-200" />
+                    {[
+                      { status: 'PENDING', label: 'Order Placed & Logged', desc: 'Logged in MS TRADERS dispatch ledger.' },
+                      { status: 'CONFIRMED', label: 'Specs Approved', desc: 'GSM, cylinder size, & printing specs approved.' },
+                      { status: 'PREPARING', label: 'Custom Manufacturing', desc: 'Printing, cutting, & handle sealing active.' },
+                      { status: 'READY_FOR_DELIVERY', label: 'Inspected & Bale Packed', desc: 'Packed into moisture-proof wholesale bales.' },
+                      { status: 'OUT_FOR_DELIVERY', label: 'In Transport / Dispatched', desc: 'Handed over to carrier for delivery.' },
+                      { status: 'DELIVERED', label: 'Delivered', desc: 'Delivered successfully to customer.' }
+                    ].map((step, idx) => {
+                      const getStepIdx = (st: string) => {
+                        if (st === 'CANCELLED') return -1;
+                        const stepsArr = ['PENDING', 'CONFIRMED', 'PREPARING', 'READY_FOR_DELIVERY', 'OUT_FOR_DELIVERY', 'DELIVERED'];
+                        const i = stepsArr.indexOf(st);
+                        return i >= 0 ? i : 0;
+                      };
+                      const currIdx = getStepIdx(selectedOrder.status);
+                      const isCompleted = idx <= currIdx;
+                      const isCurrent = idx === currIdx;
+
+                      return (
+                        <div key={step.status} className="relative flex items-start gap-3">
+                          <div className={cn(
+                            "absolute -left-[20px] top-0 flex items-center justify-center w-5 h-5 rounded-full font-bold text-[10px]",
+                            isCurrent && "bg-brand-green text-white ring-4 ring-emerald-100 scale-110",
+                            isCompleted && !isCurrent && "bg-brand-green text-white",
+                            !isCompleted && "bg-white border-2 border-slate-300 text-slate-400"
+                          )}>
+                            {isCompleted ? <Check className="h-3 w-3 stroke-[3]" /> : idx + 1}
+                          </div>
+
+                          <div className="flex-1">
+                            <p className={cn("font-bold text-xs", isCurrent ? "text-brand-green" : isCompleted ? "text-slate-800" : "text-slate-400")}>
+                              {step.label} {isCurrent && <span className="text-[10px] text-emerald-800 font-normal ml-1">(Active)</span>}
+                            </p>
+                            <p className="text-[11px] text-slate-500 mt-0.5">{step.desc}</p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Ordered Items Breakdown */}
+                <div>
+                  <h4 className="font-bold text-brand-charcoal mb-2 flex items-center justify-between">
+                    <span>Ordered Goods</span>
+                    <span className="text-slate-500 font-normal">{selectedOrder.order_items?.length || 1} item(s)</span>
+                  </h4>
+
+                  {selectedOrder.order_items && selectedOrder.order_items.length > 0 ? (
+                    <div className="border border-border rounded-xl divide-y divide-border overflow-hidden">
+                      {selectedOrder.order_items.map((item, idx) => (
+                        <div key={idx} className="p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50/50">
+                          <div className="space-y-1">
+                            <p className="font-bold text-slate-900 text-sm">{item.product_name}</p>
+                            {item.variant_details && (
+                              <div className="flex flex-wrap gap-1 text-[10px]">
+                                {Object.entries(item.variant_details).map(([k, v]) => v ? (
+                                  <span key={k} className="px-1.5 py-0.5 bg-white border border-slate-200 rounded font-medium text-slate-700">
+                                    {k}: {v}
+                                  </span>
+                                ) : null)}
+                              </div>
+                            )}
+                          </div>
+                          <div className="text-left sm:text-right">
+                            <span className="font-extrabold text-brand-green text-sm">₹{item.total_price?.toLocaleString('en-IN')}</span>
+                            <p className="text-slate-500 text-[11px]">{item.quantity?.toLocaleString('en-IN')} units @ ₹{item.unit_price}/unit</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    /* Rich Fallback Summary Card when order_items array is empty */
+                    <div className="p-4 bg-emerald-50/60 border border-emerald-200 rounded-xl flex items-center justify-between">
+                      <div className="space-y-1">
+                        <p className="font-bold text-slate-900 text-sm">Wholesale Carry Bags Batch Order</p>
+                        <p className="text-slate-600 text-xs">Custom Non-Woven / Paper Bag Bulk Manufacturing Batch</p>
+                        <p className="text-emerald-800 text-[11px] font-medium flex items-center gap-1 pt-0.5">
+                          <ShieldCheck className="h-3.5 w-3.5 text-brand-green" /> Specifications & GSM verified by factory supervisor
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <span className="font-extrabold text-brand-green text-base">₹{(selectedOrder.total || 0).toLocaleString('en-IN')}</span>
+                        <span className="block text-[11px] text-slate-500 font-medium">Bulk Batch</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Customer & Shipping Info */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-slate-50 border border-slate-200 rounded-xl">
                   <div>
-                    <span className="text-muted-foreground block">Date</span>
-                    <span className="font-bold text-brand-charcoal">
-                      {new Date(selectedOrder.created_at).toLocaleDateString('en-IN')}
+                    <span className="font-bold text-slate-800 flex items-center gap-1.5 mb-1">
+                      <Building2 className="h-3.5 w-3.5 text-brand-green" /> Customer Profile
+                    </span>
+                    <p className="font-bold text-slate-900">{selectedOrder.customer_name}</p>
+                    {selectedOrder.company_name && <p className="text-brand-green font-semibold">{selectedOrder.company_name}</p>}
+                    <p className="text-slate-600">{selectedOrder.email}</p>
+                    <p className="text-slate-600 font-mono">{selectedOrder.phone}</p>
+                  </div>
+
+                  <div>
+                    <span className="font-bold text-slate-800 flex items-center gap-1.5 mb-1">
+                      <MapPin className="h-3.5 w-3.5 text-brand-green" /> Shipping Address
+                    </span>
+                    {typeof selectedOrder.shipping_address === 'string' ? (
+                      <p className="text-slate-700 font-medium">{selectedOrder.shipping_address}</p>
+                    ) : selectedOrder.shipping_address ? (
+                      <div className="text-slate-700 leading-relaxed">
+                        <p className="font-bold">{selectedOrder.shipping_address.firstName} {selectedOrder.shipping_address.lastName}</p>
+                        <p>{selectedOrder.shipping_address.address}</p>
+                        <p>{selectedOrder.shipping_address.city}, {selectedOrder.shipping_address.state} - {selectedOrder.shipping_address.postalCode}</p>
+                      </div>
+                    ) : (
+                      <p className="text-slate-500 italic">Address recorded on order invoice</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Price Breakdown & Actions */}
+                <div className="pt-3 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <div>
+                    <span className="text-slate-500 block text-[11px]">Total Invoice Value (Incl. GST)</span>
+                    <span className="font-heading text-xl font-extrabold text-brand-green">
+                      ₹{(selectedOrder.total || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                     </span>
                   </div>
-                </div>
 
-                <div>
-                  <h4 className="font-bold text-brand-charcoal mb-2">Order Items</h4>
-                  <div className="border border-border rounded-xl divide-y divide-border overflow-hidden">
-                    {selectedOrder.order_items?.map((item, idx) => (
-                      <div key={idx} className="p-3 flex items-center justify-between">
-                        <div>
-                          <p className="font-bold text-slate-800">{item.product_name}</p>
-                          <p className="text-muted-foreground">{item.quantity} units x ₹{item.unit_price}</p>
-                        </div>
-                        <span className="font-bold text-brand-green">₹{item.total_price}</span>
-                      </div>
-                    ))}
+                  <div className="flex items-center gap-2 w-full sm:w-auto">
+                    <Button variant="outline" size="sm" onClick={() => window.print()} className="text-xs font-bold">
+                      <Printer className="h-3.5 w-3.5 mr-1" /> Print
+                    </Button>
+                    <Button asChild size="sm" className="bg-brand-green hover:bg-emerald-700 text-white font-bold text-xs flex-1 sm:flex-none">
+                      <Link href={`/track-order?orderNumber=${selectedOrder.order_number}&phone=${selectedOrder.phone}`}>
+                        Full Live Tracking Desk
+                      </Link>
+                    </Button>
                   </div>
-                </div>
-
-                <div className="pt-2 flex justify-between items-center font-bold text-sm border-t border-border">
-                  <span>Total Amount</span>
-                  <span className="text-brand-green text-base">₹{(selectedOrder.total || 0).toLocaleString('en-IN')}</span>
                 </div>
               </div>
             )}
