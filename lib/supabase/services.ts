@@ -12,6 +12,7 @@ import {
   HomepageSection,
   Testimonial,
   MediaItem,
+  AppNotification,
   QuoteStatus,
   OrderStatus 
 } from '@/types';
@@ -520,6 +521,16 @@ export async function createQuote(quoteData: {
       return null;
     }
 
+    // Auto-create initial Notification for Customer
+    await createNotification({
+      user_id: quoteData.customer_id || null,
+      email: quoteData.email,
+      title: `Quotation Request Logged (${quote_number})`,
+      message: `Your request for ${quoteData.bag_type.replace(/-/g, ' ').toUpperCase()} (${quoteData.quantity.toLocaleString('en-IN')} units) was received. MS TRADERS desk is preparing custom pricing.`,
+      type: 'QUOTE_RECEIVED',
+      link: `/quotes/${quote_number}`
+    });
+
     return data as Quote;
   } catch (err) {
     console.error('Error submitting quote:', err);
@@ -578,26 +589,88 @@ export async function updateQuoteStatus(
   updates: Partial<Quote>
 ): Promise<boolean> {
   try {
-    // If customer_id is missing on quote, try linking with profile by email
-    if (!updates.customer_id) {
-      const { data: quoteData } = await supabase.from('quotes').select('email, customer_id').eq('id', id).single();
-      if (quoteData && quoteData.email && !quoteData.customer_id) {
-        const { data: profile } = await supabase.from('profiles').select('id').ilike('email', quoteData.email.trim()).maybeSingle();
-        if (profile) {
-          updates.customer_id = profile.id;
-        }
-      }
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+    let quoteQuery = supabase.from('quotes').select('id, quote_number, email, customer_id, total_amount');
+    
+    if (isUuid) {
+      quoteQuery = quoteQuery.eq('id', id);
+    } else {
+      quoteQuery = quoteQuery.eq('quote_number', id.trim().toUpperCase());
     }
 
-    const { error } = await supabase
-      .from('quotes')
-      .update(updates)
-      .eq('id', id);
+    const { data: quoteRecord } = await quoteQuery.maybeSingle();
 
-    if (error) throw error;
+    const targetEmail = quoteRecord?.email || updates.email;
+    let customerId = quoteRecord?.customer_id || updates.customer_id;
+
+    if (!customerId && targetEmail) {
+      const { data: profile } = await supabase.from('profiles').select('id').ilike('email', targetEmail.trim()).maybeSingle();
+      if (profile) customerId = profile.id;
+    }
+
+    // Clean payload keys to prevent invalid Postgres column errors
+    const allowedKeys = [
+      'status', 'customer_id', 'customer_name', 'business_name', 'email', 'phone', 
+      'whatsapp', 'city', 'delivery_address', 'bag_type', 'quantity', 'material', 
+      'printing', 'handle_type', 'size', 'requirements', 'attachments', 'unit_price', 
+      'subtotal', 'customization_charges', 'delivery_charges', 'discount', 'tax_amount', 
+      'total_amount', 'valid_until', 'notes', 'admin_notes', 'customer_notes', 'order_id'
+    ];
+
+    const cleanUpdates: Record<string, any> = {};
+    if (customerId) cleanUpdates.customer_id = customerId;
+
+    Object.keys(updates).forEach((key) => {
+      if (allowedKeys.includes(key) && (updates as any)[key] !== undefined) {
+        cleanUpdates[key] = (updates as any)[key];
+      }
+    });
+
+    let updateQuery = supabase.from('quotes').update(cleanUpdates);
+    if (quoteRecord?.id) {
+      updateQuery = updateQuery.eq('id', quoteRecord.id);
+    } else if (isUuid) {
+      updateQuery = updateQuery.eq('id', id);
+    } else {
+      updateQuery = updateQuery.eq('quote_number', id.trim().toUpperCase());
+    }
+
+    const { error } = await updateQuery;
+    if (error) {
+      console.error('Supabase updateQuoteStatus error:', error);
+      throw error;
+    }
+
+    // Send Notification Trigger
+    const qNum = quoteRecord?.quote_number || id;
+    if (cleanUpdates.status || cleanUpdates.total_amount !== undefined) {
+      let notifTitle = `Quotation Updated (#${qNum})`;
+      let notifMsg = `Quotation #${qNum} status changed to ${cleanUpdates.status || 'Updated'}.`;
+
+      if (cleanUpdates.status === 'QUOTED' || (cleanUpdates.total_amount && cleanUpdates.total_amount > 0)) {
+        notifTitle = `Official Quotation Ready (#${qNum})`;
+        notifMsg = `MS TRADERS issued your formal quotation #${qNum} for ₹${(cleanUpdates.total_amount || 0).toLocaleString('en-IN')}. Click to review & approve.`;
+      } else if (cleanUpdates.status === 'CHANGES_REQUESTED') {
+        notifTitle = `Revision Request Received (#${qNum})`;
+        notifMsg = `Your requested changes for quote #${qNum} were logged with MS TRADERS desk.`;
+      } else if (cleanUpdates.status === 'APPROVED') {
+        notifTitle = `Quotation Approved (#${qNum})`;
+        notifMsg = `Quotation #${qNum} approved! Your order is being processed for manufacturing.`;
+      }
+
+      await createNotification({
+        user_id: customerId || null,
+        email: targetEmail || null,
+        title: notifTitle,
+        message: notifMsg,
+        type: cleanUpdates.status === 'QUOTED' ? 'QUOTE_RECEIVED' : 'QUOTE_UPDATED',
+        link: `/quotes/${qNum}`
+      });
+    }
+
     return true;
   } catch (err) {
-    console.error('Error updating quote:', err);
+    console.error('Error updating quote status:', err);
     return false;
   }
 }
@@ -1459,6 +1532,96 @@ export async function deleteMediaItem(id: string): Promise<boolean> {
     const { error } = await supabase.from('media').delete().eq('id', id);
     if (error) throw error;
     return true;
+  } catch (err) {
+    return false;
+  }
+}
+
+// --- NOTIFICATIONS SERVICE ---
+export async function createNotification(notifData: {
+  user_id?: string | null;
+  email?: string | null;
+  title: string;
+  message: string;
+  type?: 'QUOTE_RECEIVED' | 'QUOTE_UPDATED' | 'QUOTE_APPROVED' | 'QUOTE_CHANGES_REQUESTED' | 'ORDER_STATUS' | 'SYSTEM';
+  link?: string | null;
+}): Promise<boolean> {
+  try {
+    const cleanEmail = notifData.email ? notifData.email.trim().toLowerCase() : null;
+    const { error } = await supabase.from('notifications').insert([{
+      user_id: notifData.user_id || null,
+      email: cleanEmail,
+      title: notifData.title,
+      message: notifData.message,
+      type: notifData.type || 'QUOTE_UPDATED',
+      link: notifData.link || null,
+      read: false
+    }]);
+
+    if (error) {
+      console.error('Error inserting notification:', error);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error('Error in createNotification:', err);
+    return false;
+  }
+}
+
+export async function getCustomerNotifications(email: string, userId?: string): Promise<AppNotification[]> {
+  try {
+    const cleanEmail = (email || '').trim().toLowerCase();
+    let query = supabase.from('notifications').select('*');
+
+    if (userId && cleanEmail) {
+      query = query.or(`user_id.eq.${userId},email.ilike."${cleanEmail}"`);
+    } else if (userId) {
+      query = query.eq('user_id', userId);
+    } else if (cleanEmail) {
+      query = query.ilike('email', cleanEmail);
+    } else {
+      return [];
+    }
+
+    const { data, error } = await query.order('created_at', { ascending: false });
+    if (error) {
+      console.error('Error fetching notifications:', error);
+      return [];
+    }
+    return (data || []) as AppNotification[];
+  } catch (err) {
+    console.error('Error in getCustomerNotifications:', err);
+    return [];
+  }
+}
+
+export async function markNotificationAsRead(id: string): Promise<boolean> {
+  try {
+    const { error } = await supabase.from('notifications').update({ read: true }).eq('id', id);
+    return !error;
+  } catch (err) {
+    return false;
+  }
+}
+
+export async function markAllNotificationsAsRead(email: string, userId?: string): Promise<boolean> {
+  try {
+    const cleanEmail = (email || '').trim().toLowerCase();
+    let query = supabase.from('notifications').update({ read: true });
+
+    if (userId && cleanEmail) {
+      query = query.or(`user_id.eq.${userId},email.ilike."${cleanEmail}"`);
+    } else if (userId) {
+      query = query.eq('user_id', userId);
+    } else if (cleanEmail) {
+      query = query.ilike('email', cleanEmail);
+    } else {
+      return false;
+    }
+
+    const { error } = await query;
+    return !error;
   } catch (err) {
     return false;
   }

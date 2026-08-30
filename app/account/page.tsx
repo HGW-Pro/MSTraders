@@ -19,7 +19,10 @@ import {
   CheckCircle2, 
   Clock, 
   ShieldCheck,
-  ChevronRight
+  ChevronRight,
+  Bell,
+  CheckCheck,
+  ExternalLink
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -36,9 +39,12 @@ import {
   getCustomerAddresses, 
   saveCustomerAddress, 
   deleteCustomerAddress,
-  syncCustomerRecords
+  syncCustomerRecords,
+  getCustomerNotifications,
+  markNotificationAsRead,
+  markAllNotificationsAsRead
 } from '@/lib/supabase/services';
-import { Order, Quote, CustomerAddress, UserProfile } from '@/types';
+import { Order, Quote, CustomerAddress, UserProfile, AppNotification } from '@/types';
 import { cn } from '@/lib/utils';
 
 export default function CustomerAccountPage() {
@@ -60,6 +66,7 @@ export default function CustomerAccountPage() {
   const [orders, setOrders] = React.useState<Order[]>([]);
   const [quotes, setQuotes] = React.useState<Quote[]>([]);
   const [addresses, setAddresses] = React.useState<CustomerAddress[]>([]);
+  const [notifications, setNotifications] = React.useState<AppNotification[]>([]);
   const [activeTab, setActiveTab] = React.useState('orders');
 
   // Modals
@@ -98,17 +105,19 @@ export default function CustomerAccountPage() {
         await syncCustomerRecords(user.id, user.email);
       }
 
-      const [usrProfile, usrOrders, usrQuotes, usrAddresses] = await Promise.all([
+      const [usrProfile, usrOrders, usrQuotes, usrAddresses, usrNotifs] = await Promise.all([
         getUserProfile(user.id),
         getCustomerOrders(user.email || '', user.id),
         getCustomerQuotes(user.email || '', user.id),
-        getCustomerAddresses(user.id)
+        getCustomerAddresses(user.id),
+        getCustomerNotifications(user.email || '', user.id)
       ]);
 
       setProfile(usrProfile);
       setOrders(usrOrders);
       setQuotes(usrQuotes);
       setAddresses(usrAddresses);
+      setNotifications(usrNotifs);
 
       if (usrProfile) {
         setEditProfile({
@@ -438,6 +447,14 @@ export default function CustomerAccountPage() {
             <TabsTrigger value="quotes" className="flex items-center gap-2 text-xs font-bold py-2.5 px-4 rounded-xl">
               <FileText className="h-4 w-4" /> Custom Quotes ({quotes.length})
             </TabsTrigger>
+            <TabsTrigger value="notifications" className="flex items-center gap-2 text-xs font-bold py-2.5 px-4 rounded-xl relative">
+              <Bell className="h-4 w-4 text-brand-green" /> Notifications
+              {notifications.filter(n => !n.read).length > 0 && (
+                <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-red-600 text-white font-bold ml-1">
+                  {notifications.filter(n => !n.read).length}
+                </span>
+              )}
+            </TabsTrigger>
             <TabsTrigger value="addresses" className="flex items-center gap-2 text-xs font-bold py-2.5 px-4 rounded-xl">
               <MapPin className="h-4 w-4" /> Saved Addresses ({addresses.length})
             </TabsTrigger>
@@ -593,6 +610,90 @@ export default function CustomerAccountPage() {
                       </div>
                     );
                   })}
+                </div>
+              )}
+            </div>
+          </TabsContent>
+
+          {/* TAB: NOTIFICATIONS */}
+          <TabsContent value="notifications">
+            <div className="bg-white border border-border rounded-2xl p-6 shadow-xs space-y-4">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div>
+                  <h2 className="font-heading text-lg font-bold text-brand-charcoal">Alerts & Notifications</h2>
+                  <p className="text-xs text-muted-foreground">Real-time status updates regarding your custom bag quotations and orders</p>
+                </div>
+                {notifications.some(n => !n.read) && (
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={async () => {
+                      if (sessionUser?.email || sessionUser?.id) {
+                        await markAllNotificationsAsRead(sessionUser.email || '', sessionUser.id);
+                        setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+                        toast.success('All notifications marked as read');
+                      }
+                    }}
+                    className="text-xs font-bold border-slate-300"
+                  >
+                    <CheckCheck className="h-3.5 w-3.5 mr-1.5 text-brand-green" /> Mark All as Read
+                  </Button>
+                )}
+              </div>
+
+              {notifications.length === 0 ? (
+                <div className="text-center py-12 border-2 border-dashed border-slate-200 rounded-xl space-y-3">
+                  <Bell className="h-10 w-10 text-muted-foreground mx-auto" />
+                  <p className="text-sm font-bold text-slate-700">No Notifications Yet</p>
+                  <p className="text-xs text-muted-foreground max-w-sm mx-auto">
+                    When MS TRADERS issues a quote or updates your order status, instant notifications will appear here.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {notifications.map((notif) => (
+                    <div 
+                      key={notif.id}
+                      className={cn(
+                        "p-4 border rounded-xl transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4",
+                        !notif.read ? "bg-emerald-50/60 border-emerald-300 shadow-2xs" : "bg-slate-50/50 border-border"
+                      )}
+                    >
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-heading font-bold text-slate-900 text-sm">{notif.title}</span>
+                          {!notif.read && (
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-600 text-white uppercase">
+                              UNREAD
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs text-slate-700 leading-relaxed">{notif.message}</p>
+                        <p className="text-[11px] text-slate-400 flex items-center gap-1">
+                          <Clock className="h-3 w-3" />
+                          {new Date(notif.created_at).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })} • {new Date(notif.created_at).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        </p>
+                      </div>
+
+                      {notif.link && (
+                        <Button 
+                          asChild 
+                          size="sm" 
+                          onClick={async () => {
+                            if (!notif.read) {
+                              await markNotificationAsRead(notif.id);
+                              setNotifications(prev => prev.map(n => n.id === notif.id ? { ...n, read: true } : n));
+                            }
+                          }}
+                          className="bg-brand-green hover:bg-emerald-700 text-white font-bold text-xs flex-shrink-0"
+                        >
+                          <Link href={notif.link}>
+                            View Details <ExternalLink className="h-3.5 w-3.5 ml-1.5" />
+                          </Link>
+                        </Button>
+                      )}
+                    </div>
+                  ))}
                 </div>
               )}
             </div>

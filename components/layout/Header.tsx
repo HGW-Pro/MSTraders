@@ -13,14 +13,20 @@ import {
   Search, 
   Sparkles, 
   ChevronRight,
-  MessageSquare
+  MessageSquare,
+  Bell,
+  FileText,
+  CheckCheck,
+  Clock,
+  ExternalLink
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Logo } from '@/components/logo';
 import { useCartStore } from '@/lib/store';
 import { supabase } from '@/lib/supabase/client';
-import { getUserProfile } from '@/lib/supabase/services';
+import { getUserProfile, getCustomerNotifications, markNotificationAsRead, markAllNotificationsAsRead } from '@/lib/supabase/services';
+import { AppNotification } from '@/types';
 import { motion, AnimatePresence } from 'motion/react';
 
 const mainNav = [
@@ -40,11 +46,28 @@ export function Header() {
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
   const [isAdmin, setIsAdmin] = React.useState(false);
   const [userEmail, setUserEmail] = React.useState<string | null>(null);
+  const [userId, setUserId] = React.useState<string | null>(null);
+
+  // Notification State
+  const [notifications, setNotifications] = React.useState<AppNotification[]>([]);
+  const [showNotifMenu, setShowNotifMenu] = React.useState(false);
 
   // Cart Store for Badge Counter
   const { items } = useCartStore();
   const mounted = React.useSyncExternalStore(() => () => {}, () => true, () => false);
   const cartCount = mounted ? items.reduce((sum, item) => sum + item.quantity, 0) : 0;
+
+  const loadNotifications = React.useCallback(async (eMail?: string | null, uId?: string | null) => {
+    const emailToUse = eMail !== undefined ? eMail : userEmail;
+    const uidToUse = uId !== undefined ? uId : userId;
+
+    if (!emailToUse && !uidToUse) {
+      setNotifications([]);
+      return;
+    }
+    const list = await getCustomerNotifications(emailToUse || '', uidToUse || undefined);
+    setNotifications(list);
+  }, [userEmail, userId]);
 
   // Sync Supabase Auth & Profile Admin Check
   React.useEffect(() => {
@@ -56,6 +79,8 @@ export function Header() {
           setIsLoggedIn(false);
           setIsAdmin(false);
           setUserEmail(null);
+          setUserId(null);
+          setNotifications([]);
         }
         return;
       }
@@ -63,6 +88,8 @@ export function Header() {
       if (active) {
         setIsLoggedIn(true);
         setUserEmail(user.email || null);
+        setUserId(user.id || null);
+        loadNotifications(user.email, user.id);
       }
 
       const profile = await getUserProfile(user.id);
@@ -84,7 +111,33 @@ export function Header() {
       active = false;
       subscription.unsubscribe();
     };
-  }, []);
+  }, [loadNotifications]);
+
+  // Poll for new notifications every 20 seconds
+  React.useEffect(() => {
+    if (!userEmail && !userId) return;
+    const timer = setInterval(() => {
+      loadNotifications();
+    }, 20000);
+    return () => clearInterval(timer);
+  }, [userEmail, userId, loadNotifications]);
+
+  const unreadNotifsCount = notifications.filter(n => !n.read).length;
+
+  const handleMarkAllRead = async () => {
+    if (userEmail || userId) {
+      await markAllNotificationsAsRead(userEmail || '', userId || undefined);
+      setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+    }
+  };
+
+  const handleNotifClick = async (notif: AppNotification) => {
+    if (!notif.read) {
+      await markNotificationAsRead(notif.id);
+      setNotifications(prev => prev.map(n => n.id === notif.id ? { ...n, read: true } : n));
+    }
+    setShowNotifMenu(false);
+  };
 
   // Prevent background scroll when mobile menu is open
   React.useEffect(() => {
@@ -188,6 +241,114 @@ export function Header() {
                 </span>
               )}
             </Link>
+
+            {/* Notification Bell Button & Popover */}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setShowNotifMenu(!showNotifMenu)}
+                className="relative p-2 rounded-full text-slate-700 hover:text-brand-green hover:bg-brand-cream transition-colors"
+                aria-label="View Notifications"
+              >
+                <Bell className="h-5 w-5" />
+                {unreadNotifsCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-bold h-4 w-4 rounded-full flex items-center justify-center shadow-xs animate-pulse">
+                    {unreadNotifsCount}
+                  </span>
+                )}
+              </button>
+
+              {/* Notifications Popover */}
+              <AnimatePresence>
+                {showNotifMenu && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-slate-200 z-50 overflow-hidden text-left"
+                  >
+                    <div className="p-3.5 bg-brand-charcoal text-white flex items-center justify-between border-b border-slate-700">
+                      <div className="flex items-center gap-2">
+                        <Bell className="h-4 w-4 text-brand-gold" />
+                        <span className="font-heading font-bold text-sm">Notifications</span>
+                        {unreadNotifsCount > 0 && (
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-brand-gold text-brand-charcoal">
+                            {unreadNotifsCount} New
+                          </span>
+                        )}
+                      </div>
+                      {unreadNotifsCount > 0 && (
+                        <button
+                          onClick={handleMarkAllRead}
+                          className="text-[11px] text-slate-300 hover:text-brand-gold font-medium flex items-center gap-1 hover:underline"
+                        >
+                          <CheckCheck className="h-3 w-3" /> Mark all read
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="max-h-80 overflow-y-auto divide-y divide-slate-100">
+                      {notifications.length === 0 ? (
+                        <div className="p-6 text-center text-slate-500 space-y-2">
+                          <Bell className="h-8 w-8 mx-auto text-slate-300" />
+                          <p className="text-xs font-semibold">No notifications yet</p>
+                          <p className="text-[11px] text-slate-400">Updates regarding your custom bag quotations and orders will appear here.</p>
+                        </div>
+                      ) : (
+                        notifications.map((notif) => (
+                          <div
+                            key={notif.id}
+                            onClick={() => {
+                              handleNotifClick(notif);
+                              if (notif.link) {
+                                window.location.href = notif.link;
+                              }
+                            }}
+                            className={cn(
+                              "p-3.5 transition-colors cursor-pointer hover:bg-slate-50 flex items-start gap-3",
+                              !notif.read ? "bg-emerald-50/50 font-semibold" : "bg-white"
+                            )}
+                          >
+                            <div className={cn(
+                              "p-2 rounded-xl flex-shrink-0 mt-0.5",
+                              notif.type === 'QUOTE_RECEIVED' ? "bg-emerald-100 text-emerald-800" :
+                              notif.type === 'ORDER_STATUS' ? "bg-blue-100 text-blue-800" : "bg-amber-100 text-amber-800"
+                            )}>
+                              <FileText className="h-4 w-4" />
+                            </div>
+
+                            <div className="space-y-1 flex-1 min-w-0">
+                              <div className="flex items-center justify-between gap-2">
+                                <p className="text-xs font-bold text-slate-900 truncate">{notif.title}</p>
+                                {!notif.read && (
+                                  <span className="w-2 h-2 rounded-full bg-emerald-600 flex-shrink-0"></span>
+                                )}
+                              </div>
+                              <p className="text-[11px] text-slate-600 line-clamp-2 leading-relaxed">{notif.message}</p>
+                              <p className="text-[10px] text-slate-400 flex items-center gap-1">
+                                <Clock className="h-3 w-3" />
+                                {new Date(notif.created_at).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })} • {new Date(notif.created_at).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })}
+                              </p>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+
+                    <div className="p-2.5 bg-slate-50 border-t border-slate-100 text-center">
+                      <Link
+                        href="/account"
+                        onClick={() => setShowNotifMenu(false)}
+                        className="text-xs font-bold text-brand-green hover:underline flex items-center justify-center gap-1"
+                      >
+                        View All Activity in Customer Account <ExternalLink className="h-3 w-3" />
+                      </Link>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
 
             {/* User Account Link */}
             <Link 

@@ -266,6 +266,18 @@ export interface Testimonial {
   created_at?: string;
 }
 
+export interface AppNotification {
+  id: string;
+  created_at: string;
+  user_id?: string | null;
+  email?: string | null;
+  title: string;
+  message: string;
+  type: 'QUOTE_RECEIVED' | 'QUOTE_UPDATED' | 'QUOTE_APPROVED' | 'QUOTE_CHANGES_REQUESTED' | 'ORDER_STATUS' | 'SYSTEM';
+  link?: string | null;
+  read: boolean;
+}
+
 export interface MediaItem {
   id: string;
   title: string;
