@@ -85,6 +85,10 @@ export interface Quote {
   order_id?: string | null;
   amount?: number | null;
   shipping_amount?: number | null;
+  expected_delivery_date?: string | null;
+  courier_partner?: string | null;
+  tracking_number?: string | null;
+  tracking_url?: string | null;
 }
 
 export type OrderStatus = 
@@ -151,6 +155,10 @@ export interface Order {
   delivery_method?: 'LOCAL_DELIVERY' | 'INTERNAL_DELIVERY' | 'CUSTOMER_PICKUP' | 'OTHER';
   delivery_notes?: string | null;
   notes?: string | null;
+  expected_delivery_date?: string | null;
+  courier_partner?: string | null;
+  tracking_number?: string | null;
+  tracking_url?: string | null;
   order_items?: OrderItem[];
 }
 
@@ -271,6 +279,7 @@ export interface AppNotification {
   created_at: string;
   user_id?: string | null;
   email?: string | null;
+  recipient_role?: 'customer' | 'admin' | 'all';
   title: string;
   message: string;
   type: 'QUOTE_RECEIVED' | 'QUOTE_UPDATED' | 'QUOTE_APPROVED' | 'QUOTE_CHANGES_REQUESTED' | 'ORDER_STATUS' | 'SYSTEM';

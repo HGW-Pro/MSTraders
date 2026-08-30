@@ -57,17 +57,18 @@ export function Header() {
   const mounted = React.useSyncExternalStore(() => () => {}, () => true, () => false);
   const cartCount = mounted ? items.reduce((sum, item) => sum + item.quantity, 0) : 0;
 
-  const loadNotifications = React.useCallback(async (eMail?: string | null, uId?: string | null) => {
+  const loadNotifications = React.useCallback(async (eMail?: string | null, uId?: string | null, adminFlag?: boolean) => {
     const emailToUse = eMail !== undefined ? eMail : userEmail;
     const uidToUse = uId !== undefined ? uId : userId;
+    const isAdm = adminFlag !== undefined ? adminFlag : isAdmin;
 
     if (!emailToUse && !uidToUse) {
       setNotifications([]);
       return;
     }
-    const list = await getCustomerNotifications(emailToUse || '', uidToUse || undefined);
+    const list = await getCustomerNotifications(emailToUse || '', uidToUse || undefined, isAdm);
     setNotifications(list);
-  }, [userEmail, userId]);
+  }, [userEmail, userId, isAdmin]);
 
   // Sync Supabase Auth & Profile Admin Check
   React.useEffect(() => {
@@ -85,16 +86,13 @@ export function Header() {
         return;
       }
 
-      if (active) {
-        setIsLoggedIn(true);
-        setUserEmail(user.email || null);
-        setUserId(user.id || null);
-        loadNotifications(user.email, user.id);
-      }
-
       const isUserAdmin = await checkIsAdmin(user.id, user.email);
       if (active) {
+        setIsLoggedIn(true);
         setIsAdmin(isUserAdmin);
+        setUserEmail(user.email || null);
+        setUserId(user.id || null);
+        loadNotifications(user.email, user.id, isUserAdmin);
       }
     }
 

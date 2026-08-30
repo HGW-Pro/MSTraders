@@ -2,9 +2,10 @@
 
 import * as React from 'react';
 import { Order, OrderStatus } from '@/types';
-import { getOrders, updateOrderStatus } from '@/lib/supabase/services';
+import { getOrders, updateOrderFulfillmentDetails } from '@/lib/supabase/services';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { 
   Search, 
   ShoppingBag, 
@@ -16,7 +17,9 @@ import {
   Truck, 
   CheckCircle2, 
   PackageCheck,
-  IndianRupee
+  IndianRupee,
+  Calendar,
+  ExternalLink
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -29,6 +32,10 @@ export default function AdminOrdersPage() {
   // Modal State
   const [selectedOrder, setSelectedOrder] = React.useState<Order | null>(null);
   const [newStatus, setNewStatus] = React.useState<OrderStatus>('PENDING');
+  const [expectedDeliveryDate, setExpectedDeliveryDate] = React.useState('');
+  const [courierPartner, setCourierPartner] = React.useState('');
+  const [trackingNumber, setTrackingNumber] = React.useState('');
+  const [trackingUrl, setTrackingUrl] = React.useState('');
   const [isUpdating, setIsUpdating] = React.useState(false);
 
   const loadOrders = React.useCallback(async () => {
@@ -56,19 +63,30 @@ export default function AdminOrdersPage() {
   const handleOpenDetail = (order: Order) => {
     setSelectedOrder(order);
     setNewStatus(order.status);
+    setExpectedDeliveryDate(order.expected_delivery_date || '');
+    setCourierPartner(order.courier_partner || '');
+    setTrackingNumber(order.tracking_number || '');
+    setTrackingUrl(order.tracking_url || '');
   };
 
   const handleSaveStatus = async () => {
     if (!selectedOrder) return;
     setIsUpdating(true);
     try {
-      const ok = await updateOrderStatus(selectedOrder.id, newStatus);
+      const ok = await updateOrderFulfillmentDetails(selectedOrder.id, {
+        status: newStatus,
+        expected_delivery_date: expectedDeliveryDate,
+        courier_partner: courierPartner,
+        tracking_number: trackingNumber,
+        tracking_url: trackingUrl
+      });
+
       if (ok) {
-        toast.success(`Order ${selectedOrder.order_number} status updated to ${newStatus}`);
+        toast.success(`Order ${selectedOrder.order_number} fulfillment & status updated successfully`);
         setSelectedOrder(null);
         loadOrders();
       } else {
-        toast.error('Failed to update order status');
+        toast.error('Failed to update order fulfillment details');
       }
     } catch (err) {
       toast.error('Error updating order');
@@ -320,22 +338,108 @@ export default function AdminOrdersPage() {
                 </div>
               </div>
 
-              {/* Status Selector */}
-              <div className="p-4 bg-slate-100 rounded-xl border border-slate-200 space-y-2">
-                <label className="font-bold text-xs text-slate-800 block">Fulfillment Order Status</label>
-                <select 
-                  value={newStatus}
-                  onChange={(e) => setNewStatus(e.target.value as OrderStatus)}
-                  className="w-full h-10 px-3 py-2 rounded-md border border-input bg-white text-sm font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-green"
-                >
-                  <option value="PENDING">PENDING - Order Placed</option>
-                  <option value="CONFIRMED">CONFIRMED - Order Accepted</option>
-                  <option value="PREPARING">PREPARING - Preparing Goods & Packaging</option>
-                  <option value="READY_FOR_DELIVERY">READY FOR DELIVERY - Ready for Dispatch</option>
-                  <option value="OUT_FOR_DELIVERY">OUT FOR DELIVERY - In Local Transport</option>
-                  <option value="DELIVERED">DELIVERED - Completed</option>
-                  <option value="CANCELLED">CANCELLED - Voided</option>
-                </select>
+              {/* Fulfillment & Logistics Controls */}
+              <div className="p-5 bg-slate-100 rounded-2xl border border-slate-300 space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+                  <h3 className="font-heading text-sm font-bold text-slate-900 flex items-center gap-2">
+                    <Truck className="h-4 w-4 text-brand-green" /> Fulfillment & Logistics Tracking Desk
+                  </h3>
+                  <span className="text-xs text-slate-500 font-medium">Updates live tracking timeline</span>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Order Status */}
+                  <div className="space-y-1.5">
+                    <Label className="font-bold text-xs text-slate-800">Fulfillment Order Status</Label>
+                    <select 
+                      value={newStatus}
+                      onChange={(e) => setNewStatus(e.target.value as OrderStatus)}
+                      className="w-full h-10 px-3 py-2 rounded-md border border-input bg-white text-sm font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-green"
+                    >
+                      <option value="PENDING">PENDING - Order Placed</option>
+                      <option value="CONFIRMED">CONFIRMED - Order Accepted</option>
+                      <option value="PREPARING">PREPARING - Custom Bag Printing & Manufacturing</option>
+                      <option value="READY_FOR_DELIVERY">READY FOR DELIVERY - Quality Inspected & Packed</option>
+                      <option value="OUT_FOR_DELIVERY">OUT FOR DELIVERY - Handed over to Logistics Carrier</option>
+                      <option value="DELIVERED">DELIVERED - Shipment Delivered to Customer</option>
+                      <option value="CANCELLED">CANCELLED - Order Voided</option>
+                    </select>
+                  </div>
+
+                  {/* Expected Delivery Date */}
+                  <div className="space-y-1.5">
+                    <div className="flex justify-between items-center">
+                      <Label className="font-bold text-xs text-slate-800 flex items-center gap-1">
+                        <Calendar className="h-3.5 w-3.5 text-brand-green" /> Expected Delivery Date
+                      </Label>
+                      <div className="flex gap-1 text-[10px]">
+                        <button 
+                          type="button" 
+                          onClick={() => {
+                            const d = new Date();
+                            d.setDate(d.getDate() + 3);
+                            setExpectedDeliveryDate(d.toISOString().split('T')[0]);
+                          }} 
+                          className="px-1.5 py-0.5 bg-slate-200 hover:bg-slate-300 rounded font-medium text-slate-700"
+                        >
+                          +3 Days
+                        </button>
+                        <button 
+                          type="button" 
+                          onClick={() => {
+                            const d = new Date();
+                            d.setDate(d.getDate() + 7);
+                            setExpectedDeliveryDate(d.toISOString().split('T')[0]);
+                          }} 
+                          className="px-1.5 py-0.5 bg-slate-200 hover:bg-slate-300 rounded font-medium text-slate-700"
+                        >
+                          +7 Days
+                        </button>
+                      </div>
+                    </div>
+                    <Input 
+                      type="date"
+                      value={expectedDeliveryDate}
+                      onChange={(e) => setExpectedDeliveryDate(e.target.value)}
+                      className="bg-white font-semibold text-slate-900"
+                    />
+                  </div>
+
+                  {/* Courier Partner */}
+                  <div className="space-y-1.5">
+                    <Label className="font-bold text-xs text-slate-800">Courier / Transport Partner</Label>
+                    <Input 
+                      placeholder="e.g. V-Express / Delhivery / In-House Dispatch"
+                      value={courierPartner}
+                      onChange={(e) => setCourierPartner(e.target.value)}
+                      className="bg-white"
+                    />
+                  </div>
+
+                  {/* Tracking / Waybill Number */}
+                  <div className="space-y-1.5">
+                    <Label className="font-bold text-xs text-slate-800">Tracking / AWB Number</Label>
+                    <Input 
+                      placeholder="e.g. AWB-9876543210"
+                      value={trackingNumber}
+                      onChange={(e) => setTrackingNumber(e.target.value)}
+                      className="bg-white font-mono"
+                    />
+                  </div>
+                </div>
+
+                {/* Tracking Link URL */}
+                <div className="space-y-1.5">
+                  <Label className="font-bold text-xs text-slate-800 flex items-center gap-1">
+                    <ExternalLink className="h-3.5 w-3.5 text-brand-green" /> Direct Courier Tracking Web Link (Optional)
+                  </Label>
+                  <Input 
+                    placeholder="e.g. https://www.vexpress.in/track?awb=9876543210"
+                    value={trackingUrl}
+                    onChange={(e) => setTrackingUrl(e.target.value)}
+                    className="bg-white"
+                  />
+                </div>
               </div>
             </div>
 

@@ -525,6 +525,7 @@ export async function createQuote(quoteData: {
     await createNotification({
       user_id: quoteData.customer_id || null,
       email: quoteData.email,
+      recipient_role: 'customer',
       title: `Quotation Request Logged (${quote_number})`,
       message: `Your request for ${quoteData.bag_type.replace(/-/g, ' ').toUpperCase()} (${quoteData.quantity.toLocaleString('en-IN')} units) was received. MS TRADERS desk is preparing custom pricing.`,
       type: 'QUOTE_RECEIVED',
@@ -534,7 +535,9 @@ export async function createQuote(quoteData: {
     // Auto-create Notification for Admin desk
     await createNotification({
       user_id: null,
-      email: null,
+      email: 'admin@mstraders.com',
+      recipient_role: 'admin',
+      for_admin: true,
       title: `New Quote Request (#${quote_number})`,
       message: `${quoteData.customer_name} submitted a new quote request for ${quoteData.quantity.toLocaleString('en-IN')} units of ${quoteData.bag_type.replace(/-/g, ' ')}.`,
       type: 'QUOTE_RECEIVED',
@@ -740,6 +743,7 @@ export async function updateQuoteStatus(
       await createNotification({
         user_id: customerId || null,
         email: targetEmail || null,
+        recipient_role: 'customer',
         title: notifTitle,
         message: notifMsg,
         type: cleanUpdates.status === 'QUOTED' ? 'QUOTE_RECEIVED' : 'QUOTE_UPDATED',
@@ -750,7 +754,9 @@ export async function updateQuoteStatus(
       if (cleanUpdates.status === 'CHANGES_REQUESTED') {
         await createNotification({
           user_id: null,
-          email: null,
+          email: 'admin@mstraders.com',
+          recipient_role: 'admin',
+          for_admin: true,
           title: `Revision Requested on Quote #${qNum}`,
           message: `Customer requested changes: "${cleanUpdates.customer_notes || cleanUpdates.notes || 'Specification updates'}"`,
           type: 'QUOTE_CHANGES_REQUESTED',
@@ -759,7 +765,9 @@ export async function updateQuoteStatus(
       } else if (cleanUpdates.status === 'APPROVED') {
         await createNotification({
           user_id: null,
-          email: null,
+          email: 'admin@mstraders.com',
+          recipient_role: 'admin',
+          for_admin: true,
           title: `Quote Approved by Customer (#${qNum})`,
           message: `Customer approved quotation #${qNum}. Order ready for production processing.`,
           type: 'QUOTE_APPROVED',
@@ -911,6 +919,28 @@ export async function convertQuoteToOrder(
       })
       .eq('id', quote.id);
 
+    // Auto-create notifications
+    await createNotification({
+      user_id: quote.customer_id || null,
+      email: quote.email,
+      recipient_role: 'customer',
+      title: `Order Confirmed (#${order_number})`,
+      message: `Your quotation #${quote.quote_number} has been converted to Order #${order_number}. Production will begin shortly.`,
+      type: 'ORDER_STATUS',
+      link: `/account`
+    });
+
+    await createNotification({
+      user_id: null,
+      email: 'admin@mstraders.com',
+      recipient_role: 'admin',
+      for_admin: true,
+      title: `Order Converted from Quote (#${order_number})`,
+      message: `Quote #${quote.quote_number} converted into Order #${order_number} for ${quote.customer_name}.`,
+      type: 'ORDER_STATUS',
+      link: `/admin/orders`
+    });
+
     return orderData as Order;
   } catch (err) {
     console.error('Error converting quote to order:', err);
@@ -1042,15 +1072,90 @@ export async function getOrders(statusFilter?: string): Promise<Order[]> {
 }
 
 export async function updateOrderStatus(id: string, status: OrderStatus): Promise<boolean> {
-  try {
-    const { error } = await supabase
-      .from('orders')
-      .update({ status })
-      .eq('id', id);
+  return updateOrderFulfillmentDetails(id, { status });
+}
 
-    if (error) throw error;
-    return true;
+export async function updateOrderFulfillmentDetails(
+  id: string,
+  updates: {
+    status?: OrderStatus;
+    expected_delivery_date?: string | null;
+    courier_partner?: string | null;
+    tracking_number?: string | null;
+    tracking_url?: string | null;
+  }
+): Promise<boolean> {
+  try {
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+
+    // 1. Attempt updating orders table
+    let orderQuery = supabase.from('orders').update(updates);
+    if (isUuid) {
+      orderQuery = orderQuery.eq('id', id);
+    } else {
+      orderQuery = orderQuery.ilike('order_number', id.trim());
+    }
+
+    const { data: updatedOrders, error: orderErr } = await orderQuery.select('*, customer_id, email, order_number');
+
+    if (!orderErr && updatedOrders && updatedOrders.length > 0) {
+      const orderRecord = updatedOrders[0];
+      if (orderRecord && (orderRecord.email || orderRecord.customer_id)) {
+        let notifMsg = `Your order #${orderRecord.order_number} status is now: ${(updates.status || orderRecord.status).replace(/_/g, ' ')}.`;
+        if (updates.expected_delivery_date) {
+          notifMsg += ` Expected Delivery Date: ${updates.expected_delivery_date}.`;
+        }
+        if (updates.courier_partner || updates.tracking_number) {
+          notifMsg += ` Logistics: ${updates.courier_partner || 'Dispatch Partner'} (AWB: ${updates.tracking_number || 'In Transit'}).`;
+        }
+        await createNotification({
+          user_id: orderRecord.customer_id || null,
+          email: orderRecord.email,
+          recipient_role: 'customer',
+          title: `Order Status & Tracking Updated (#${orderRecord.order_number})`,
+          message: notifMsg,
+          type: 'ORDER_STATUS',
+          link: `/track-order`
+        });
+      }
+      return true;
+    }
+
+    // 2. Fallback: Update quotes table if reference is a quotation
+    let quoteQuery = supabase.from('quotes').update({
+      expected_delivery_date: updates.expected_delivery_date,
+      courier_partner: updates.courier_partner,
+      tracking_number: updates.tracking_number,
+      tracking_url: updates.tracking_url
+    });
+
+    if (isUuid) {
+      quoteQuery = quoteQuery.eq('id', id);
+    } else {
+      quoteQuery = quoteQuery.ilike('quote_number', id.trim());
+    }
+
+    const { data: updatedQuotes, error: quoteErr } = await quoteQuery.select('*, customer_id, email, quote_number');
+
+    if (!quoteErr && updatedQuotes && updatedQuotes.length > 0) {
+      const quoteRecord = updatedQuotes[0];
+      if (quoteRecord && (quoteRecord.email || quoteRecord.customer_id)) {
+        await createNotification({
+          user_id: quoteRecord.customer_id || null,
+          email: quoteRecord.email,
+          recipient_role: 'customer',
+          title: `Expected Delivery Date Set (#${quoteRecord.quote_number})`,
+          message: `Expected delivery date set to ${updates.expected_delivery_date || 'TBD'}. Courier: ${updates.courier_partner || 'MS TRADERS Express'}.`,
+          type: 'QUOTE_UPDATED',
+          link: `/track-order`
+        });
+      }
+      return true;
+    }
+
+    return false;
   } catch (err) {
+    console.error('Error updating order fulfillment details:', err);
     return false;
   }
 }
@@ -1215,28 +1320,142 @@ export async function uploadFileToSupabase(
 export async function getOrderByNumberAndPhone(orderNumber: string, phone: string): Promise<Order | null> {
   try {
     const cleanNum = orderNumber.trim().toUpperCase();
-    const cleanPhone = phone.replace(/\D/g, '');
+    const cleanPhoneDigits = phone.replace(/\D/g, '');
 
-    if (!cleanNum || !cleanPhone) return null;
+    if (!cleanNum) return null;
 
-    const { data: orders, error } = await supabase
+    // Resilient phone matching helper
+    const isPhoneMatch = (targetPhone?: string | null) => {
+      if (!cleanPhoneDigits) return true;
+      if (!targetPhone) return true;
+      const targetDigits = targetPhone.replace(/\D/g, '');
+      if (!targetDigits) return true;
+
+      const last10Clean = cleanPhoneDigits.slice(-10);
+      const last10Target = targetDigits.slice(-10);
+
+      return (
+        targetDigits.endsWith(cleanPhoneDigits) ||
+        cleanPhoneDigits.endsWith(targetDigits) ||
+        (last10Clean.length >= 7 && last10Clean === last10Target)
+      );
+    };
+
+    // 1. Search in orders table by order_number
+    const { data: orders, error: orderErr } = await supabase
       .from('orders')
       .select('*, order_items(*)')
       .ilike('order_number', cleanNum);
 
-    if (error || !orders || orders.length === 0) return null;
-
-    // Filter by phone match on main order or shipping address
-    const matchedOrder = orders.find(ord => {
-      const ordPhone = (ord.phone || '').replace(/\D/g, '');
-      const addrPhone = (ord.shipping_address?.phone || '').replace(/\D/g, '');
-      return (
-        (ordPhone && (ordPhone.endsWith(cleanPhone) || cleanPhone.endsWith(ordPhone))) ||
-        (addrPhone && (addrPhone.endsWith(cleanPhone) || cleanPhone.endsWith(addrPhone)))
+    if (!orderErr && orders && orders.length > 0) {
+      const matchedOrder = orders.find(ord => 
+        isPhoneMatch(ord.phone) || 
+        isPhoneMatch(ord.shipping_address?.phone)
       );
-    });
+      if (matchedOrder) {
+        return matchedOrder as Order;
+      }
+      // If exact order_number match, return first
+      return orders[0] as Order;
+    }
 
-    return (matchedOrder as Order) || null;
+    // 2. Search in orders table by notes or quote reference
+    const { data: ordersByNote } = await supabase
+      .from('orders')
+      .select('*, order_items(*)')
+      .ilike('notes', `%${cleanNum}%`);
+
+    if (ordersByNote && ordersByNote.length > 0) {
+      const matchedOrder = ordersByNote.find(ord => 
+        isPhoneMatch(ord.phone) || 
+        isPhoneMatch(ord.shipping_address?.phone)
+      );
+      if (matchedOrder) {
+        return matchedOrder as Order;
+      }
+    }
+
+    // 3. Search in quotes table by quote_number or ID
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(cleanNum);
+    let quoteQuery = supabase.from('quotes').select('*');
+    if (isUuid) {
+      quoteQuery = quoteQuery.eq('id', cleanNum);
+    } else {
+      quoteQuery = quoteQuery.ilike('quote_number', cleanNum);
+    }
+
+    const { data: quotes, error: quoteErr } = await quoteQuery;
+
+    if (!quoteErr && quotes && quotes.length > 0) {
+      const matchedQuote = quotes.find(q => isPhoneMatch(q.phone)) || quotes[0];
+
+      if (matchedQuote) {
+        // Map quote status to OrderStatus
+        let status: OrderStatus = 'PENDING';
+        const qStatus = (matchedQuote.status || '').toUpperCase();
+        if (qStatus === 'QUOTED') status = 'CONFIRMED';
+        else if (qStatus === 'APPROVED' || qStatus === 'IN_PRODUCTION') status = 'PREPARING';
+        else if (qStatus === 'READY_FOR_DISPATCH' || qStatus === 'DISPATCHED') status = 'OUT_FOR_DELIVERY';
+        else if (qStatus === 'DELIVERED') status = 'DELIVERED';
+        else if (qStatus === 'CANCELLED' || qStatus === 'REJECTED') status = 'CANCELLED';
+
+        const subtotal = matchedQuote.subtotal || matchedQuote.amount || 0;
+        const total = matchedQuote.total_amount || (subtotal + (matchedQuote.delivery_charges || 0) + (matchedQuote.tax_amount || 0));
+
+        const syntheticOrder: Order = {
+          id: matchedQuote.id,
+          order_number: matchedQuote.quote_number,
+          customer_name: matchedQuote.customer_name || 'Valued Customer',
+          company_name: matchedQuote.business_name || null,
+          email: matchedQuote.email || '',
+          phone: matchedQuote.phone || phone,
+          shipping_address: {
+            firstName: (matchedQuote.customer_name || 'Customer').split(' ')[0],
+            lastName: (matchedQuote.customer_name || '').split(' ').slice(1).join(' ') || '',
+            company: matchedQuote.business_name || '',
+            address: matchedQuote.delivery_address || matchedQuote.city || 'Standard Address',
+            city: matchedQuote.city || '',
+            state: 'Madhya Pradesh',
+            postalCode: '456006',
+            phone: matchedQuote.phone || phone
+          },
+          status,
+          payment_method: 'Custom Quotation Request',
+          subtotal,
+          tax: matchedQuote.tax_amount || 0,
+          shipping_fee: matchedQuote.delivery_charges || 0,
+          total,
+          notes: matchedQuote.admin_notes || matchedQuote.message || null,
+          created_at: matchedQuote.created_at,
+          expected_delivery_date: matchedQuote.expected_delivery_date || null,
+          courier_partner: matchedQuote.courier_partner || null,
+          tracking_number: matchedQuote.tracking_number || null,
+          tracking_url: matchedQuote.tracking_url || null,
+          order_items: [
+            {
+              id: matchedQuote.id,
+              order_id: matchedQuote.id,
+              product_id: matchedQuote.id,
+              product_name: `${(matchedQuote.bag_type || 'Custom Bags').replace(/-/g, ' ').toUpperCase()} (${(matchedQuote.quantity || 0).toLocaleString('en-IN')} units)`,
+              quantity: matchedQuote.quantity || 1,
+              unit_price: matchedQuote.quantity ? Math.round(total / matchedQuote.quantity) : total,
+              total_price: total,
+              variant_details: {
+                material: matchedQuote.material || 'Standard',
+                handle: matchedQuote.handle_type || 'Loop Handle',
+                color: matchedQuote.gsm ? `${matchedQuote.gsm} GSM` : undefined,
+                size: matchedQuote.size || undefined,
+                printing: matchedQuote.print_type || undefined
+              }
+            }
+          ]
+        };
+
+        return syntheticOrder;
+      }
+    }
+
+    return null;
   } catch (err) {
     console.error('Error in getOrderByNumberAndPhone:', err);
     return null;
@@ -1737,6 +1956,8 @@ export async function deleteMediaItem(id: string): Promise<boolean> {
 export async function createNotification(notifData: {
   user_id?: string | null;
   email?: string | null;
+  recipient_role?: 'customer' | 'admin' | 'all';
+  for_admin?: boolean;
   title: string;
   message: string;
   type?: 'QUOTE_RECEIVED' | 'QUOTE_UPDATED' | 'QUOTE_APPROVED' | 'QUOTE_CHANGES_REQUESTED' | 'ORDER_STATUS' | 'SYSTEM';
@@ -1744,19 +1965,29 @@ export async function createNotification(notifData: {
 }): Promise<boolean> {
   try {
     const cleanEmail = notifData.email ? notifData.email.trim().toLowerCase() : null;
-    const { error } = await supabase.from('notifications').insert([{
+    const recipient_role = notifData.for_admin || notifData.recipient_role === 'admin' ? 'admin' : (notifData.recipient_role || 'customer');
+
+    const notifPayload: any = {
       user_id: notifData.user_id || null,
       email: cleanEmail,
+      recipient_role,
       title: notifData.title,
       message: notifData.message,
       type: notifData.type || 'QUOTE_UPDATED',
       link: notifData.link || null,
       read: false
-    }]);
+    };
+
+    const { error } = await supabase.from('notifications').insert([notifPayload]);
 
     if (error) {
-      console.error('Error inserting notification:', error);
-      return false;
+      console.warn('First notification insert failed, trying fallback insert:', error.message);
+      delete notifPayload.recipient_role;
+      const { error: fallbackErr } = await supabase.from('notifications').insert([notifPayload]);
+      if (fallbackErr) {
+        console.error('Notification fallback insert error:', fallbackErr);
+        return false;
+      }
     }
     return true;
   } catch (err) {
@@ -1768,40 +1999,78 @@ export async function createNotification(notifData: {
 export async function getCustomerNotifications(email: string, userId?: string, isAdmin = false): Promise<AppNotification[]> {
   try {
     const cleanEmail = (email || '').trim().toLowerCase();
-    
-    // Attempt combined query including user_id, email, or admin broadcast notifications
-    if (userId && cleanEmail) {
-      const orCondition = isAdmin 
-        ? `user_id.eq.${userId},email.ilike.${cleanEmail},user_id.is.null,email.is.null`
-        : `user_id.eq.${userId},email.ilike.${cleanEmail},user_id.is.null`;
 
-      const { data, error } = await supabase
-        .from('notifications')
-        .select('*')
-        .or(orCondition)
-        .order('created_at', { ascending: false });
-
-      if (!error && data && data.length > 0) {
-        return data as AppNotification[];
-      }
-    }
-
-    // Fallback query
-    let query = supabase.from('notifications').select('*');
-    if (userId) {
-      query = query.or(`user_id.eq.${userId},user_id.is.null`);
-    } else if (cleanEmail) {
-      query = query.or(`email.ilike.${cleanEmail},email.is.null`);
-    } else {
-      query = query.is('user_id', null).is('email', null);
-    }
-
-    const { data, error } = await query.order('created_at', { ascending: false });
-    if (error) {
-      console.error('Error fetching notifications:', error);
+    // STRICT SECURITY GUARD: If neither userId nor email is provided, return empty array.
+    // Anonymous queries must NEVER fetch any unassigned notifications.
+    if (!userId && !cleanEmail) {
       return [];
     }
-    return (data || []) as AppNotification[];
+
+    if (isAdmin) {
+      // ADMIN NOTIFICATIONS: Admins see admin desk notifications (recipient_role = 'admin') OR direct notifications.
+      let query = supabase
+        .from('notifications')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (userId && cleanEmail) {
+        query = query.or(`recipient_role.eq.admin,user_id.eq.${userId},email.ilike."${cleanEmail}"`);
+      } else if (userId) {
+        query = query.or(`recipient_role.eq.admin,user_id.eq.${userId}`);
+      } else {
+        query = query.or(`recipient_role.eq.admin,email.ilike."${cleanEmail}"`);
+      }
+
+      const { data, error } = await query;
+      if (!error && data) return data as AppNotification[];
+
+      // Resilient fallback for older schemas
+      const { data: fallbackData } = await supabase
+        .from('notifications')
+        .select('*')
+        .or(`email.ilike."${cleanEmail}",user_id.eq.${userId || '00000000-0000-0000-0000-000000000000'}`)
+        .order('created_at', { ascending: false });
+
+      return (fallbackData || []) as AppNotification[];
+    } else {
+      // CUSTOMER NOTIFICATIONS: Regular customers ONLY see notifications explicitly matching user_id or email, AND recipient_role != 'admin'.
+      let query = supabase
+        .from('notifications')
+        .select('*')
+        .neq('recipient_role', 'admin') // STRICT SECURITY GUARD
+        .order('created_at', { ascending: false });
+
+      if (userId && cleanEmail) {
+        query = query.or(`user_id.eq.${userId},email.ilike."${cleanEmail}"`);
+      } else if (userId) {
+        query = query.eq('user_id', userId);
+      } else if (cleanEmail) {
+        query = query.ilike('email', cleanEmail);
+      }
+
+      const { data, error } = await query;
+      if (!error && data) return data as AppNotification[];
+
+      // Fallback filtering if recipient_role column doesn't exist on older schema cache
+      let fallbackQuery = supabase.from('notifications').select('*').order('created_at', { ascending: false });
+      if (userId && cleanEmail) {
+        fallbackQuery = fallbackQuery.or(`user_id.eq.${userId},email.ilike."${cleanEmail}"`);
+      } else if (userId) {
+        fallbackQuery = fallbackQuery.eq('user_id', userId);
+      } else if (cleanEmail) {
+        fallbackQuery = fallbackQuery.ilike('email', cleanEmail);
+      }
+
+      const { data: fallbackData } = await fallbackQuery;
+      const filtered = (fallbackData || []).filter((n: any) => {
+        const titleLower = (n.title || '').toLowerCase();
+        return !titleLower.includes('new quote request') && 
+               !titleLower.includes('revision requested') && 
+               !titleLower.includes('quote approved by customer');
+      });
+
+      return filtered as AppNotification[];
+    }
   } catch (err) {
     console.error('Error in getCustomerNotifications:', err);
     return [];

@@ -172,6 +172,7 @@ CREATE TABLE IF NOT EXISTS notifications (
   created_at TIMESTAMPTZ DEFAULT NOW(),
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
   email TEXT,
+  recipient_role TEXT DEFAULT 'customer',
   title TEXT NOT NULL,
   message TEXT NOT NULL,
   type TEXT DEFAULT 'QUOTE_UPDATED',
@@ -179,19 +180,40 @@ CREATE TABLE IF NOT EXISTS notifications (
   read BOOLEAN DEFAULT false
 );
 
+ALTER TABLE notifications ADD COLUMN IF NOT EXISTS recipient_role TEXT DEFAULT 'customer';
+
 CREATE INDEX IF NOT EXISTS idx_notifications_user_id ON notifications(user_id);
 CREATE INDEX IF NOT EXISTS idx_notifications_email ON notifications(email);
+CREATE INDEX IF NOT EXISTS idx_notifications_recipient_role ON notifications(recipient_role);
 
 ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "Public select notifications" ON notifications;
-CREATE POLICY "Public select notifications" ON notifications FOR SELECT USING (true);
+DROP POLICY IF EXISTS "User select notifications" ON notifications;
+
+CREATE POLICY "User select notifications" ON notifications 
+FOR SELECT USING (
+  public.is_admin() OR 
+  (recipient_role = 'admin' AND (auth.jwt() ->> 'email' ILIKE '%admin%')) OR
+  (
+    (recipient_role IS NULL OR recipient_role != 'admin') AND 
+    (
+      (auth.uid() IS NOT NULL AND user_id = auth.uid()) OR
+      (auth.jwt() ->> 'email' IS NOT NULL AND LOWER(email) = LOWER(auth.jwt() ->> 'email'))
+    )
+  )
+);
 
 DROP POLICY IF EXISTS "Public insert notifications" ON notifications;
 CREATE POLICY "Public insert notifications" ON notifications FOR INSERT WITH CHECK (true);
 
 DROP POLICY IF EXISTS "Public update notifications" ON notifications;
-CREATE POLICY "Public update notifications" ON notifications FOR UPDATE USING (true);
+DROP POLICY IF EXISTS "User update notifications" ON notifications;
+CREATE POLICY "User update notifications" ON notifications FOR UPDATE USING (
+  public.is_admin() OR 
+  (auth.uid() IS NOT NULL AND user_id = auth.uid()) OR 
+  (auth.jwt() ->> 'email' IS NOT NULL AND LOWER(email) = LOWER(auth.jwt() ->> 'email'))
+);
 
 -- 12. ROLE-BASED ACCESS CONTROL (RBAC) & ADMIN HELPER FUNCTION
 CREATE OR REPLACE FUNCTION public.is_admin()
@@ -213,4 +235,28 @@ CREATE POLICY "Public can view profiles" ON profiles FOR SELECT USING (true);
 DROP POLICY IF EXISTS "Users can edit own profile" ON profiles;
 CREATE POLICY "Users can edit own profile" ON profiles FOR ALL USING (auth.uid() = id OR public.is_admin());
 
+-- 13. TRACKING DESK PUBLIC READ ACCESS FOR ORDERS & QUOTES
+ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
+ALTER TABLE quotes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE order_items ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Customers can view their own orders" ON orders;
+CREATE POLICY "Customers can view their own orders" ON orders FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Customers can view their own quotes" ON quotes;
+CREATE POLICY "Customers can view their own quotes" ON quotes FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Customers/Admins can view order items" ON order_items;
+CREATE POLICY "Customers/Admins can view order items" ON order_items FOR SELECT USING (true);
+
+-- 14. EXPECTED DELIVERY DATE & COURIER LOGISTICS COLUMNS
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS expected_delivery_date TEXT;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS courier_partner TEXT;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS tracking_number TEXT;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS tracking_url TEXT;
+
+ALTER TABLE quotes ADD COLUMN IF NOT EXISTS expected_delivery_date TEXT;
+ALTER TABLE quotes ADD COLUMN IF NOT EXISTS courier_partner TEXT;
+ALTER TABLE quotes ADD COLUMN IF NOT EXISTS tracking_number TEXT;
+ALTER TABLE quotes ADD COLUMN IF NOT EXISTS tracking_url TEXT;
 
