@@ -74,7 +74,10 @@ export default function CustomerQuoteViewPage() {
   }, [rawId]);
 
   React.useEffect(() => {
-    fetchQuoteData();
+    const timer = setTimeout(() => {
+      fetchQuoteData();
+    }, 0);
+    return () => clearTimeout(timer);
   }, [fetchQuoteData]);
 
   const handleLookup = async (e: React.FormEvent) => {

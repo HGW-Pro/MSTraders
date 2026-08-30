@@ -18,11 +18,13 @@ import {
   FolderKanban,
   LayoutTemplate,
   FolderGit2,
-  MessageSquareQuote
+  MessageSquareQuote,
+  ShieldAlert
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/lib/supabase/client';
+import { checkIsAdmin } from '@/lib/supabase/services';
 import { toast } from 'sonner';
 
 const adminNav = [
@@ -44,6 +46,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const router = useRouter();
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
   const [userEmail, setUserEmail] = React.useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = React.useState<boolean | null>(null);
   const [isCheckingAuth, setIsCheckingAuth] = React.useState(true);
 
   // Skip auth check if on login page
@@ -56,24 +59,40 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     }
 
     let active = true;
+
+    async function verifyAdminAccess(session: any) {
+      if (!session?.user) {
+        if (active) {
+          setIsAdmin(false);
+          setIsCheckingAuth(false);
+          router.push('/admin/login');
+        }
+        return;
+      }
+
+      const email = session.user.email || '';
+      const authorized = await checkIsAdmin(session.user.id, email);
+
+      if (active) {
+        setUserEmail(email);
+        setIsAdmin(authorized);
+        setIsCheckingAuth(false);
+
+        if (!authorized) {
+          toast.error('Access Denied: You do not have administrator permissions.');
+        }
+      }
+    }
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (active) {
-        if (!session?.user) {
-          router.push('/admin/login');
-        } else {
-          setUserEmail(session.user.email || 'Admin');
-          setIsCheckingAuth(false);
-        }
+        verifyAdminAccess(session);
       }
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (active) {
-        if (!session?.user) {
-          router.push('/admin/login');
-        } else {
-          setUserEmail(session.user.email || 'Admin');
-        }
+        verifyAdminAccess(session);
       }
     });
 
@@ -102,7 +121,41 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <div className="min-h-screen bg-slate-900 flex items-center justify-center text-white p-6">
         <div className="text-center space-y-3">
           <div className="w-10 h-10 border-4 border-brand-gold border-t-transparent rounded-full animate-spin mx-auto" />
-          <p className="text-xs text-slate-400 font-medium tracking-wider uppercase">Verifying Admin Session...</p>
+          <p className="text-xs text-slate-400 font-medium tracking-wider uppercase">Verifying Admin Privileges...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (isAdmin === false) {
+    return (
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4 sm:p-6">
+        <div className="max-w-md w-full bg-white rounded-2xl p-6 sm:p-8 shadow-2xl text-center space-y-4 border border-slate-200">
+          <div className="w-16 h-16 bg-red-100 text-red-600 rounded-2xl flex items-center justify-center mx-auto border border-red-200">
+            <ShieldAlert className="h-8 w-8" />
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold text-slate-900 font-heading">Access Denied</h2>
+            <p className="text-xs text-red-600 font-bold uppercase tracking-wider mt-1">Admin Privilege Required</p>
+          </div>
+          <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+            You are currently signed in as <strong className="text-slate-900 font-semibold">{userEmail || 'Customer User'}</strong>. This account does not have administrator privileges to access the MS TRADERS Admin Portal.
+          </p>
+          <div className="pt-4 space-y-2.5">
+            <Button 
+              onClick={handleLogout}
+              className="w-full bg-brand-charcoal hover:bg-slate-800 text-white font-bold h-11 text-xs uppercase tracking-wider"
+            >
+              Sign Out & Log In as Admin
+            </Button>
+            <Button 
+              variant="outline" 
+              onClick={() => router.push('/')}
+              className="w-full h-11 text-xs font-bold border-slate-300 text-slate-700"
+            >
+              Return to Public Storefront
+            </Button>
+          </div>
         </div>
       </div>
     );

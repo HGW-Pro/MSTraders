@@ -25,7 +25,7 @@ import { Button } from '@/components/ui/button';
 import { Logo } from '@/components/logo';
 import { useCartStore } from '@/lib/store';
 import { supabase } from '@/lib/supabase/client';
-import { getUserProfile, getCustomerNotifications, markNotificationAsRead, markAllNotificationsAsRead } from '@/lib/supabase/services';
+import { getUserProfile, checkIsAdmin, getCustomerNotifications, markNotificationAsRead, markAllNotificationsAsRead } from '@/lib/supabase/services';
 import { AppNotification } from '@/types';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -92,10 +92,9 @@ export function Header() {
         loadNotifications(user.email, user.id);
       }
 
-      const profile = await getUserProfile(user.id);
+      const isUserAdmin = await checkIsAdmin(user.id, user.email);
       if (active) {
-        const adminRole = profile?.role === 'admin' || user.email?.toLowerCase().includes('admin');
-        setIsAdmin(!!adminRole);
+        setIsAdmin(isUserAdmin);
       }
     }
 

@@ -105,12 +105,14 @@ export default function CustomerAccountPage() {
         await syncCustomerRecords(user.id, user.email);
       }
 
-      const [usrProfile, usrOrders, usrQuotes, usrAddresses, usrNotifs] = await Promise.all([
-        getUserProfile(user.id),
+      const usrProfile = await getUserProfile(user.id);
+      const isAdmin = usrProfile?.role === 'admin';
+
+      const [usrOrders, usrQuotes, usrAddresses, usrNotifs] = await Promise.all([
         getCustomerOrders(user.email || '', user.id),
         getCustomerQuotes(user.email || '', user.id),
         getCustomerAddresses(user.id),
-        getCustomerNotifications(user.email || '', user.id)
+        getCustomerNotifications(user.email || '', user.id, isAdmin)
       ]);
 
       setProfile(usrProfile);

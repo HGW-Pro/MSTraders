@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
+import { checkIsAdmin } from '@/lib/supabase/services';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -17,10 +18,12 @@ export default function AdminLoginPage() {
 
   // Check if already authenticated as admin
   React.useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (session?.user) {
-        // Redirect to admin dashboard
-        router.push('/admin');
+        const authorized = await checkIsAdmin(session.user.id, session.user.email);
+        if (authorized) {
+          router.push('/admin');
+        }
       }
     });
   }, [router]);
@@ -34,24 +37,32 @@ export default function AdminLoginPage() {
 
     setLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email: email.trim(),
         password,
       });
 
-      if (error) {
-        if (error.message.includes('Invalid login credentials')) {
-          toast.error('Invalid credentials. If you haven\'t created the admin user in Supabase yet, click "Initialize Admin User" below or use Direct Admin Sign-in.');
-        } else if (error.message.includes('rate limit')) {
-          toast.error('Supabase Email Rate Limit Exceeded. Use "Direct Admin Sign-In" below to access without email verification.');
+      if (error || !data.user) {
+        if (error?.message.includes('Invalid login credentials')) {
+          toast.error('Invalid credentials. Please verify your admin email and password.');
+        } else if (error?.message.includes('rate limit')) {
+          toast.error('Supabase Email Rate Limit Exceeded. Please try again in a few minutes.');
         } else {
-          toast.error(error.message);
+          toast.error(error?.message || 'Login failed.');
         }
         setLoading(false);
         return;
       }
 
-      toast.success('Signed in successfully!');
+      const authorized = await checkIsAdmin(data.user.id, data.user.email);
+      if (!authorized) {
+        toast.error('Access Denied: This account is a customer account and does not have administrator privileges.');
+        await supabase.auth.signOut();
+        setLoading(false);
+        return;
+      }
+
+      toast.success('Admin authenticated successfully!');
       router.push('/admin');
     } catch (err: any) {
       toast.error(err.message || 'An error occurred during sign in');

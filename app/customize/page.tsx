@@ -86,11 +86,13 @@ function CustomizeForm() {
 
     if (fromCart && cartItems.length > 0) {
       const cartSummaryStr = cartItems.map(i => `- ${i.quantity}x ${i.product.name} (${i.product.material || 'Standard'})`).join('\n');
-      setFormData(prev => ({
-        ...prev,
-        bagType: 'cart-order',
-        message: prev.message ? prev.message : `Items requested from Cart:\n${cartSummaryStr}`
-      }));
+      setTimeout(() => {
+        setFormData(prev => ({
+          ...prev,
+          bagType: 'cart-order',
+          message: prev.message ? prev.message : `Items requested from Cart:\n${cartSummaryStr}`
+        }));
+      }, 0);
     }
 
     return () => { active = false; };

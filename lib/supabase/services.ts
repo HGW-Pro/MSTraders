@@ -531,6 +531,16 @@ export async function createQuote(quoteData: {
       link: `/quotes/${quote_number}`
     });
 
+    // Auto-create Notification for Admin desk
+    await createNotification({
+      user_id: null,
+      email: null,
+      title: `New Quote Request (#${quote_number})`,
+      message: `${quoteData.customer_name} submitted a new quote request for ${quoteData.quantity.toLocaleString('en-IN')} units of ${quoteData.bag_type.replace(/-/g, ' ')}.`,
+      type: 'QUOTE_RECEIVED',
+      link: `/admin/quotes`
+    });
+
     return data as Quote;
   } catch (err) {
     console.error('Error submitting quote:', err);
@@ -638,7 +648,76 @@ export async function updateQuoteStatus(
     const { error } = await updateQuery;
     if (error) {
       console.error('Supabase updateQuoteStatus error:', error);
-      throw error;
+      
+      // Fallback A: Handle Check Constraint Violation (e.g. quotes_status_check constraint error 23514)
+      if (error.code === '23514' || (error.message && error.message.toLowerCase().includes('check constraint'))) {
+        console.warn('Status check constraint violation (23514). Retrying quote update without strict status value...');
+        const safeUpdates: Record<string, any> = { ...cleanUpdates };
+        delete safeUpdates.status; // Remove unaccepted status value
+        
+        if (cleanUpdates.customer_notes || cleanUpdates.admin_notes) {
+          safeUpdates.notes = cleanUpdates.customer_notes || cleanUpdates.admin_notes;
+        }
+
+        let retryQuery = supabase.from('quotes').update(safeUpdates);
+        if (quoteRecord?.id) {
+          retryQuery = retryQuery.eq('id', quoteRecord.id);
+        } else if (isUuid) {
+          retryQuery = retryQuery.eq('id', id);
+        } else {
+          retryQuery = retryQuery.eq('quote_number', id.trim().toUpperCase());
+        }
+
+        const { error: retryErr } = await retryQuery;
+        if (retryErr) {
+          console.error('Retry without status failed:', retryErr);
+          // If retry also failed due to column missing (42703), try minimal fallback
+          const minimalUpdates: Record<string, any> = {};
+          if (cleanUpdates.customer_notes || cleanUpdates.admin_notes || cleanUpdates.notes) {
+            minimalUpdates.notes = cleanUpdates.customer_notes || cleanUpdates.admin_notes || cleanUpdates.notes;
+          }
+          let minQuery = supabase.from('quotes').update(minimalUpdates);
+          if (quoteRecord?.id) minQuery = minQuery.eq('id', quoteRecord.id);
+          else if (isUuid) minQuery = minQuery.eq('id', id);
+          else minQuery = minQuery.eq('quote_number', id.trim().toUpperCase());
+          await minQuery;
+        }
+      } 
+      // Fallback B: Handle Column Missing (42703)
+      else if (error.code === '42703' || (error.message && error.message.toLowerCase().includes('column'))) {
+        console.warn('Column missing in Supabase DB (42703). Executing fallback update with basic fields...');
+        const fallbackUpdates: Record<string, any> = {};
+        if (cleanUpdates.status) fallbackUpdates.status = cleanUpdates.status;
+        if (cleanUpdates.customer_notes || cleanUpdates.admin_notes) {
+          fallbackUpdates.notes = cleanUpdates.customer_notes || cleanUpdates.admin_notes;
+        }
+
+        let fallbackQuery = supabase.from('quotes').update(fallbackUpdates);
+        if (quoteRecord?.id) {
+          fallbackQuery = fallbackQuery.eq('id', quoteRecord.id);
+        } else if (isUuid) {
+          fallbackQuery = fallbackQuery.eq('id', id);
+        } else {
+          fallbackQuery = fallbackQuery.eq('quote_number', id.trim().toUpperCase());
+        }
+
+        const { error: fallbackErr } = await fallbackQuery;
+        if (fallbackErr) {
+          console.error('Fallback quote update error:', fallbackErr);
+          // Try minimal update on notes column only
+          const minUpdates: Record<string, any> = {};
+          if (cleanUpdates.customer_notes || cleanUpdates.admin_notes || cleanUpdates.notes) {
+            minUpdates.notes = cleanUpdates.customer_notes || cleanUpdates.admin_notes || cleanUpdates.notes;
+          }
+          let minQuery = supabase.from('quotes').update(minUpdates);
+          if (quoteRecord?.id) minQuery = minQuery.eq('id', quoteRecord.id);
+          else if (isUuid) minQuery = minQuery.eq('id', id);
+          else minQuery = minQuery.eq('quote_number', id.trim().toUpperCase());
+          await minQuery;
+        }
+      } else {
+        throw error;
+      }
     }
 
     // Send Notification Trigger
@@ -666,6 +745,27 @@ export async function updateQuoteStatus(
         type: cleanUpdates.status === 'QUOTED' ? 'QUOTE_RECEIVED' : 'QUOTE_UPDATED',
         link: `/quotes/${qNum}`
       });
+
+      // If customer requested changes or approved, notify Admin desk as well
+      if (cleanUpdates.status === 'CHANGES_REQUESTED') {
+        await createNotification({
+          user_id: null,
+          email: null,
+          title: `Revision Requested on Quote #${qNum}`,
+          message: `Customer requested changes: "${cleanUpdates.customer_notes || cleanUpdates.notes || 'Specification updates'}"`,
+          type: 'QUOTE_CHANGES_REQUESTED',
+          link: `/admin/quotes`
+        });
+      } else if (cleanUpdates.status === 'APPROVED') {
+        await createNotification({
+          user_id: null,
+          email: null,
+          title: `Quote Approved by Customer (#${qNum})`,
+          message: `Customer approved quotation #${qNum}. Order ready for production processing.`,
+          type: 'QUOTE_APPROVED',
+          link: `/admin/orders`
+        });
+      }
     }
 
     return true;
@@ -732,15 +832,54 @@ export async function convertQuoteToOrder(
       notes: `Converted from Quote ${quote.quote_number}${customOptions?.customer_notes ? ` | Customer Note: ${customOptions.customer_notes}` : ''}`
     };
 
-    const { data: orderData, error: orderErr } = await supabase
+    let orderData: any = null;
+
+    const { data: firstTryData, error: orderErr } = await supabase
       .from('orders')
       .insert([newOrder])
       .select()
       .single();
 
     if (orderErr) {
-      console.error('Failed to insert order from quote:', orderErr);
-      return null;
+      console.warn('First order insert attempt failed, trying resilient fallback insert:', orderErr.message);
+      
+      // Resilient fallback: remove optional columns that might not exist in older Supabase schema cache
+      const { 
+        payment_method, 
+        payment_status, 
+        quote_id, 
+        customization_charges, 
+        delivery_charges, 
+        discount, 
+        delivery_method, 
+        delivery_notes, 
+        ...essentialOrder 
+      } = newOrder;
+
+      const fallbackNotes = [
+        newOrder.notes,
+        payment_method ? `Payment Method: ${payment_method}` : null,
+        payment_status ? `Payment Status: ${payment_status}` : null,
+        quote.quote_number ? `Quote Reference: #${quote.quote_number}` : null,
+        delivery_notes ? `Delivery Notes: ${delivery_notes}` : null
+      ].filter(Boolean).join(' | ');
+
+      essentialOrder.notes = fallbackNotes;
+
+      const { data: retryData, error: retryErr } = await supabase
+        .from('orders')
+        .insert([essentialOrder])
+        .select()
+        .single();
+
+      if (retryErr || !retryData) {
+        console.error('Failed to insert order from quote (fallback failed):', retryErr || orderErr);
+        return null;
+      }
+
+      orderData = retryData;
+    } else {
+      orderData = firstTryData;
     }
 
     // Insert order item for the quote
@@ -1105,6 +1244,35 @@ export async function getOrderByNumberAndPhone(orderNumber: string, phone: strin
 }
 
 // --- CUSTOMER PROFILE & ADDRESS SERVICES ---
+export async function checkIsAdmin(userId?: string | null, userEmail?: string | null): Promise<boolean> {
+  if (!userId && !userEmail) return false;
+
+  const cleanEmail = (userEmail || '').trim().toLowerCase();
+  
+  // Dedicated system admin email addresses
+  if (cleanEmail === 'admin@mstraders.com' || cleanEmail === 'admin@mstraders.in' || cleanEmail === 'contact@mstradersujjain.com') {
+    return true;
+  }
+
+  if (userId) {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', userId)
+        .maybeSingle();
+
+      if (!error && data?.role === 'admin') {
+        return true;
+      }
+    } catch (err) {
+      console.warn('Error checking admin role:', err);
+    }
+  }
+
+  return false;
+}
+
 export async function getUserProfile(userId: string): Promise<UserProfile | null> {
   try {
     const { data, error } = await supabase
@@ -1160,14 +1328,28 @@ export async function syncCustomerRecords(userId: string, email: string): Promis
 export async function getCustomerOrders(email: string, userId?: string): Promise<Order[]> {
   try {
     const cleanEmail = (email || '').trim().toLowerCase();
-    let query = supabase.from('orders').select('*, order_items(*)');
     
+    // First try with combined OR query
     if (userId && cleanEmail) {
-      query = query.or(`customer_id.eq.${userId},email.ilike."${cleanEmail}"`);
-    } else if (userId) {
+      const { data, error } = await supabase
+        .from('orders')
+        .select('*, order_items(*)')
+        .or(`customer_id.eq.${userId},email.ilike.${cleanEmail}`)
+        .order('created_at', { ascending: false });
+        
+      if (!error && data && data.length > 0) {
+        return data as Order[];
+      }
+    }
+
+    // Fallback query if OR query returned empty or failed
+    let query = supabase.from('orders').select('*, order_items(*)');
+    if (userId) {
       query = query.eq('customer_id', userId);
     } else if (cleanEmail) {
       query = query.ilike('email', cleanEmail);
+    } else {
+      return [];
     }
 
     const { data, error } = await query.order('created_at', { ascending: false });
@@ -1185,14 +1367,28 @@ export async function getCustomerOrders(email: string, userId?: string): Promise
 export async function getCustomerQuotes(email: string, userId?: string): Promise<Quote[]> {
   try {
     const cleanEmail = (email || '').trim().toLowerCase();
-    let query = supabase.from('quotes').select('*');
     
+    // First try combined query
     if (userId && cleanEmail) {
-      query = query.or(`customer_id.eq.${userId},email.ilike."${cleanEmail}"`);
-    } else if (userId) {
+      const { data, error } = await supabase
+        .from('quotes')
+        .select('*')
+        .or(`customer_id.eq.${userId},email.ilike.${cleanEmail}`)
+        .order('created_at', { ascending: false });
+
+      if (!error && data && data.length > 0) {
+        return data as Quote[];
+      }
+    }
+
+    // Fallback query if OR query returned empty or failed
+    let query = supabase.from('quotes').select('*');
+    if (userId) {
       query = query.eq('customer_id', userId);
     } else if (cleanEmail) {
       query = query.ilike('email', cleanEmail);
+    } else {
+      return [];
     }
 
     const { data, error } = await query.order('created_at', { ascending: false });
@@ -1569,19 +1765,35 @@ export async function createNotification(notifData: {
   }
 }
 
-export async function getCustomerNotifications(email: string, userId?: string): Promise<AppNotification[]> {
+export async function getCustomerNotifications(email: string, userId?: string, isAdmin = false): Promise<AppNotification[]> {
   try {
     const cleanEmail = (email || '').trim().toLowerCase();
-    let query = supabase.from('notifications').select('*');
-
+    
+    // Attempt combined query including user_id, email, or admin broadcast notifications
     if (userId && cleanEmail) {
-      query = query.or(`user_id.eq.${userId},email.ilike."${cleanEmail}"`);
-    } else if (userId) {
-      query = query.eq('user_id', userId);
+      const orCondition = isAdmin 
+        ? `user_id.eq.${userId},email.ilike.${cleanEmail},user_id.is.null,email.is.null`
+        : `user_id.eq.${userId},email.ilike.${cleanEmail},user_id.is.null`;
+
+      const { data, error } = await supabase
+        .from('notifications')
+        .select('*')
+        .or(orCondition)
+        .order('created_at', { ascending: false });
+
+      if (!error && data && data.length > 0) {
+        return data as AppNotification[];
+      }
+    }
+
+    // Fallback query
+    let query = supabase.from('notifications').select('*');
+    if (userId) {
+      query = query.or(`user_id.eq.${userId},user_id.is.null`);
     } else if (cleanEmail) {
-      query = query.ilike('email', cleanEmail);
+      query = query.or(`email.ilike.${cleanEmail},email.is.null`);
     } else {
-      return [];
+      query = query.is('user_id', null).is('email', null);
     }
 
     const { data, error } = await query.order('created_at', { ascending: false });

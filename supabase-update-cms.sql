@@ -133,6 +133,10 @@ INSERT INTO testimonials (customer_name, business_name, role, rating, review, di
 ON CONFLICT DO NOTHING;
 
 -- 10. QUOTATION WORKFLOW & ORDER CONVERSION COLUMNS
+-- Remove legacy restrictive status check constraints if present to support full workflow
+ALTER TABLE quotes DROP CONSTRAINT IF EXISTS quotes_status_check;
+ALTER TABLE orders DROP CONSTRAINT IF EXISTS orders_status_check;
+
 ALTER TABLE quotes ADD COLUMN IF NOT EXISTS customer_id UUID REFERENCES profiles(id) ON DELETE SET NULL;
 ALTER TABLE quotes ADD COLUMN IF NOT EXISTS access_token TEXT DEFAULT gen_random_uuid()::text;
 ALTER TABLE quotes ADD COLUMN IF NOT EXISTS delivery_address TEXT;
@@ -147,6 +151,7 @@ ALTER TABLE quotes ADD COLUMN IF NOT EXISTS customer_notes TEXT;
 ALTER TABLE quotes ADD COLUMN IF NOT EXISTS order_id UUID REFERENCES orders(id) ON DELETE SET NULL;
 
 ALTER TABLE orders ADD COLUMN IF NOT EXISTS quote_id UUID REFERENCES quotes(id) ON DELETE SET NULL;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS payment_method TEXT DEFAULT 'Invoice';
 ALTER TABLE orders ADD COLUMN IF NOT EXISTS delivery_method TEXT DEFAULT 'INTERNAL_DELIVERY';
 ALTER TABLE orders ADD COLUMN IF NOT EXISTS delivery_notes TEXT;
 ALTER TABLE orders ADD COLUMN IF NOT EXISTS payment_status TEXT DEFAULT 'PENDING';
@@ -161,12 +166,51 @@ ALTER TABLE settings ADD COLUMN IF NOT EXISTS customer_accounts_enabled BOOLEAN 
 ALTER TABLE settings ADD COLUMN IF NOT EXISTS enable_direct_cart_checkout BOOLEAN DEFAULT false;
 ALTER TABLE settings ADD COLUMN IF NOT EXISTS require_account_for_quotes BOOLEAN DEFAULT true;
 
--- Ensure Quotes can be viewed via access_token or by quote_number + phone for guest users
-DROP POLICY IF EXISTS "Anyone can view quote by token or email" ON quotes;
-CREATE POLICY "Anyone can view quote by token or email" ON quotes
-  FOR SELECT USING (true);
+-- 11. NOTIFICATIONS TABLE & POLICIES
+CREATE TABLE IF NOT EXISTS notifications (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  email TEXT,
+  title TEXT NOT NULL,
+  message TEXT NOT NULL,
+  type TEXT DEFAULT 'QUOTE_UPDATED',
+  link TEXT,
+  read BOOLEAN DEFAULT false
+);
 
-DROP POLICY IF EXISTS "Customers can update their quotes" ON quotes;
-CREATE POLICY "Customers can update their quotes" ON quotes
-  FOR UPDATE USING (true);
+CREATE INDEX IF NOT EXISTS idx_notifications_user_id ON notifications(user_id);
+CREATE INDEX IF NOT EXISTS idx_notifications_email ON notifications(email);
+
+ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Public select notifications" ON notifications;
+CREATE POLICY "Public select notifications" ON notifications FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Public insert notifications" ON notifications;
+CREATE POLICY "Public insert notifications" ON notifications FOR INSERT WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Public update notifications" ON notifications;
+CREATE POLICY "Public update notifications" ON notifications FOR UPDATE USING (true);
+
+-- 12. ROLE-BASED ACCESS CONTROL (RBAC) & ADMIN HELPER FUNCTION
+CREATE OR REPLACE FUNCTION public.is_admin()
+RETURNS BOOLEAN AS $$
+BEGIN
+  RETURN EXISTS (
+    SELECT 1 FROM profiles
+    WHERE id = auth.uid() AND role = 'admin'
+  );
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Ensure RLS Policies for Profiles
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Public can view profiles" ON profiles;
+CREATE POLICY "Public can view profiles" ON profiles FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Users can edit own profile" ON profiles;
+CREATE POLICY "Users can edit own profile" ON profiles FOR ALL USING (auth.uid() = id OR public.is_admin());
+
 

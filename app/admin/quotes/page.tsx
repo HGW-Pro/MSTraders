@@ -80,31 +80,86 @@ export default function AdminQuotesPage() {
     const qty = quote.quantity || 1;
     const sub = quote.subtotal || quote.amount || 0;
     const uPrice = quote.unit_price || (sub > 0 ? sub / qty : 0);
+    const cust = quote.customization_charges || 0;
+    const del = quote.delivery_charges || quote.shipping_amount || 0;
+    const disc = quote.discount || 0;
+    const tx = quote.tax_amount || 0;
+
+    const calculatedSub = sub > 0 ? sub : (uPrice * qty);
+    const calculatedTot = quote.total_amount || quote.amount || (calculatedSub + cust + del + tx - disc);
     
-    setUnitPrice(String(uPrice));
-    setSubtotalAmount(String(sub));
-    setCustomizationCharges(String(quote.customization_charges || 0));
-    setDeliveryCharges(String(quote.delivery_charges || quote.shipping_amount || 0));
-    setDiscountAmount(String(quote.discount || 0));
-    setTaxAmount(String(quote.tax_amount || 0));
-    setTotalAmount(String(quote.total_amount || quote.amount || 0));
+    setUnitPrice(uPrice ? String(uPrice) : '0');
+    setSubtotalAmount(calculatedSub ? String(calculatedSub) : '0');
+    setCustomizationCharges(String(cust));
+    setDeliveryCharges(String(del));
+    setDiscountAmount(String(disc));
+    setTaxAmount(String(tx));
+    setTotalAmount(String(calculatedTot));
     setValidUntilDate(quote.valid_until ? quote.valid_until.slice(0, 10) : '');
     setAdminNotes(quote.admin_notes || quote.notes || '');
     setQuoteStatus(quote.status);
   };
 
-  const handleRecalculateTotal = (
-    uP: string, sub: string, cust: string, del: string, disc: string, tx: string, qty: number
+  const handleUnitPriceChange = (val: string) => {
+    setUnitPrice(val);
+    const uP = parseFloat(val) || 0;
+    const qty = selectedQuote?.quantity || 1;
+    const computedSub = Math.round(uP * qty * 100) / 100;
+    const subStr = String(computedSub);
+    setSubtotalAmount(subStr);
+    recalculateGrandTotal(subStr, customizationCharges, deliveryCharges, discountAmount, taxAmount);
+  };
+
+  const handleSubtotalChange = (val: string) => {
+    setSubtotalAmount(val);
+    const sub = parseFloat(val) || 0;
+    const qty = selectedQuote?.quantity || 1;
+    const uP = qty > 0 ? sub / qty : 0;
+    const unitStr = uP % 1 === 0 ? String(uP) : String(Math.round(uP * 100) / 100);
+    setUnitPrice(unitStr);
+    recalculateGrandTotal(val, customizationCharges, deliveryCharges, discountAmount, taxAmount);
+  };
+
+  const handleCustomizationChange = (val: string) => {
+    setCustomizationCharges(val);
+    recalculateGrandTotal(subtotalAmount, val, deliveryCharges, discountAmount, taxAmount);
+  };
+
+  const handleDeliveryChange = (val: string) => {
+    setDeliveryCharges(val);
+    recalculateGrandTotal(subtotalAmount, customizationCharges, val, discountAmount, taxAmount);
+  };
+
+  const handleDiscountChange = (val: string) => {
+    setDiscountAmount(val);
+    recalculateGrandTotal(subtotalAmount, customizationCharges, deliveryCharges, val, taxAmount);
+  };
+
+  const handleTaxChange = (val: string) => {
+    setTaxAmount(val);
+    recalculateGrandTotal(subtotalAmount, customizationCharges, deliveryCharges, discountAmount, val);
+  };
+
+  const applyGstPercentage = (percent: number) => {
+    const sub = parseFloat(subtotalAmount) || 0;
+    const cust = parseFloat(customizationCharges) || 0;
+    const calculatedTax = Math.round((sub + cust) * (percent / 100) * 100) / 100;
+    const taxStr = String(calculatedTax);
+    setTaxAmount(taxStr);
+    recalculateGrandTotal(subtotalAmount, customizationCharges, deliveryCharges, discountAmount, taxStr);
+  };
+
+  const recalculateGrandTotal = (
+    sub: string, cust: string, del: string, disc: string, tx: string
   ) => {
-    const unitP = parseFloat(uP) || 0;
-    const subT = parseFloat(sub) || (unitP * qty);
+    const subT = parseFloat(sub) || 0;
     const cCharges = parseFloat(cust) || 0;
     const dCharges = parseFloat(del) || 0;
     const dAmount = parseFloat(disc) || 0;
     const tAmount = parseFloat(tx) || 0;
 
     const computedTotal = subT + cCharges + dCharges + tAmount - dAmount;
-    setTotalAmount(String(Math.max(0, computedTotal)));
+    setTotalAmount(String(Math.max(0, Math.round(computedTotal * 100) / 100)));
   };
 
   const handleSaveQuoteUpdate = async (overrideStatus?: QuoteStatus) => {
@@ -285,57 +340,93 @@ export default function AdminQuotesPage() {
             No quote inquiries found matching your filters.
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm text-left">
-              <thead className="bg-slate-50 border-b border-border text-xs uppercase tracking-wider text-muted-foreground">
-                <tr>
-                  <th className="px-6 py-3 font-semibold">Quote #</th>
-                  <th className="px-6 py-3 font-semibold">Customer</th>
-                  <th className="px-6 py-3 font-semibold">Bag Type & Quantity</th>
-                  <th className="px-6 py-3 font-semibold">Submitted Date</th>
-                  <th className="px-6 py-3 font-semibold">Status</th>
-                  <th className="px-6 py-3 font-semibold text-right">Action</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {filteredQuotes.map((quote) => (
-                  <tr key={quote.id} className="hover:bg-slate-50/60 transition-colors">
-                    <td className="px-6 py-4 font-bold text-brand-charcoal font-mono">
+          <div>
+            {/* Mobile Cards View */}
+            <div className="block md:hidden divide-y divide-border">
+              {filteredQuotes.map((quote) => (
+                <div key={quote.id} className="p-4 space-y-3 hover:bg-slate-50/60 transition-colors">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-brand-charcoal font-mono text-base">
                       {quote.quote_number}
-                    </td>
-                    <td className="px-6 py-4">
-                      <div>
-                        <div className="font-semibold text-slate-800">{quote.customer_name}</div>
-                        <div className="text-xs text-muted-foreground">{quote.business_name || quote.email}</div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="font-medium text-slate-800 capitalize">{quote.bag_type.replace(/-/g, ' ')}</div>
-                      <div className="text-xs text-brand-green font-bold">{quote.quantity.toLocaleString()} units</div>
-                    </td>
-                    <td className="px-6 py-4 text-xs text-slate-500">
-                      {new Date(quote.created_at).toLocaleDateString('en-IN', {
-                        day: 'numeric',
-                        month: 'short',
-                        year: 'numeric'
-                      })}
-                    </td>
-                    <td className="px-6 py-4">
-                      {getStatusBadge(quote.status)}
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <Button 
-                        size="sm" 
-                        onClick={() => handleOpenDetail(quote)}
-                        className="bg-brand-charcoal text-white hover:bg-slate-800 h-8 text-xs"
-                      >
-                        <Eye className="h-3.5 w-3.5 mr-1" /> View & Quote
-                      </Button>
-                    </td>
+                    </span>
+                    {getStatusBadge(quote.status)}
+                  </div>
+
+                  <div className="text-xs space-y-0.5">
+                    <div className="font-semibold text-slate-900 text-sm">{quote.customer_name}</div>
+                    <div className="text-muted-foreground">{quote.business_name || quote.email} • {quote.phone}</div>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-xs">
+                    <div>
+                      <div className="font-semibold text-slate-800 capitalize">{quote.bag_type.replace(/-/g, ' ')}</div>
+                      <div className="text-brand-green font-bold">{quote.quantity.toLocaleString()} units</div>
+                    </div>
+                    <Button 
+                      size="sm" 
+                      onClick={() => handleOpenDetail(quote)}
+                      className="bg-brand-charcoal text-white hover:bg-slate-800 h-8 text-xs shrink-0"
+                    >
+                      <Eye className="h-3.5 w-3.5 mr-1" /> View & Quote
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop Full Table View */}
+            <div className="hidden md:block overflow-x-auto min-w-full">
+              <table className="w-full min-w-[750px] text-sm text-left">
+                <thead className="bg-slate-50 border-b border-border text-xs uppercase tracking-wider text-muted-foreground">
+                  <tr>
+                    <th className="px-6 py-3 font-semibold whitespace-nowrap">Quote #</th>
+                    <th className="px-6 py-3 font-semibold">Customer</th>
+                    <th className="px-6 py-3 font-semibold">Bag Type & Quantity</th>
+                    <th className="px-6 py-3 font-semibold whitespace-nowrap">Submitted Date</th>
+                    <th className="px-6 py-3 font-semibold whitespace-nowrap">Status</th>
+                    <th className="px-6 py-3 font-semibold text-right whitespace-nowrap">Action</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {filteredQuotes.map((quote) => (
+                    <tr key={quote.id} className="hover:bg-slate-50/60 transition-colors">
+                      <td className="px-6 py-4 font-bold text-brand-charcoal font-mono whitespace-nowrap">
+                        {quote.quote_number}
+                      </td>
+                      <td className="px-6 py-4">
+                        <div>
+                          <div className="font-semibold text-slate-800">{quote.customer_name}</div>
+                          <div className="text-xs text-muted-foreground">{quote.business_name || quote.email}</div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="font-medium text-slate-800 capitalize">{quote.bag_type.replace(/-/g, ' ')}</div>
+                        <div className="text-xs text-brand-green font-bold">{quote.quantity.toLocaleString()} units</div>
+                      </td>
+                      <td className="px-6 py-4 text-xs text-slate-500 whitespace-nowrap">
+                        {new Date(quote.created_at).toLocaleDateString('en-IN', {
+                          day: 'numeric',
+                          month: 'short',
+                          year: 'numeric'
+                        })}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {getStatusBadge(quote.status)}
+                      </td>
+                      <td className="px-6 py-4 text-right whitespace-nowrap">
+                        <Button 
+                          size="sm" 
+                          onClick={() => handleOpenDetail(quote)}
+                          className="bg-brand-charcoal text-white hover:bg-slate-800 h-8 text-xs"
+                        >
+                          <Eye className="h-3.5 w-3.5 mr-1" /> View & Quote
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
       </div>
@@ -476,65 +567,85 @@ export default function AdminQuotesPage() {
 
               {/* Financial Quoting Form */}
               <div className="p-4 bg-emerald-50/70 border border-emerald-200 rounded-xl space-y-4">
-                <div className="flex items-center justify-between border-b border-emerald-200 pb-2">
-                  <h3 className="text-sm font-bold text-emerald-900 flex items-center gap-1.5">
-                    <IndianRupee className="h-4 w-4 text-emerald-700" /> Commercial Quotation Builder
-                  </h3>
-                  <span className="text-xs text-emerald-700 font-semibold">Qty: {selectedQuote.quantity} units</span>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-emerald-200 pb-2 gap-1">
+                  <div>
+                    <h3 className="text-sm font-bold text-emerald-900 flex items-center gap-1.5">
+                      <IndianRupee className="h-4 w-4 text-emerald-700" /> Commercial Quotation Builder
+                    </h3>
+                    <p className="text-[11px] text-emerald-700 font-medium">
+                      Calculations update automatically as you enter unit price, subtotal, charges, or tax.
+                    </p>
+                  </div>
+                  <span className="text-xs text-emerald-800 font-bold bg-emerald-100/80 px-2.5 py-1 rounded-md border border-emerald-200 self-start sm:self-auto">
+                    Qty: {selectedQuote.quantity.toLocaleString()} units
+                  </span>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                   <div>
-                    <Label className="text-[11px] text-slate-700 font-semibold">Unit Price (₹)</Label>
+                    <div className="flex items-center justify-between">
+                      <Label className="text-[11px] text-slate-700 font-semibold">Unit Price (₹/pc)</Label>
+                      <span className="text-[10px] text-emerald-700 font-medium">Auto-calculates</span>
+                    </div>
                     <Input 
                       type="number"
                       step="0.01"
+                      placeholder="e.g. 25"
                       value={unitPrice}
-                      onChange={(e) => {
-                        setUnitPrice(e.target.value);
-                        handleRecalculateTotal(e.target.value, subtotalAmount, customizationCharges, deliveryCharges, discountAmount, taxAmount, selectedQuote.quantity);
-                      }}
-                      className="mt-1 font-bold bg-white text-xs h-9"
+                      onChange={(e) => handleUnitPriceChange(e.target.value)}
+                      className="mt-1 font-bold bg-white text-xs h-9 border-emerald-300 focus-visible:ring-emerald-500"
                     />
+                    <p className="text-[10px] text-slate-500 mt-0.5">
+                      {selectedQuote.quantity.toLocaleString()} pcs @ ₹{unitPrice || '0'}/pc
+                    </p>
                   </div>
+
                   <div>
-                    <Label className="text-[11px] text-slate-700 font-semibold">Subtotal (₹)</Label>
+                    <div className="flex items-center justify-between">
+                      <Label className="text-[11px] text-slate-700 font-semibold">Subtotal (₹)</Label>
+                      <span className="text-[10px] text-emerald-700 font-medium">Auto-calculates</span>
+                    </div>
                     <Input 
                       type="number"
                       step="0.01"
+                      placeholder="e.g. 25000"
                       value={subtotalAmount}
-                      onChange={(e) => {
-                        setSubtotalAmount(e.target.value);
-                        handleRecalculateTotal(unitPrice, e.target.value, customizationCharges, deliveryCharges, discountAmount, taxAmount, selectedQuote.quantity);
-                      }}
-                      className="mt-1 bg-white text-xs h-9"
+                      onChange={(e) => handleSubtotalChange(e.target.value)}
+                      className="mt-1 font-semibold bg-white text-xs h-9 border-emerald-300 focus-visible:ring-emerald-500"
                     />
+                    <p className="text-[10px] text-slate-500 mt-0.5">
+                      Base order cost
+                    </p>
                   </div>
+
                   <div>
                     <Label className="text-[11px] text-slate-700 font-semibold">Custom Print Setup (₹)</Label>
                     <Input 
                       type="number"
                       step="0.01"
+                      placeholder="e.g. 1500"
                       value={customizationCharges}
-                      onChange={(e) => {
-                        setCustomizationCharges(e.target.value);
-                        handleRecalculateTotal(unitPrice, subtotalAmount, e.target.value, deliveryCharges, discountAmount, taxAmount, selectedQuote.quantity);
-                      }}
-                      className="mt-1 bg-white text-xs h-9"
+                      onChange={(e) => handleCustomizationChange(e.target.value)}
+                      className="mt-1 bg-white text-xs h-9 border-emerald-300 focus-visible:ring-emerald-500"
                     />
+                    <p className="text-[10px] text-slate-500 mt-0.5">
+                      Plate/screen/block fee
+                    </p>
                   </div>
+
                   <div>
                     <Label className="text-[11px] text-slate-700 font-semibold">Delivery Charge (₹)</Label>
                     <Input 
                       type="number"
                       step="0.01"
+                      placeholder="e.g. 500"
                       value={deliveryCharges}
-                      onChange={(e) => {
-                        setDeliveryCharges(e.target.value);
-                        handleRecalculateTotal(unitPrice, subtotalAmount, customizationCharges, e.target.value, discountAmount, taxAmount, selectedQuote.quantity);
-                      }}
-                      className="mt-1 bg-white text-xs h-9"
+                      onChange={(e) => handleDeliveryChange(e.target.value)}
+                      className="mt-1 bg-white text-xs h-9 border-emerald-300 focus-visible:ring-emerald-500"
                     />
+                    <p className="text-[10px] text-slate-500 mt-0.5">
+                      Freight / logistics
+                    </p>
                   </div>
 
                   <div>
@@ -542,37 +653,40 @@ export default function AdminQuotesPage() {
                     <Input 
                       type="number"
                       step="0.01"
+                      placeholder="e.g. 1000"
                       value={discountAmount}
-                      onChange={(e) => {
-                        setDiscountAmount(e.target.value);
-                        handleRecalculateTotal(unitPrice, subtotalAmount, customizationCharges, deliveryCharges, e.target.value, taxAmount, selectedQuote.quantity);
-                      }}
-                      className="mt-1 bg-white text-xs h-9 text-emerald-800 font-semibold"
+                      onChange={(e) => handleDiscountChange(e.target.value)}
+                      className="mt-1 bg-white text-xs h-9 text-emerald-800 font-semibold border-emerald-300 focus-visible:ring-emerald-500"
                     />
+                    <p className="text-[10px] text-slate-500 mt-0.5">
+                      Deducted from total
+                    </p>
                   </div>
 
-                  <div>
-                    <Label className="text-[11px] text-slate-700 font-semibold">GST / Tax Amount (₹)</Label>
+                  <div className="sm:col-span-2">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-[11px] text-slate-700 font-semibold">GST / Tax Amount (₹)</Label>
+                      <div className="flex items-center gap-1">
+                        <span className="text-[10px] text-slate-500 font-medium">Quick GST:</span>
+                        {[0, 5, 12, 18].map((pct) => (
+                          <button
+                            key={pct}
+                            type="button"
+                            onClick={() => applyGstPercentage(pct)}
+                            className="px-1.5 py-0.5 bg-white border border-emerald-300 hover:bg-emerald-100 text-emerald-800 rounded text-[10px] font-bold transition-colors"
+                          >
+                            {pct}%
+                          </button>
+                        ))}
+                      </div>
+                    </div>
                     <Input 
                       type="number"
                       step="0.01"
+                      placeholder="Enter or pick GST % above"
                       value={taxAmount}
-                      onChange={(e) => {
-                        setTaxAmount(e.target.value);
-                        handleRecalculateTotal(unitPrice, subtotalAmount, customizationCharges, deliveryCharges, discountAmount, e.target.value, selectedQuote.quantity);
-                      }}
-                      className="mt-1 bg-white text-xs h-9"
-                    />
-                  </div>
-
-                  <div>
-                    <Label className="text-[11px] text-slate-700 font-semibold">Total Price (₹)</Label>
-                    <Input 
-                      type="number"
-                      step="0.01"
-                      value={totalAmount}
-                      onChange={(e) => setTotalAmount(e.target.value)}
-                      className="mt-1 bg-white font-bold text-brand-green text-xs h-9"
+                      onChange={(e) => handleTaxChange(e.target.value)}
+                      className="mt-1 bg-white text-xs h-9 border-emerald-300 focus-visible:ring-emerald-500"
                     />
                   </div>
 
@@ -582,16 +696,26 @@ export default function AdminQuotesPage() {
                       type="date"
                       value={validUntilDate}
                       onChange={(e) => setValidUntilDate(e.target.value)}
-                      className="mt-1 bg-white text-xs h-9"
+                      className="mt-1 bg-white text-xs h-9 border-emerald-300 focus-visible:ring-emerald-500"
                     />
+                    <p className="text-[10px] text-slate-500 mt-0.5">
+                      Expiry date
+                    </p>
                   </div>
                 </div>
 
-                <div className="pt-2 border-t border-emerald-200 flex items-center justify-between">
-                  <span className="text-xs font-bold text-emerald-900 uppercase">Calculated Grand Total Amount:</span>
-                  <span className="text-lg font-extrabold text-brand-green font-mono">
-                    ₹{Number(totalAmount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-                  </span>
+                <div className="pt-3 border-t border-emerald-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div className="text-xs text-emerald-900">
+                    <span className="font-bold uppercase tracking-wider block">Calculated Grand Total Breakdown:</span>
+                    <span className="text-[11px] text-emerald-800">
+                      ₹{parseFloat(subtotalAmount) || 0} (Subtotal) + ₹{parseFloat(customizationCharges) || 0} (Print) + ₹{parseFloat(deliveryCharges) || 0} (Delivery) + ₹{parseFloat(taxAmount) || 0} (GST) - ₹{parseFloat(discountAmount) || 0} (Disc)
+                    </span>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-2xl font-extrabold text-brand-green font-mono block">
+                      ₹{Number(totalAmount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </span>
+                  </div>
                 </div>
               </div>
 
