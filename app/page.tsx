@@ -125,7 +125,7 @@ export default function HomePage() {
                     {hero.subtitle}
                   </span>
                 )}
-                <h1 className="font-heading text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-brand-charcoal leading-[1.15] mb-4 sm:mb-6">
+                <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl lg:text-[4rem] font-bold tracking-tight text-brand-charcoal leading-[1.1] mb-4 sm:mb-6">
                   {hero.title || 'BAGS THAT CARRY YOUR BRAND.'}
                 </h1>
                 <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-6 sm:mb-8 max-w-lg">

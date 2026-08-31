@@ -30,10 +30,8 @@ import { AppNotification } from '@/types';
 import { motion, AnimatePresence } from 'motion/react';
 
 const mainNav = [
-  { title: 'Home', href: '/' },
   { title: 'Shop', href: '/shop' },
   { title: 'Customize', href: '/customize' },
-  { title: 'Track Order', href: '/track-order' },
   { title: 'Industries', href: '/industries' },
   { title: 'Our Work', href: '/our-work' },
   { title: 'About', href: '/about' },
@@ -186,8 +184,8 @@ export function Header() {
             <Logo size="md" />
           </Link>
 
-          {/* Desktop Navigation Links (xl breakpoint prevents wrapping on medium screens) */}
-          <nav className="hidden xl:flex items-center gap-1.5">
+          {/* Desktop Navigation Links (lg breakpoint prevents wrapping on medium screens) */}
+          <nav className="hidden lg:flex flex-1 items-center justify-center gap-1 xl:gap-3 px-2">
             {mainNav.map((item) => {
               const isActive = pathname === item.href;
               return (
@@ -195,7 +193,7 @@ export function Header() {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    'px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-200',
+                    'px-2 xl:px-3 py-1.5 rounded-full text-[10px] xl:text-xs font-bold uppercase tracking-wider transition-all duration-200 whitespace-nowrap',
                     isActive
                       ? 'bg-brand-green/10 text-brand-green font-bold'
                       : 'text-slate-700 hover:text-brand-green hover:bg-brand-cream/60'
@@ -208,7 +206,7 @@ export function Header() {
           </nav>
 
           {/* Right Side Actions */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
             
             {/* Admin Panel Button (Shown if user is authenticated as admin) */}
             {isAdmin && (
@@ -350,7 +348,7 @@ export function Header() {
             {/* User Account Link */}
             <Link 
               href="/account" 
-              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold text-slate-700 hover:bg-brand-cream hover:text-brand-green transition-colors border border-border/50"
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold text-slate-700 hover:bg-brand-cream hover:text-brand-green transition-colors border border-border/50 whitespace-nowrap"
             >
               <User className="h-4 w-4 text-brand-green" />
               <span className="hidden md:inline">
@@ -359,14 +357,14 @@ export function Header() {
             </Link>
 
             {/* Get Quote CTA */}
-            <Button size="sm" className="hidden sm:inline-flex bg-brand-green hover:bg-emerald-700 text-white font-bold text-xs rounded-full px-4 shadow-2xs" asChild>
+            <Button size="sm" className="hidden sm:inline-flex bg-brand-green hover:bg-emerald-700 text-white font-bold text-[10px] xl:text-xs rounded-full px-3 xl:px-4 shadow-2xs whitespace-nowrap" asChild>
               <Link href="/customize">GET QUOTE</Link>
             </Button>
 
             {/* Mobile / Tablet Menu Toggle */}
             <button
               type="button"
-              className="xl:hidden p-2 rounded-xl text-slate-700 hover:text-brand-green hover:bg-brand-cream transition-colors border border-border/40"
+              className="lg:hidden p-2 rounded-xl text-slate-700 hover:text-brand-green hover:bg-brand-cream transition-colors border border-border/40"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               aria-label="Toggle navigation menu"
             >
@@ -388,7 +386,7 @@ export function Header() {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.25, ease: 'easeInOut' }}
-            className="xl:hidden border-b border-border bg-white shadow-2xl overflow-hidden"
+            className="lg:hidden border-b border-border bg-white shadow-2xl overflow-hidden"
           >
             <div className="container mx-auto px-4 py-6 space-y-5 max-h-[85vh] overflow-y-auto">
               
