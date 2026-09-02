@@ -1852,24 +1852,106 @@ export async function updateHomepageSection(sectionKey: string, sectionData: Par
 // --- TESTIMONIALS SERVICE ---
 export async function getTestimonials(onlyPublished = true): Promise<Testimonial[]> {
   try {
-    let query = supabase.from('testimonials').select('*').order('display_order', { ascending: true });
+    let query = supabase.from('testimonials').select('*');
     if (onlyPublished) {
-      query = query.eq('status', 'published');
+      query = query.in('status', ['published', 'approved']).order('display_order', { ascending: true }).order('created_at', { ascending: false });
+    } else {
+      query = query.order('created_at', { ascending: false });
     }
     const { data, error } = await query;
     if (error || !data) return [];
     
     return data.map((t: any) => ({
       ...t,
-      name: t.name || t.customer_name,
+      name: t.customer_name || t.name,
       customer_name: t.customer_name || t.name,
-      content: t.content || t.review,
+      content: t.review || t.content,
       review: t.review || t.content,
-      company: t.company || t.business_name,
+      company: t.business_name || t.company,
       business_name: t.business_name || t.company
     })) as Testimonial[];
   } catch (err) {
     return [];
+  }
+}
+
+export async function submitClientFeedback(feedback: {
+  customer_name: string;
+  business_name?: string;
+  role?: string;
+  email?: string;
+  phone?: string;
+  city?: string;
+  product_purchased?: string;
+  rating: number;
+  review: string;
+}): Promise<{ success: boolean; data?: Testimonial; error?: string }> {
+  try {
+    const payload = {
+      customer_name: feedback.customer_name.trim(),
+      business_name: feedback.business_name?.trim() || null,
+      role: feedback.role?.trim() || 'Store Owner',
+      email: feedback.email?.trim() || null,
+      phone: feedback.phone?.trim() || null,
+      city: feedback.city?.trim() || null,
+      product_purchased: feedback.product_purchased?.trim() || null,
+      rating: Math.min(5, Math.max(1, Number(feedback.rating) || 5)),
+      review: feedback.review.trim(),
+      status: 'pending',
+      display_order: 99
+    };
+
+    const { data, error } = await supabase
+      .from('testimonials')
+      .insert([payload])
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    // Trigger admin notification so store admin sees new review immediately
+    try {
+      await createNotification({
+        title: '⭐ New Client Review Submitted',
+        message: `${feedback.customer_name} (${feedback.business_name || 'Client'}) submitted a ${feedback.rating}-star review: "${feedback.review.slice(0, 60)}..."`,
+        type: 'SYSTEM',
+        recipient_role: 'admin',
+        link: '/admin/testimonials'
+      });
+    } catch (notifErr) {
+      console.warn('Could not post admin notification for feedback:', notifErr);
+    }
+
+    return {
+      success: true,
+      data: {
+        ...data,
+        name: data.customer_name,
+        content: data.review,
+        company: data.business_name
+      } as Testimonial
+    };
+  } catch (err: any) {
+    console.error('Error submitting client feedback:', err);
+    return { success: false, error: err.message || 'Failed to submit feedback' };
+  }
+}
+
+export async function updateTestimonialStatus(
+  id: string, 
+  status: 'published' | 'approved' | 'rejected' | 'pending' | 'draft'
+): Promise<boolean> {
+  try {
+    const { error } = await supabase
+      .from('testimonials')
+      .update({ status })
+      .eq('id', id);
+
+    if (error) throw error;
+    return true;
+  } catch (err) {
+    console.error('Error updating testimonial status:', err);
+    return false;
   }
 }
 
@@ -1879,7 +1961,8 @@ export async function saveTestimonial(testimonial: Partial<Testimonial>): Promis
       ...testimonial,
       customer_name: testimonial.name || testimonial.customer_name || 'Valued Client',
       review: testimonial.content || testimonial.review || '',
-      business_name: testimonial.company || testimonial.business_name || null
+      business_name: testimonial.company || testimonial.business_name || null,
+      status: testimonial.status || 'published'
     };
 
     const { data, error } = await supabase

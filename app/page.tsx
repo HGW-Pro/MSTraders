@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowRight, CheckCircle2, Star, Quote, Truck, ShieldCheck, Printer, RefreshCw } from 'lucide-react';
 import { getHomepageSections, getCategories, getTestimonials } from '@/lib/supabase/services';
 import { HomepageSection, Category, Testimonial } from '@/types';
+import { ClientFeedbackSection } from '@/components/feedback/ClientFeedbackSection';
 
 export default function HomePage() {
   const [sections, setSections] = React.useState<Record<string, HomepageSection>>({});
@@ -402,44 +403,15 @@ export default function HomePage() {
         </section>
       )}
 
-      {/* 7. CLIENT TESTIMONIALS */}
-      {testSec.enabled !== false && testimonials.length > 0 && (
-        <section className="py-20 bg-slate-50 border-t border-b border-border">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
-            <div className="text-center max-w-3xl mx-auto mb-12">
-              <span className="text-xs font-bold tracking-widest text-brand-green uppercase mb-2 block">
-                {testSec.subtitle || 'CLIENT FEEDBACK'}
-              </span>
-              <h2 className="font-heading text-3xl md:text-4xl font-bold text-brand-charcoal mb-3">
-                {testSec.title}
-              </h2>
-              <p className="text-sm text-muted-foreground">
-                {testSec.description}
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {testimonials.map((t) => (
-                <div key={t.id} className="bg-white border border-border rounded-2xl p-6 shadow-xs flex flex-col justify-between">
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-1 text-amber-400">
-                      {Array.from({ length: 5 }).map((_, i) => (
-                        <Star key={i} className={`h-4 w-4 ${i < t.rating ? 'fill-amber-400' : 'text-slate-200'}`} />
-                      ))}
-                    </div>
-                    <p className="text-sm text-slate-700 italic leading-relaxed">
-                      &ldquo;{t.content}&rdquo;
-                    </p>
-                  </div>
-                  <div className="pt-4 mt-4 border-t border-slate-100">
-                    <p className="font-bold text-sm text-brand-charcoal">{t.name}</p>
-                    <p className="text-xs text-muted-foreground">{t.role}{t.company ? `, ${t.company}` : ''}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+      {/* 7. CLIENT TESTIMONIALS & FEEDBACK DESK */}
+      {testSec.enabled !== false && (
+        <ClientFeedbackSection 
+          testimonials={testimonials}
+          sectionConfig={testSec}
+          onFeedbackSubmitted={() => {
+            getTestimonials(true).then(setTestimonials);
+          }}
+        />
       )}
 
       {/* 8. FINAL CALL TO ACTION */}

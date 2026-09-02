@@ -269,8 +269,13 @@ export interface Testimonial {
   review?: string;
   content?: string;
   photo_url?: string | null;
-  display_order: number;
-  status: 'published' | 'draft';
+  display_order?: number;
+  status: 'published' | 'approved' | 'pending' | 'rejected' | 'draft';
+  email?: string | null;
+  phone?: string | null;
+  city?: string | null;
+  product_purchased?: string | null;
+  admin_response?: string | null;
   created_at?: string;
 }
 

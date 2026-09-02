@@ -42,19 +42,38 @@ CREATE TABLE IF NOT EXISTS homepage_sections (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 3. ADD TESTIMONIALS TABLE (For Client Reviews & Feedback Management)
+-- 3. ADD TESTIMONIALS TABLE (For Client Reviews & Feedback Moderation)
 CREATE TABLE IF NOT EXISTS testimonials (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   customer_name TEXT NOT NULL,
   business_name TEXT,
   role TEXT DEFAULT 'Store Owner',
+  email TEXT,
+  phone TEXT,
+  city TEXT,
+  product_purchased TEXT,
   rating INTEGER DEFAULT 5,
   review TEXT NOT NULL,
   photo_url TEXT,
   display_order INTEGER DEFAULT 0,
-  status TEXT DEFAULT 'published' CHECK (status IN ('published', 'draft')),
-  created_at TIMESTAMPTZ DEFAULT NOW()
+  status TEXT DEFAULT 'pending',
+  admin_response TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- Ensure all columns exist for existing tables
+ALTER TABLE testimonials ADD COLUMN IF NOT EXISTS email TEXT;
+ALTER TABLE testimonials ADD COLUMN IF NOT EXISTS phone TEXT;
+ALTER TABLE testimonials ADD COLUMN IF NOT EXISTS city TEXT;
+ALTER TABLE testimonials ADD COLUMN IF NOT EXISTS product_purchased TEXT;
+ALTER TABLE testimonials ADD COLUMN IF NOT EXISTS admin_response TEXT;
+ALTER TABLE testimonials ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
+
+-- Drop legacy status check constraint to support full moderation workflow
+ALTER TABLE testimonials DROP CONSTRAINT IF EXISTS testimonials_status_check;
+ALTER TABLE testimonials ADD CONSTRAINT testimonials_status_check 
+  CHECK (status IN ('published', 'approved', 'pending', 'rejected', 'draft'));
 
 -- 4. ADD MEDIA TABLE (For Supabase Asset & Upload Library)
 CREATE TABLE IF NOT EXISTS media (
@@ -96,7 +115,11 @@ CREATE POLICY "Admins can manage homepage sections" ON homepage_sections
 -- TESTIMONIALS POLICIES
 DROP POLICY IF EXISTS "Public can view published testimonials" ON testimonials;
 CREATE POLICY "Public can view published testimonials" ON testimonials
-  FOR SELECT USING (status = 'published' OR public.is_admin());
+  FOR SELECT USING (status IN ('published', 'approved') OR public.is_admin());
+
+DROP POLICY IF EXISTS "Public can submit testimonials" ON testimonials;
+CREATE POLICY "Public can submit testimonials" ON testimonials
+  FOR INSERT WITH CHECK (true);
 
 DROP POLICY IF EXISTS "Admins can manage testimonials" ON testimonials;
 CREATE POLICY "Admins can manage testimonials" ON testimonials
@@ -125,12 +148,8 @@ DROP POLICY IF EXISTS "Public Upload Access on Storage" ON storage.objects;
 CREATE POLICY "Public Upload Access on Storage" ON storage.objects
   FOR INSERT WITH CHECK (bucket_id IN ('media', 'attachments'));
 
--- 9. SEED DEFAULT TESTIMONIALS DATA
-INSERT INTO testimonials (customer_name, business_name, role, rating, review, display_order, status) VALUES
-('Rajesh Agarwal', 'Agarwal Garments', 'Owner', 5, 'MS TRADERS delivers exceptional quality paper bags with crisp logo printing. Their wholesale pricing and quick turnaround time in Ujjain are top tier.', 1, 'published'),
-('Sunita Sharma', 'Ujjain Sweet House', 'Store Manager', 5, 'We ordered custom W-Cut non-woven bags for our festival rush. High load capacity and beautiful design. Highly recommended!', 2, 'published'),
-('Vikram Singh', 'Hotel Crown Palace', 'General Manager', 5, 'Top-tier luxury gift bags for our VIP guest amenities. Excellent paper GSM and ribbon handles.', 3, 'published')
-ON CONFLICT DO NOTHING;
+-- 9. CLEAN UP DEFAULTED TESTIMONIALS (Ensures ONLY genuine approved customer feedback is displayed)
+DELETE FROM testimonials WHERE customer_name IN ('Rajesh Agarwal', 'Sunita Sharma', 'Vikram Singh');
 
 -- 10. QUOTATION WORKFLOW & ORDER CONVERSION COLUMNS
 -- Remove legacy restrictive status check constraints if present to support full workflow
