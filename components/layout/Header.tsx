@@ -11,7 +11,6 @@ import {
   ShieldCheck, 
   Phone, 
   Search, 
-  Sparkles, 
   ChevronRight,
   MessageSquare,
   Bell,
@@ -150,7 +149,7 @@ export function Header() {
         <div className="container mx-auto flex items-center justify-between max-w-7xl">
           <div className="flex items-center gap-3 truncate">
             <span className="inline-flex items-center gap-1 font-semibold text-brand-gold">
-              <Sparkles className="h-3 w-3 text-brand-gold animate-pulse" /> MS TRADERS
+              MS TRADERS
             </span>
             <span className="hidden sm:inline text-slate-400">•</span>
             <span className="truncate text-slate-300">Wholesale & Retail Bag Manufacturer in Ujjain</span>
