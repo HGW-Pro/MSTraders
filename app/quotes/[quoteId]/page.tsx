@@ -216,7 +216,7 @@ export default function CustomerQuoteViewPage() {
 
           <div className="mt-8 pt-6 border-t border-slate-100 text-xs text-slate-500">
             Need help locating your quote? <br />
-            Contact MS TRADERS Desk on <a href="https://wa.me/919131268724" target="_blank" rel="noreferrer" className="text-brand-green font-bold hover:underline">+91 91312 68724</a>
+            Contact MS TRADERS Desk on <a href="https://wa.me/919999999999" target="_blank" rel="noreferrer" className="text-brand-green font-bold hover:underline">+91 99999 99999</a>
           </div>
         </div>
       </div>
@@ -270,7 +270,7 @@ export default function CustomerQuoteViewPage() {
               className="border-emerald-200 text-emerald-800 hover:bg-emerald-50 text-xs font-bold"
             >
               <a 
-                href={`https://wa.me/919131268724?text=${encodeURIComponent(`Hi MS TRADERS, regarding Quote ${quote.quote_number} for ${quote.bag_type}:`)}`} 
+                href={`https://wa.me/919999999999?text=${encodeURIComponent(`Hi MS TRADERS, regarding Quote ${quote.quote_number} for ${quote.bag_type}:`)}`} 
                 target="_blank" 
                 rel="noreferrer"
               >
@@ -293,7 +293,7 @@ export default function CustomerQuoteViewPage() {
               <h1 className="font-heading text-2xl sm:text-3xl font-bold text-slate-900">Commercial Price Quotation</h1>
               <p className="text-xs text-slate-500 mt-1">
                 57 Kalalseri, Behind Power House, Dabri Pitha, Ujjain (M.P) 456006 <br />
-                Ph: +91 91312 68724 / +91 90094 46352 | Email: contact@mstradersujjain.com
+                Ph: +91 99999 99999 | Email: contact@example.com
               </p>
             </div>
 

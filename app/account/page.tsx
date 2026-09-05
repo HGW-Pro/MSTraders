@@ -353,7 +353,7 @@ export default function CustomerAccountPage() {
                     <Label htmlFor="phone" className="text-xs">Phone Number *</Label>
                     <Input 
                       id="phone" 
-                      placeholder="+91 91312 68724" 
+                      placeholder="+91 99999 99999" 
                       value={phone} 
                       onChange={(e) => setPhone(e.target.value)} 
                       required

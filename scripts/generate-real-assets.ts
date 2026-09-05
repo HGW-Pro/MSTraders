@@ -86,7 +86,7 @@ const rajputiLuxuryBag = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8
 
     <!-- Instagram Handle & Phone Numbers -->
     <text x="400" y="555" font-family="sans-serif" font-size="14" font-weight="600" fill="#f8e4a5" text-anchor="middle" letter-spacing="1">@ rajputisaafeujjain7773</text>
-    <text x="400" y="580" font-family="sans-serif" font-size="15" font-weight="bold" fill="#ffffff" text-anchor="middle" letter-spacing="1">9691869625 || 7999938263</text>
+    <text x="400" y="580" font-family="sans-serif" font-size="15" font-weight="bold" fill="#ffffff" text-anchor="middle" letter-spacing="1">9999999999 || 99999 99999</text>
     <text x="400" y="605" font-family="sans-serif" font-size="12" font-weight="600" fill="url(#goldGrad)" text-anchor="middle" letter-spacing="2">UJJAIN (M.P.)</text>
   </g>
 </svg>`;
@@ -150,7 +150,7 @@ const jalsaBag = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" 
     <!-- Address & Contact Information -->
     <text x="430" y="565" font-family="sans-serif" font-size="12" font-weight="700" fill="#4a423b" text-anchor="middle">📍 26/626 Rajendra Prasad Marg,</text>
     <text x="430" y="585" font-family="sans-serif" font-size="12" font-weight="700" fill="#4a423b" text-anchor="middle">Do Batti Ratlam, M. P. India</text>
-    <text x="430" y="615" font-family="sans-serif" font-size="14" font-weight="800" fill="#96172e" text-anchor="middle">📞 9343310385</text>
+    <text x="430" y="615" font-family="sans-serif" font-size="14" font-weight="800" fill="#96172e" text-anchor="middle">📞 99999 99999</text>
   </g>
 </svg>`;
 
@@ -182,10 +182,10 @@ const fusionFashionBag = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8
 
     <!-- Top Contact Headers -->
     <text x="210" y="220" font-family="sans-serif" font-size="12" font-weight="bold" fill="#333333">KANIZA MALAK</text>
-    <text x="210" y="238" font-family="sans-serif" font-size="12" font-weight="600" fill="#555555">9303230521</text>
+    <text x="210" y="238" font-family="sans-serif" font-size="12" font-weight="600" fill="#555555">9999999999</text>
 
     <text x="590" y="220" font-family="sans-serif" font-size="12" font-weight="bold" fill="#333333" text-anchor="end">FATEMA MALAK</text>
-    <text x="590" y="238" font-family="sans-serif" font-size="12" font-weight="600" fill="#555555" text-anchor="end">+919424830920</text>
+    <text x="590" y="238" font-family="sans-serif" font-size="12" font-weight="600" fill="#555555" text-anchor="end">+999999999920</text>
 
     <!-- Pink Floral Geometric Diamond Frame -->
     <polygon points="400,270 510,380 400,490 290,380" fill="none" stroke="#e0658b" stroke-width="2" opacity="0.6"/>
@@ -392,7 +392,7 @@ const panchmevaBag = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 8
     <!-- Business Name & Address in Ujjain -->
     <text x="400" y="625" font-family="'Noto Sans Devanagari', sans-serif" font-size="22" font-weight="900" fill="#800000" text-anchor="middle">मे. घनश्यामदास कन्हैयालाल</text>
     <text x="400" y="658" font-family="'Noto Sans Devanagari', sans-serif" font-size="22" font-weight="bold" fill="#800000" text-anchor="middle">104/2, गुदरी चौराहा, उज्जैन</text>
-    <text x="400" y="690" font-family="sans-serif" font-size="16" font-weight="bold" fill="#1e293b" text-anchor="middle">मो. 9826950541</text>
+    <text x="400" y="690" font-family="sans-serif" font-size="16" font-weight="bold" fill="#1e293b" text-anchor="middle">मो. 99999 99999</text>
   </g>
 </svg>`;
 

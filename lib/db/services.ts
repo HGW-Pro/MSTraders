@@ -20,9 +20,9 @@ import {
 export const DEFAULT_SETTINGS: BusinessSettings = {
   business_name: 'MS TRADERS',
   tagline: 'Wholesale & Retail Supplier of Paper Bags, Non-Woven Bags, Customized Bags, Designer Gift Bags & Envelopes',
-  phone: '+91 91312 68724 / +91 90094 46352',
-  whatsapp: '919131268724',
-  email: 'contact@mstradersujjain.com',
+  phone: '+91 99999 99999',
+  whatsapp: '919999999999',
+  email: 'contact@example.com',
   address: '57 Kalalseri, Behind Power House, Dabri Pitha',
   city: 'Ujjain',
   state: 'Madhya Pradesh',
@@ -2379,7 +2379,7 @@ export async function checkIsAdmin(userId?: string | null, userEmail?: string | 
   const cleanEmail = (userEmail || '').trim().toLowerCase();
   
   // Dedicated system admin email addresses
-  if (cleanEmail === 'admin@mstraders.com' || cleanEmail === 'admin@mstraders.in' || cleanEmail === 'contact@mstradersujjain.com') {
+  if (cleanEmail === 'admin@mstraders.com' || cleanEmail === 'admin@mstraders.in' || cleanEmail === 'contact@example.com') {
     return true;
   }
 

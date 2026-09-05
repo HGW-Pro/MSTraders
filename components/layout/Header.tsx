@@ -157,12 +157,12 @@ export function Header() {
 
           <div className="flex items-center gap-4 flex-shrink-0">
             <a 
-              href="https://wa.me/919131268724" 
+              href="https://wa.me/919999999999" 
               target="_blank" 
               rel="noopener noreferrer"
               className="hidden sm:flex items-center gap-1 text-slate-300 hover:text-brand-gold transition-colors font-medium"
             >
-              <Phone className="h-3 w-3 text-emerald-400" /> +91 91312 68724
+              <Phone className="h-3 w-3 text-emerald-400" /> +91 99999 99999
             </a>
             <Link 
               href="/track-order" 
@@ -457,8 +457,8 @@ export function Header() {
                 {/* Contact Quick Support in Mobile Menu */}
                 <div className="bg-slate-50 rounded-xl p-3 text-center border border-slate-200">
                   <p className="text-xs font-medium text-slate-500 mb-1">Direct wholesale enquiry</p>
-                  <a href="tel:+919131268724" className="text-sm font-bold text-brand-green hover:underline flex items-center justify-center gap-1.5">
-                    <Phone className="h-3.5 w-3.5" /> +91 91312 68724 / +91 90094 46352
+                  <a href="tel:+919999999999" className="text-sm font-bold text-brand-green hover:underline flex items-center justify-center gap-1.5">
+                    <Phone className="h-3.5 w-3.5" /> +91 99999 99999
                   </a>
                 </div>
               </div>

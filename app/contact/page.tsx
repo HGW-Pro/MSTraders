@@ -39,8 +39,8 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <h3 className="font-semibold text-lg text-brand-charcoal mb-1">Phone & WhatsApp</h3>
-                      <p className="text-muted-foreground">{settings.phone || '+91 91312 68724'}</p>
-                      <p className="text-muted-foreground">+{settings.whatsapp || '919131268724'} (Wholesale & Custom Printing Inquiries)</p>
+                      <p className="text-muted-foreground">{settings.phone || '+91 99999 99999'}</p>
+                      <p className="text-muted-foreground">+{settings.whatsapp || '919999999999'} (Wholesale & Custom Printing Inquiries)</p>
                     </div>
                   </div>
                   
@@ -50,7 +50,7 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <h3 className="font-semibold text-lg text-brand-charcoal mb-1">Email</h3>
-                      <p className="text-muted-foreground">{settings.email || 'contact@mstradersujjain.com'}</p>
+                      <p className="text-muted-foreground">{settings.email || 'contact@example.com'}</p>
                     </div>
                   </div>
                   
