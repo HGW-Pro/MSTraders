@@ -29,6 +29,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import Image from 'next/image';
+import { getPricing, formatInr } from '@/lib/utils';
 
 export default function AdminProductsPage() {
   const [products, setProducts] = React.useState<Product[]>([]);
@@ -36,6 +37,7 @@ export default function AdminProductsPage() {
   const [loading, setLoading] = React.useState(true);
   const [searchQuery, setSearchQuery] = React.useState('');
   const [selectedCategory, setSelectedCategory] = React.useState('all');
+  const [selectedStatus, setSelectedStatus] = React.useState<'all' | 'published' | 'draft' | 'archived'>('all');
 
   // Dialog State
   const [isModalOpen, setIsModalOpen] = React.useState(false);
@@ -63,36 +65,41 @@ export default function AdminProductsPage() {
     printing_options: 'Single Color Screen Print, Offset Print'
   });
 
+  // Pure fetch - no state - so the initial-mount effect and the manual
+  // refresh can share it without setting state synchronously in an effect.
+  const fetchCatalog = React.useCallback(async () => {
+    const [prods, cats] = await Promise.all([
+      getProducts({ status: 'all' }),
+      getCategories()
+    ]);
+    return { prods, cats: cats.map(c => ({ name: c.name, slug: c.slug })) };
+  }, []);
+
   const loadData = React.useCallback(async () => {
     setLoading(true);
     try {
-      const [prods, cats] = await Promise.all([
-        getProducts({ status: 'all' as any }),
-        getCategories()
-      ]);
+      const { prods, cats } = await fetchCatalog();
       setProducts(prods);
-      setCategories(cats.map(c => ({ name: c.name, slug: c.slug })));
-    } catch (err) {
+      setCategories(cats);
+    } catch {
       toast.error('Failed to fetch products');
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [fetchCatalog]);
 
   React.useEffect(() => {
     let active = true;
-    Promise.all([
-      getProducts({ status: 'all' as any }),
-      getCategories()
-    ]).then(([prods, cats]) => {
-      if (active) {
+    fetchCatalog()
+      .then(({ prods, cats }) => {
+        if (!active) return;
         setProducts(prods);
-        setCategories(cats.map(c => ({ name: c.name, slug: c.slug })));
-        setLoading(false);
-      }
-    });
+        setCategories(cats);
+      })
+      .catch(() => { if (active) toast.error('Failed to fetch products'); })
+      .finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
-  }, []);
+  }, [fetchCatalog]);
 
   const handleOpenAdd = () => {
     setEditingProduct(null);
@@ -253,7 +260,8 @@ export default function AdminProductsPage() {
                           p.sku?.toLowerCase().includes(searchQuery.toLowerCase()) ||
                           p.material?.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCat = selectedCategory === 'all' || p.category === selectedCategory;
-    return matchesSearch && matchesCat;
+    const matchesStatus = selectedStatus === 'all' || p.status === selectedStatus;
+    return matchesSearch && matchesCat && matchesStatus;
   });
 
   return (
@@ -292,6 +300,17 @@ export default function AdminProductsPage() {
               <option key={cat.slug} value={cat.slug}>{cat.name}</option>
             ))}
           </select>
+          <span className="text-sm font-medium text-muted-foreground whitespace-nowrap ml-2">Status:</span>
+          <select
+            value={selectedStatus}
+            onChange={(e) => setSelectedStatus(e.target.value as typeof selectedStatus)}
+            className="h-10 px-3 py-2 rounded-md border border-input bg-background text-sm font-medium focus:outline-none focus:ring-2 focus:ring-brand-green w-full md:w-36"
+          >
+            <option value="all">All</option>
+            <option value="published">Published</option>
+            <option value="draft">Draft</option>
+            <option value="archived">Archived</option>
+          </select>
         </div>
       </div>
 
@@ -318,7 +337,7 @@ export default function AdminProductsPage() {
               </thead>
               <tbody className="divide-y divide-border">
                 {filteredProducts.map((product) => (
-                  <tr key={product.id} className="hover:bg-slate-50/60 transition-colors">
+                  <tr key={product.id} className={`hover:bg-slate-50/60 transition-colors ${product.status === 'archived' ? 'opacity-60' : ''}`}>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <div className="relative h-12 w-12 rounded-lg bg-slate-100 overflow-hidden border border-slate-200 shrink-0">
@@ -342,6 +361,15 @@ export default function AdminProductsPage() {
                                 <Sparkles className="h-3 w-3 mr-0.5 text-amber-600" /> Featured
                               </span>
                             )}
+                            {product.status !== 'published' && (
+                              <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide ${
+                                product.status === 'archived'
+                                  ? 'bg-slate-200 text-slate-600'
+                                  : 'bg-sky-100 text-sky-800'
+                              }`}>
+                                {product.status}
+                              </span>
+                            )}
                           </div>
                           <div className="text-xs text-muted-foreground flex items-center gap-2 mt-0.5">
                             <span>SKU: {product.sku || 'N/A'}</span>
@@ -355,11 +383,11 @@ export default function AdminProductsPage() {
                       {product.category.replace(/-/g, ' ')}
                     </td>
                     <td className="px-6 py-4 font-medium">
-                      {product.price ? (
+                      {getPricing(product).effective !== null ? (
                         <div>
-                          <span className="text-brand-charcoal font-bold">₹{product.price}</span>
-                          {product.sale_price && (
-                            <span className="text-xs text-muted-foreground line-through ml-1.5">₹{product.sale_price}</span>
+                          <span className="text-brand-charcoal font-bold">{formatInr(getPricing(product).effective)}</span>
+                          {getPricing(product).compareAt !== null && (
+                            <span className="text-xs text-muted-foreground line-through ml-1.5">{formatInr(getPricing(product).compareAt)}</span>
                           )}
                         </div>
                       ) : (

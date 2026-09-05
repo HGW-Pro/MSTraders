@@ -257,10 +257,34 @@ CREATE POLICY "Users can view their own profile" ON profiles
   FOR SELECT USING (auth.uid() = id OR public.is_admin());
 
 CREATE POLICY "Users can update their own profile" ON profiles
-  FOR UPDATE USING (auth.uid() = id OR public.is_admin());
+  FOR UPDATE
+  USING (auth.uid() = id OR public.is_admin())
+  WITH CHECK (auth.uid() = id OR public.is_admin());
 
+-- Customers may only ever create themselves as 'customer'.
 CREATE POLICY "Allow user insertion during signup" ON profiles
-  FOR INSERT WITH CHECK (auth.uid() = id OR public.is_admin());
+  FOR INSERT WITH CHECK (
+    public.is_admin()
+    OR (auth.uid() = id AND COALESCE(role, 'customer') = 'customer')
+  );
+
+-- Role changes require an existing admin. Enforced by trigger so it holds
+-- regardless of how the UPDATE policy above is worded.
+CREATE OR REPLACE FUNCTION public.protect_profile_role()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF NEW.role IS DISTINCT FROM OLD.role AND NOT public.is_admin() THEN
+    RAISE EXCEPTION 'Changing profile role requires administrator privileges'
+      USING ERRCODE = 'insufficient_privilege';
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+DROP TRIGGER IF EXISTS protect_profile_role ON profiles;
+CREATE TRIGGER protect_profile_role
+  BEFORE UPDATE ON profiles
+  FOR EACH ROW EXECUTE FUNCTION public.protect_profile_role();
 
 -- CATEGORIES POLICIES
 CREATE POLICY "Public can view categories" ON categories
@@ -414,26 +438,17 @@ CREATE TRIGGER update_orders_updated_at BEFORE UPDATE ON orders FOR EACH ROW EXE
 -- INITIAL SEED DATA FOR MS TRADERS
 -- ========================================================
 
--- SEED CATEGORIES
-INSERT INTO categories (name, slug, description, image_url, display_order) VALUES
-('Paper Bags', 'paper-bags', 'High-quality customized paper bags for retail, gifting, and corporate branding.', 'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=800&q=80', 1),
-('Kraft Bags', 'kraft-bags', 'Eco-friendly brown and white kraft paper bags with twisted or flat handles.', 'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?auto=format&fit=crop&w=800&q=80', 2),
-('Non-Woven Bags', 'non-woven-bags', 'Durable, reusable non-woven fabric bags for everyday shopping and retail.', 'https://images.unsplash.com/photo-1597484661643-2f5fef640dd1?auto=format&fit=crop&w=800&q=80', 3),
-('W-Cut Bags', 'w-cut-bags', 'Grocery and supermarket bags with ergonomic W-cut handles.', 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=800&q=80', 4),
-('D-Cut Bags', 'd-cut-bags', 'Sleek D-cut handle bags for apparel stores, exhibitions, and pharmacies.', 'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=800&q=80', 5),
-('Designer Bags', 'designer-bags', 'Luxury laminated boutique bags with foil stamping and velvet or rope handles.', 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=800&q=80', 6),
-('Gift Bags', 'gift-bags', 'Festive and corporate gift packaging bags with custom prints.', 'https://images.unsplash.com/photo-1513885535751-8b9238bd345a?auto=format&fit=crop&w=800&q=80', 7),
-('Customized Bags', 'customized-bags', 'Tailor-made bags engineered to your exact dimension, GSM, handle, and printing specs.', 'https://images.unsplash.com/photo-1572021335469-31706a17aaef?auto=format&fit=crop&w=800&q=80', 8)
-ON CONFLICT (slug) DO NOTHING;
-
--- SEED PRODUCTS
-INSERT INTO products (name, slug, description, price, sale_price, category, sku, material, moq, is_featured, is_customizable, status, images, sizes, colors, handles, printing_options) VALUES
-('Premium Kraft Paper Bag', 'premium-kraft-paper-bag', 'High-quality twisted handle kraft paper bag made from premium virgin kraft paper. Durable, eco-friendly, and ideal for upscale retail stores and boutiques.', 18.00, 15.00, 'kraft-bags', 'MST-KB-001', '120 GSM Natural Virgin Kraft Paper', 500, true, true, 'published', ARRAY['https://images.unsplash.com/photo-1590874103328-eac38a683ce7?auto=format&fit=crop&w=800&q=80'], ARRAY['Small (8x10x4")', 'Medium (10x13x5")', 'Large (16x12x6")'], ARRAY['Natural Brown', 'Bleached White'], ARRAY['Twisted Paper', 'Flat Cotton Ribbon'], ARRAY['Single Color Screen Print', 'Multi-Color Offset', 'Foil Stamping']),
-('Luxury Boutique Designer Bag', 'luxury-boutique-designer-bag', 'Elegant matte laminated art paper bag featuring reinforced cardboard base, cotton rope handles, and spot UV printing. Perfect for fashion apparel and luxury gifts.', 45.00, NULL, 'designer-bags', 'MST-DB-002', '210 GSM Imported Art Card', 250, true, true, 'published', ARRAY['https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=800&q=80'], ARRAY['Small (7x9x3")', 'Medium (11x14x4.5")', 'Large (15x18x6")'], ARRAY['Jet Black', 'Ivory White', 'Royal Blue', 'Emerald Green'], ARRAY['Braided Cotton Rope', 'Satin Ribbon'], ARRAY['Gold Foil Stamping', 'Spot UV', 'Full Color CMYK Offset']),
-('Standard Non-Woven D-Cut Bag', 'standard-non-woven-d-cut-bag', 'Cost-effective, highly durable reusable bag for everyday retail, trade shows, and pharmacies. Heavy heat-seal seams ensure high load capacity.', 8.00, 6.50, 'non-woven-bags', 'MST-NW-003', '70 GSM Spunbond Non-Woven Fabric', 1000, true, true, 'published', ARRAY['https://images.unsplash.com/photo-1597484661643-2f5fef640dd1?auto=format&fit=crop&w=800&q=80'], ARRAY['10x14 inch', '12x16 inch', '14x19 inch'], ARRAY['Bright Red', 'Navy Blue', 'Forest Green', 'Black', 'White'], ARRAY['Built-in D-Cut'], ARRAY['Screen Printing', 'Rotogravure']),
-('Eco Supermarket W-Cut Bag', 'eco-supermarket-w-cut-bag', 'Sturdy grocery carry bag with side gussets and ergonomic W-cut vest handles, engineered specifically for supermarkets and department stores.', 10.00, NULL, 'w-cut-bags', 'MST-WC-004', '80 GSM Recycled Non-Woven', 2000, false, true, 'published', ARRAY['https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=800&q=80'], ARRAY['13x16+4 inch', '16x20+5 inch'], ARRAY['Off White', 'Yellow', 'Sky Blue'], ARRAY['W-Cut Vest Handle'], ARRAY['Flexographic Print']),
-('Festive Custom Gift Bag', 'festive-custom-gift-bag', 'Premium gift bag with glossy finish and custom hot-stamped patterns, perfect for weddings, corporate gifting, and festive celebrations.', 32.00, 28.00, 'gift-bags', 'MST-GB-005', '180 GSM Glossy Coated Paper', 300, true, true, 'published', ARRAY['https://images.unsplash.com/photo-1513885535751-8b9238bd345a?auto=format&fit=crop&w=800&q=80'], ARRAY['8x10x3.5"', '10x12x4"', '12x15x5"'], ARRAY['Crimson Red', 'Metallic Gold', 'Deep Purple'], ARRAY['Silk Ribbon', 'Twisted Cotton Cord'], ARRAY['Embossed Gold Foil', 'Glitter Finish'])
-ON CONFLICT (slug) DO NOTHING;
+-- SEED CATEGORIES + PRODUCTS
+-- Moved to scripts/seed-catalogue.sql, which is generated from the TypeScript
+-- catalogue (lib/supabase/services.ts) and is the single source of truth.
+-- The previous inline seed here used Unsplash placeholder images and a
+-- different product set, which produced duplicate SKUs and mismatched
+-- artwork in the admin catalogue.
+--
+-- Fresh install order:
+--   1. this file
+--   2. scripts/seed-catalogue.sql
+--   3. scripts/security-hardening.sql
 
 -- SEED BUSINESS SETTINGS
 INSERT INTO settings (key, value) VALUES

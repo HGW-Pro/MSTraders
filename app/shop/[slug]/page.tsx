@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Product } from '@/types';
 import { getProductBySlug } from '@/lib/supabase/services';
+import { getPricing, formatInr } from '@/lib/utils';
 import { useCartStore } from '@/lib/store';
 import { ChevronRight, Info, ShoppingCart, MessageSquare, ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -133,7 +134,14 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
             </h1>
             
             <div className="text-2xl font-extrabold text-brand-green mb-6">
-              {product.price ? `₹${product.price} / piece` : 'Wholesale Bulk Pricing Only'}
+              {getPricing(product).effective !== null ? (
+                <>
+                  {formatInr(getPricing(product).effective)} / piece
+                  {getPricing(product).compareAt !== null && (
+                    <span className="ml-2 text-base font-normal text-muted-foreground line-through">{formatInr(getPricing(product).compareAt)}</span>
+                  )}
+                </>
+              ) : 'Wholesale Bulk Pricing Only'}
             </div>
             
             <p className="text-slate-600 text-base mb-8 leading-relaxed">

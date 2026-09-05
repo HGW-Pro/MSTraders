@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Product, Category } from '@/types';
 import { getProducts, getCategories } from '@/lib/supabase/services';
+import { getPricing, formatInr } from '@/lib/utils';
 import { Search, SlidersHorizontal, ArrowRight } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 
@@ -164,7 +165,14 @@ export default function ShopPage() {
 
                       <div className="flex items-center justify-between pt-3 border-t border-slate-100 mt-auto">
                         <div className="font-extrabold text-brand-charcoal text-sm">
-                          {product.price ? `₹${product.price} / pc` : 'Bulk Custom Quote'}
+                          {getPricing(product).effective !== null ? (
+                            <>
+                              {formatInr(getPricing(product).effective)} / pc
+                              {getPricing(product).compareAt !== null && (
+                                <span className="ml-1.5 text-xs font-normal text-muted-foreground line-through">{formatInr(getPricing(product).compareAt)}</span>
+                              )}
+                            </>
+                          ) : 'Bulk Custom Quote'}
                         </div>
                         <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center group-hover:bg-brand-green group-hover:text-white transition-colors">
                           <ArrowRight className="h-4 w-4" />
