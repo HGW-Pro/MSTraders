@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { Order, OrderStatus } from '@/types';
-import { getOrders, updateOrderFulfillmentDetails } from '@/lib/supabase/services';
+import { getOrders, updateOrderFulfillmentDetails } from '@/lib/db/services';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -169,7 +169,7 @@ export default function AdminOrdersPage() {
       {/* Orders Table */}
       <div className="bg-white border border-border rounded-xl shadow-xs overflow-hidden">
         {loading ? (
-          <div className="p-12 text-center text-muted-foreground animate-pulse">Fetching orders from Supabase...</div>
+          <div className="p-12 text-center text-muted-foreground animate-pulse">Fetching orders...</div>
         ) : filteredOrders.length === 0 ? (
           <div className="p-12 text-center text-muted-foreground">
             No order requests found.

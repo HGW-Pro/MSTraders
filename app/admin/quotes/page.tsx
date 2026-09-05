@@ -3,7 +3,7 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { Quote, QuoteStatus } from '@/types';
-import { getQuotes, updateQuoteStatus, convertQuoteToOrder } from '@/lib/supabase/services';
+import { getQuotes, updateQuoteStatus, convertQuoteToOrder } from '@/lib/db/services';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -58,7 +58,7 @@ export default function AdminQuotesPage() {
       const data = await getQuotes(statusFilter);
       setQuotes(data);
     } catch (err) {
-      toast.error('Failed to load quotes from Supabase');
+      toast.error('Failed to load quotes');
     } finally {
       setLoading(false);
     }
@@ -334,7 +334,7 @@ export default function AdminQuotesPage() {
       {/* Quotes Table */}
       <div className="bg-white border border-border rounded-xl shadow-xs overflow-hidden">
         {loading ? (
-          <div className="p-12 text-center text-muted-foreground animate-pulse">Fetching quote inquiries from Supabase...</div>
+          <div className="p-12 text-center text-muted-foreground animate-pulse">Fetching quote inquiries...</div>
         ) : filteredQuotes.length === 0 ? (
           <div className="p-12 text-center text-muted-foreground">
             No quote inquiries found matching your filters.

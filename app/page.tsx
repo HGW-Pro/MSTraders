@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, CheckCircle2, Star, Quote, Truck, ShieldCheck, Printer, RefreshCw } from 'lucide-react';
-import { getHomepageSections, getCategories, getTestimonials, DEFAULT_CATEGORIES } from '@/lib/supabase/services';
+import { getHomepageSections, getCategories, getTestimonials, DEFAULT_CATEGORIES } from '@/lib/db/services';
 import { HomepageSection, Category, Testimonial } from '@/types';
 import { ClientFeedbackSection } from '@/components/feedback/ClientFeedbackSection';
 

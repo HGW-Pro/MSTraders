@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { CheckCircle2, ChevronRight, Building2, Truck, FileCheck, Phone, ShieldCheck, MessageSquare } from 'lucide-react';
 import { toast } from 'sonner';
-import { createOrder } from '@/lib/supabase/services';
+import { createOrder } from '@/lib/db/services';
 import { useSettings } from '@/components/settings-provider';
 
 export default function CheckoutPage() {
@@ -426,7 +426,7 @@ export default function CheckoutPage() {
                     onClick={handlePlaceOrder}
                     disabled={isProcessing}
                   >
-                    {isProcessing ? 'Submitting Order to Supabase...' : 'Confirm & Place Purchase Order'}
+                    {isProcessing ? 'Submitting Order...' : 'Confirm & Place Purchase Order'}
                   </Button>
                 </div>
               </div>

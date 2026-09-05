@@ -38,7 +38,7 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import { supabase } from '@/lib/supabase/client';
+import { db } from '@/lib/db/client';
 import { 
   getUserProfile, 
   updateUserProfile, 
@@ -51,7 +51,7 @@ import {
   getCustomerNotifications,
   markNotificationAsRead,
   markAllNotificationsAsRead
-} from '@/lib/supabase/services';
+} from '@/lib/db/services';
 import { Order, Quote, CustomerAddress, UserProfile, AppNotification } from '@/types';
 import { cn } from '@/lib/utils';
 
@@ -146,7 +146,7 @@ export default function CustomerAccountPage() {
 
   React.useEffect(() => {
     let isMounted = true;
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    db.auth.getSession().then(({ data: { session } }) => {
       if (isMounted) {
         if (session?.user) {
           setSessionUser(session.user);
@@ -157,7 +157,7 @@ export default function CustomerAccountPage() {
       }
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = db.auth.onAuthStateChange((_event, session) => {
       if (isMounted) {
         if (session?.user) {
           setSessionUser(session.user);
@@ -182,11 +182,11 @@ export default function CustomerAccountPage() {
 
     try {
       if (authMode === 'signin') {
-        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+        const { data, error } = await db.auth.signInWithPassword({ email, password });
         if (error) throw error;
         toast.success('Signed in successfully');
       } else {
-        const { data, error } = await supabase.auth.signUp({
+        const { data, error } = await db.auth.signUp({
           email,
           password,
           options: {
@@ -221,7 +221,7 @@ export default function CustomerAccountPage() {
 
   const handleSignOut = async () => {
     try {
-      await supabase.auth.signOut();
+      await db.auth.signOut();
       toast.success('Signed out');
       setSessionUser(null);
     } catch (err) {

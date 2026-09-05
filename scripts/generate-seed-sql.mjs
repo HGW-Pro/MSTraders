@@ -1,6 +1,6 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 
-const src = readFileSync('lib/supabase/services.ts', 'utf8');
+const src = readFileSync('lib/db/services.ts', 'utf8');
 
 function grab(name) {
   const start = src.indexOf(`export const ${name}`);
@@ -26,7 +26,7 @@ const bool = (v) => v ? 'true' : 'false';
 let out = `-- =====================================================================
 -- MS TRADERS - CATALOGUE SEED / RESYNC
 -- =====================================================================
--- Idempotent. Safe to run repeatedly in the Supabase SQL Editor.
+-- Idempotent. Safe to run repeatedly in the database SQL editor.
 --
 -- Why this exists:
 --   getProducts()/getCategories() fall back to an in-memory seed catalogue
@@ -35,7 +35,7 @@ let out = `-- ==================================================================
 --   them failed with: 22P02 invalid input syntax for type uuid.
 --   Seeding the tables removes the fallback path entirely.
 --
--- Generated from lib/supabase/services.ts - do not hand-edit; regenerate with
+-- Generated from lib/db/services.ts - do not hand-edit; regenerate with
 --   node scripts/generate-seed-sql.mjs
 -- =====================================================================
 

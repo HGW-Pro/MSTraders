@@ -1,6 +1,6 @@
 -- ========================================================
--- MS TRADERS - UPDATE & EXTENSION SCRIPT FOR SUPABASE
--- Run this script in the Supabase SQL Editor if you have already
+-- MS TRADERS - DATABASE UPDATE & EXTENSION SCRIPT
+-- Run this script in the database SQL editor if you have already
 -- executed the base schema.sql previously.
 -- ========================================================
 
@@ -75,7 +75,7 @@ ALTER TABLE testimonials DROP CONSTRAINT IF EXISTS testimonials_status_check;
 ALTER TABLE testimonials ADD CONSTRAINT testimonials_status_check 
   CHECK (status IN ('published', 'approved', 'pending', 'rejected', 'draft'));
 
--- 4. ADD MEDIA TABLE (For Supabase Asset & Upload Library)
+-- 4. ADD MEDIA TABLE (For the Asset & Upload Library)
 CREATE TABLE IF NOT EXISTS media (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   name TEXT,
@@ -370,7 +370,7 @@ BEGIN
   END IF;
 END $$;
 
--- 16. SUPABASE STORAGE BUCKETS & POLICIES SETUP
+-- 16. STORAGE BUCKETS & POLICIES SETUP
 -- Creates all required storage buckets for MS Traders image uploads
 INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 VALUES 
@@ -396,7 +396,7 @@ ON CONFLICT (id) DO UPDATE SET public = true;
 -- =====================================================================
 -- MS TRADERS - CATALOGUE SEED / RESYNC
 -- =====================================================================
--- Idempotent. Safe to run repeatedly in the Supabase SQL Editor.
+-- Idempotent. Safe to run repeatedly in the database SQL editor.
 --
 -- Why this exists:
 --   getProducts()/getCategories() fall back to an in-memory seed catalogue
@@ -405,7 +405,7 @@ ON CONFLICT (id) DO UPDATE SET public = true;
 --   them failed with: 22P02 invalid input syntax for type uuid.
 --   Seeding the tables removes the fallback path entirely.
 --
--- Generated from lib/supabase/services.ts - do not hand-edit; regenerate with
+-- Generated from lib/db/services.ts - do not hand-edit; regenerate with
 --   node scripts/generate-seed-sql.mjs
 -- =====================================================================
 
@@ -515,10 +515,10 @@ SELECT
 -- =====================================================================
 -- MS TRADERS - SECURITY HARDENING + CATALOGUE CLEANUP
 -- =====================================================================
--- Idempotent. Safe to run repeatedly in the Supabase SQL Editor.
+-- Idempotent. Safe to run repeatedly in the database SQL editor.
 -- Run AFTER the catalogue seed block above.
 --
--- The app talks to Supabase with the public anon key from the browser and
+-- The app talks to the database with the public anon key from the browser and
 -- middleware.ts is a pass-through, so Row Level Security is the ONLY
 -- server-side boundary. This block closes four holes in it and fixes the
 -- data problems visible in the admin catalogue.
@@ -530,7 +530,7 @@ SELECT
 -- ---------------------------------------------------------------------
 -- "Users can update their own profile" had USING (auth.uid() = id) and no
 -- WITH CHECK / column restriction. Any signed-up customer could run
---   supabase.from('profiles').update({ role: 'admin' }).eq('id', myId)
+--   db.from('profiles').update({ role: 'admin' }).eq('id', myId)
 -- from the browser console; is_admin() then returned true and every
 -- admin-gated policy in the database opened up.
 --
@@ -678,7 +678,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS products_sku_unique
 
 
 -- ---------------------------------------------------------------------
--- F. CATALOGUE: the 5 legacy demo products from supabase-schema.sql
+-- F. CATALOGUE: the 5 legacy demo products from database-schema.sql
 -- ---------------------------------------------------------------------
 -- The original schema file seeded five generic placeholders with Unsplash
 -- URLs. They overlap the real catalogue and were showing the same stock

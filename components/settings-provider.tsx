@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { BusinessSettings } from '@/types';
-import { getSettings, DEFAULT_SETTINGS } from '@/lib/supabase/services';
+import { getSettings, DEFAULT_SETTINGS } from '@/lib/db/services';
 
 const SettingsContext = React.createContext<{
   settings: BusinessSettings;

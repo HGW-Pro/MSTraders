@@ -18,11 +18,11 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { provisionSupabaseStorageAndSchema, ProvisionLog } from '@/lib/supabase/services';
+import { provisionStorageAndSchema, ProvisionLog } from '@/lib/db/services';
 
 const FULL_SQL_SCRIPT = `-- ==============================================================================
--- MS TRADERS SUPABASE MASTER STORAGE & SCHEMA PROVISIONING SCRIPT
--- Copy and paste this script directly into your Supabase Dashboard -> SQL Editor
+-- MS TRADERS MASTER STORAGE & SCHEMA PROVISIONING SCRIPT
+-- Copy and paste this script directly into your database SQL editor
 -- ==============================================================================
 
 -- 1. CREATE / SYNCHRONIZE MEDIA TABLE
@@ -137,9 +137,9 @@ export function DatabaseSetupRunner() {
     setRunning(true);
     setLogs([]);
     try {
-      const result = await provisionSupabaseStorageAndSchema();
+      const result = await provisionStorageAndSchema();
       setLogs(result.logs);
-      toast.success('Supabase storage buckets & schema provisioning finished!');
+      toast.success('Storage & schema provisioning finished!');
     } catch (err: any) {
       toast.error(`Provisioning error: ${err?.message || err}`);
     } finally {
@@ -161,7 +161,7 @@ export function DatabaseSetupRunner() {
           <div className="flex items-center gap-2">
             <Database className="h-5 w-5 text-emerald-400" />
             <h3 className="font-heading text-lg font-bold text-white">
-              Supabase Storage & Schema Provisioning Tool
+              Storage & Schema Provisioning Tool
             </h3>
             <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-mono px-2 py-0.5 rounded font-bold uppercase">
               1-Click Active
@@ -244,7 +244,7 @@ export function DatabaseSetupRunner() {
           className="flex items-center gap-2 text-xs font-semibold text-slate-400 hover:text-emerald-400 transition-colors"
         >
           {showSqlCode ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-          {showSqlCode ? 'Hide Supabase SQL Script' : 'View Full Supabase SQL Script Code'}
+          {showSqlCode ? 'Hide SQL Script' : 'View Full SQL Script'}
         </button>
 
         {showSqlCode && (

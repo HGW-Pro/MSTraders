@@ -8,8 +8,8 @@ import {
   updateProduct, 
   deleteProduct, 
   getCategories, 
-  uploadFileToSupabase 
-} from '@/lib/supabase/services';
+  uploadFile 
+} from '@/lib/db/services';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -168,7 +168,7 @@ export default function AdminProductsPage() {
 
     for (const file of files) {
       try {
-        const url = await uploadFileToSupabase(file, 'product-images');
+        const url = await uploadFile(file, 'product-images');
         if (url) newImageUrls.push(url);
       } catch (err: any) {
         toast.error(err?.message || `Failed to upload ${file.name}`);
@@ -224,7 +224,7 @@ export default function AdminProductsPage() {
         // Seed rows carry a non-uuid id; updateProduct persists them by slug.
         const success = await updateProduct(editingProduct.id, { ...payload, slug: payload.slug });
         if (success) {
-          toast.success('Product saved successfully in Supabase');
+          toast.success('Product saved successfully');
           setIsModalOpen(false);
           loadData();
         } else {
@@ -233,7 +233,7 @@ export default function AdminProductsPage() {
       } else {
         const created = await createProduct(payload);
         if (created) {
-          toast.success('New product created in Supabase catalog');
+          toast.success('New product added to the catalog');
           setIsModalOpen(false);
           loadData();
         } else {
@@ -321,7 +321,7 @@ export default function AdminProductsPage() {
       {/* Products Table */}
       <div className="bg-white border border-border rounded-xl shadow-xs overflow-hidden">
         {loading ? (
-          <div className="p-12 text-center text-muted-foreground animate-pulse">Loading catalog from Supabase...</div>
+          <div className="p-12 text-center text-muted-foreground animate-pulse">Loading catalog...</div>
         ) : filteredProducts.length === 0 ? (
           <div className="p-12 text-center text-muted-foreground">
             No products found matching your filters.

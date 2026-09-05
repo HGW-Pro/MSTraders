@@ -2,8 +2,8 @@
 
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabase/client';
-import { checkIsAdmin } from '@/lib/supabase/services';
+import { db } from '@/lib/db/client';
+import { checkIsAdmin } from '@/lib/db/services';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -18,7 +18,7 @@ export default function AdminLoginPage() {
 
   // Check if already authenticated as admin
   React.useEffect(() => {
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
+    db.auth.getSession().then(async ({ data: { session } }) => {
       if (session?.user) {
         const authorized = await checkIsAdmin(session.user.id, session.user.email);
         if (authorized) {
@@ -37,7 +37,7 @@ export default function AdminLoginPage() {
 
     setLoading(true);
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await db.auth.signInWithPassword({
         email: email.trim(),
         password,
       });
@@ -46,7 +46,7 @@ export default function AdminLoginPage() {
         if (error?.message.includes('Invalid login credentials')) {
           toast.error('Invalid credentials. Please verify your admin email and password.');
         } else if (error?.message.includes('rate limit')) {
-          toast.error('Supabase Email Rate Limit Exceeded. Please try again in a few minutes.');
+          toast.error('Too many login attempts. Please try again in a few minutes.');
         } else {
           toast.error(error?.message || 'Login failed.');
         }
@@ -57,7 +57,7 @@ export default function AdminLoginPage() {
       const authorized = await checkIsAdmin(data.user.id, data.user.email);
       if (!authorized) {
         toast.error('Access Denied: This account is a customer account and does not have administrator privileges.');
-        await supabase.auth.signOut();
+        await db.auth.signOut();
         setLoading(false);
         return;
       }

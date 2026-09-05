@@ -24,8 +24,8 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Logo } from '@/components/logo';
 import { useCartStore } from '@/lib/store';
-import { supabase } from '@/lib/supabase/client';
-import { getUserProfile, checkIsAdmin, getCustomerNotifications, markNotificationAsRead, markAllNotificationsAsRead } from '@/lib/supabase/services';
+import { db } from '@/lib/db/client';
+import { getUserProfile, checkIsAdmin, getCustomerNotifications, markNotificationAsRead, markAllNotificationsAsRead } from '@/lib/db/services';
 import { AppNotification } from '@/types';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -68,7 +68,7 @@ export function Header() {
     setNotifications(list);
   }, [userEmail, userId, isAdmin]);
 
-  // Sync Supabase Auth & Profile Admin Check
+  // Sync auth session & profile admin check
   React.useEffect(() => {
     let active = true;
 
@@ -94,11 +94,11 @@ export function Header() {
       }
     }
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    db.auth.getSession().then(({ data: { session } }) => {
       checkAuth(session?.user || null);
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = db.auth.onAuthStateChange((_event, session) => {
       checkAuth(session?.user || null);
     });
 

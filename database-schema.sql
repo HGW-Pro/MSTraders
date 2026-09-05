@@ -1,9 +1,9 @@
--- MS TRADERS Comprehensive Supabase Schema & Security Setup
+-- MS TRADERS Comprehensive Database Schema & Security Setup
 
 -- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- 1. PROFILES / USERS (Extends Supabase auth.users)
+-- 1. PROFILES / USERS (Extends database auth.users)
 CREATE TABLE IF NOT EXISTS profiles (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   created_at TIMESTAMPTZ DEFAULT NOW(),
@@ -440,7 +440,7 @@ CREATE TRIGGER update_orders_updated_at BEFORE UPDATE ON orders FOR EACH ROW EXE
 
 -- SEED CATEGORIES + PRODUCTS
 -- Moved to scripts/seed-catalogue.sql, which is generated from the TypeScript
--- catalogue (lib/supabase/services.ts) and is the single source of truth.
+-- catalogue (lib/db/services.ts) and is the single source of truth.
 -- The previous inline seed here used Unsplash placeholder images and a
 -- different product set, which produced duplicate SKUs and mismatched
 -- artwork in the admin catalogue.

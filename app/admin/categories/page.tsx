@@ -21,7 +21,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import { getCategories, saveCategory, deleteCategory, uploadFileToSupabase } from '@/lib/supabase/services';
+import { getCategories, saveCategory, deleteCategory, uploadFile } from '@/lib/db/services';
 import { Category } from '@/types';
 import { cn } from '@/lib/utils';
 
@@ -119,7 +119,7 @@ export default function AdminCategoriesPage() {
 
     setUploadingImage(true);
     try {
-      const publicUrl = await uploadFileToSupabase(file, 'category-images');
+      const publicUrl = await uploadFile(file, 'category-images');
       if (publicUrl) {
         setEditingCategory(prev => ({ ...prev, image_url: publicUrl }));
         toast.success('Category image uploaded');

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Product, Category } from '@/types';
-import { getProducts, getCategories } from '@/lib/supabase/services';
+import { getProducts, getCategories } from '@/lib/db/services';
 import { getPricing, formatInr } from '@/lib/utils';
 import { Search, SlidersHorizontal, ArrowRight } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -114,7 +114,7 @@ export default function ShopPage() {
           {/* Product Grid */}
           <div className="flex-1">
             {loading ? (
-              <div className="p-16 text-center text-muted-foreground animate-pulse">Loading catalog from Supabase...</div>
+              <div className="p-16 text-center text-muted-foreground animate-pulse">Loading catalog...</div>
             ) : filteredProducts.length === 0 ? (
               <div className="text-center py-20 bg-white border border-border rounded-2xl p-8">
                 <p className="text-base text-muted-foreground mb-4">No products found matching your search criteria.</p>

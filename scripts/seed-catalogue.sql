@@ -1,7 +1,7 @@
 -- =====================================================================
 -- MS TRADERS - CATALOGUE SEED / RESYNC
 -- =====================================================================
--- Idempotent. Safe to run repeatedly in the Supabase SQL Editor.
+-- Idempotent. Safe to run repeatedly in the database SQL editor.
 --
 -- Why this exists:
 --   getProducts()/getCategories() fall back to an in-memory seed catalogue
@@ -10,7 +10,7 @@
 --   them failed with: 22P02 invalid input syntax for type uuid.
 --   Seeding the tables removes the fallback path entirely.
 --
--- Generated from lib/supabase/services.ts - do not hand-edit; regenerate with
+-- Generated from lib/db/services.ts - do not hand-edit; regenerate with
 --   node scripts/generate-seed-sql.mjs
 -- =====================================================================
 

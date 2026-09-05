@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Hotel, Utensils, ShoppingBag, Store, Stethoscope, Building2, Gift, Briefcase } from 'lucide-react';
-import { getIndustries } from '@/lib/supabase/services';
+import { getIndustries } from '@/lib/db/services';
 import { Industry } from '@/types';
 
 const ICON_MAP: Record<string, any> = {
@@ -55,7 +55,7 @@ export default function IndustriesPage() {
       <section className="py-16 md:py-24">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
           {loading ? (
-            <div className="p-12 text-center text-muted-foreground animate-pulse">Loading industry solutions from Supabase...</div>
+            <div className="p-12 text-center text-muted-foreground animate-pulse">Loading industry solutions...</div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
               {industries.map((ind) => {

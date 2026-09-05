@@ -9,9 +9,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { CheckCircle2, Upload, FileText, ChevronRight, MessageSquare } from 'lucide-react';
 import { toast } from 'sonner';
-import { createQuote, uploadFileToSupabase, getUserProfile } from '@/lib/supabase/services';
+import { createQuote, uploadFile, getUserProfile } from '@/lib/db/services';
 import { useSettings } from '@/components/settings-provider';
-import { supabase } from '@/lib/supabase/client';
+import { db } from '@/lib/db/client';
 import { useCartStore } from '@/lib/store';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 
@@ -69,7 +69,7 @@ function CustomizeForm() {
   // Pre-fill user profile and cart items if present
   React.useEffect(() => {
     let active = true;
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
+    db.auth.getSession().then(async ({ data: { session } }) => {
       if (session?.user && active) {
         setCurrentUser(session.user);
         const profile = await getUserProfile(session.user.id);
@@ -240,7 +240,7 @@ function CustomizeForm() {
       let attachmentUrl: string | null = null;
       if (file) {
         toast.info('Uploading artwork file...');
-        attachmentUrl = await uploadFileToSupabase(file, 'quote-attachments');
+        attachmentUrl = await uploadFile(file, 'quote-attachments');
       }
 
       const dimensionsStr = (formData.width && formData.height) 
@@ -612,7 +612,7 @@ function CustomizeForm() {
                 disabled={isSubmitting || !formData.fullName || !formData.email || !formData.phone}
                 className="bg-brand-gold text-brand-charcoal hover:bg-amber-400 font-bold px-8 shadow-sm"
               >
-                {isSubmitting ? 'Submitting to Supabase...' : 'Submit Custom Quote Request'}
+                {isSubmitting ? 'Submitting...' : 'Submit Custom Quote Request'}
               </Button>
             )}
           </div>

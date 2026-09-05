@@ -4,7 +4,7 @@ import * as React from 'react';
 import Image from 'next/image';
 import { Maximize2, X, Sparkles } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
-import { getGalleryItems } from '@/lib/supabase/services';
+import { getGalleryItems } from '@/lib/db/services';
 import { GalleryItem } from '@/types';
 
 export default function OurWorkPage() {
@@ -64,7 +64,7 @@ export default function OurWorkPage() {
 
         {/* Masonry / Grid */}
         {loading ? (
-          <div className="p-16 text-center text-muted-foreground animate-pulse">Loading showcase gallery from Supabase...</div>
+          <div className="p-16 text-center text-muted-foreground animate-pulse">Loading showcase gallery...</div>
         ) : filteredItems.length === 0 ? (
           <div className="text-center py-20 bg-white border border-border rounded-2xl p-8">
             <p className="text-muted-foreground">No showcase photos found in this category.</p>

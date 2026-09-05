@@ -1,4 +1,4 @@
-import { supabase } from './client';
+import { db } from './client';
 import { 
   Product, 
   Category, 
@@ -73,7 +73,7 @@ export const DEFAULT_CATEGORIES: Category[] = [
   { id: 'cat-9', name: 'Envelopes', slug: 'envelopes', description: 'Heavy paper envelope pouches for documents, boutique items, and gifts.', image_url: '/images/categories/envelopes.svg', display_order: 9, is_active: true },
 ];
 
-// DEFAULT SEED PRODUCTS FOR FIRST-TIME SUPABASE INITIALIZATION
+// DEFAULT SEED PRODUCTS FOR FIRST-TIME DATABASE INITIALIZATION
 export const INITIAL_PRODUCTS: Partial<Product>[] = [
   {
     name: 'White Kraft Paper Bag with Twisted Handle',
@@ -586,7 +586,7 @@ export const DEFAULT_INDUSTRIES: Industry[] = [
 // --- SETTINGS SERVICE ---
 export async function getSettings(): Promise<BusinessSettings> {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from('settings')
       .select('key, value');
 
@@ -616,14 +616,14 @@ export async function updateSettings(newSettings: Partial<BusinessSettings>): Pr
       updated_at: new Date().toISOString()
     }));
 
-    const { error } = await supabase
+    const { error } = await db
       .from('settings')
       .upsert(updates, { onConflict: 'key' });
 
     if (error) throw error;
     return true;
   } catch (err) {
-    console.error('Error updating settings in Supabase:', err);
+    console.error('Error updating settings in the database:', err);
     return false;
   }
 }
@@ -636,7 +636,7 @@ export async function getProducts(options?: {
   search?: string;
 }): Promise<Product[]> {
   try {
-    let query = supabase.from('products').select('*');
+    let query = db.from('products').select('*');
 
     if (options?.status === 'all') {
       // Admin views every status - do not filter at all
@@ -670,7 +670,7 @@ export async function getProducts(options?: {
 
     return data as Product[];
   } catch (err) {
-    console.warn('Error fetching products from Supabase, using initial catalog:', err);
+    console.warn('Error fetching products from the database, using initial catalog:', err);
     return buildSeedProducts();
   }
 }
@@ -702,7 +702,7 @@ function buildSeedProducts(): Product[] {
 
 export async function getProductBySlug(slug: string): Promise<Product | null> {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from('products')
       .select('*')
       .eq('slug', slug)
@@ -744,7 +744,7 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
 
 export async function createProduct(product: Partial<Product>): Promise<Product | null> {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from('products')
       .insert([product])
       .select()
@@ -753,7 +753,7 @@ export async function createProduct(product: Partial<Product>): Promise<Product 
     if (error) throw error;
     return data as Product;
   } catch (err) {
-    console.error('Error creating product in Supabase:', err);
+    console.error('Error creating product in the database:', err);
     return null;
   }
 }
@@ -772,7 +772,7 @@ export async function updateProduct(id: string, updates: Partial<Product>): Prom
         return false;
       }
 
-      const { error } = await supabase
+      const { error } = await db
         .from('products')
         .upsert([payload], { onConflict: 'slug' });
 
@@ -780,7 +780,7 @@ export async function updateProduct(id: string, updates: Partial<Product>): Prom
       return true;
     }
 
-    const { error } = await supabase
+    const { error } = await db
       .from('products')
       .update(updates)
       .eq('id', id);
@@ -788,7 +788,7 @@ export async function updateProduct(id: string, updates: Partial<Product>): Prom
     if (error) throw error;
     return true;
   } catch (err) {
-    console.error('Error updating product in Supabase:', err);
+    console.error('Error updating product in the database:', err);
     return false;
   }
 }
@@ -799,13 +799,13 @@ export async function deleteProduct(id: string, slug?: string): Promise<boolean>
       // Seed rows only exist in memory. If a real row shares the slug, remove it;
       // otherwise there is nothing to delete server-side.
       if (slug) {
-        const { error } = await supabase.from('products').delete().eq('slug', slug);
+        const { error } = await db.from('products').delete().eq('slug', slug);
         if (error) throw error;
       }
       return true;
     }
 
-    const { error } = await supabase
+    const { error } = await db
       .from('products')
       .delete()
       .eq('id', id);
@@ -813,7 +813,7 @@ export async function deleteProduct(id: string, slug?: string): Promise<boolean>
     if (error) throw error;
     return true;
   } catch (err) {
-    console.error('Error deleting product in Supabase:', err);
+    console.error('Error deleting product in the database:', err);
     return false;
   }
 }
@@ -821,7 +821,7 @@ export async function deleteProduct(id: string, slug?: string): Promise<boolean>
 // --- CATEGORIES SERVICE ---
 export async function getCategories(): Promise<Category[]> {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from('categories')
       .select('*')
       .order('display_order', { ascending: true });
@@ -887,14 +887,14 @@ export async function createQuote(quoteData: {
       total_amount: 0
     };
 
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from('quotes')
       .insert([newQuote])
       .select()
       .single();
 
     if (error) {
-      console.error('Supabase quote insert error:', error);
+      console.error('Database quote insert error:', error);
       return null;
     }
 
@@ -930,7 +930,7 @@ export async function createQuote(quoteData: {
 
 export async function getQuotes(statusFilter?: string): Promise<Quote[]> {
   try {
-    let query = supabase.from('quotes').select('*').order('created_at', { ascending: false });
+    let query = db.from('quotes').select('*').order('created_at', { ascending: false });
 
     if (statusFilter && statusFilter !== 'ALL') {
       query = query.eq('status', statusFilter);
@@ -946,7 +946,7 @@ export async function getQuotes(statusFilter?: string): Promise<Quote[]> {
 
 export async function getQuoteById(id: string): Promise<Quote | null> {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from('quotes')
       .select('*')
       .eq('id', id)
@@ -961,7 +961,7 @@ export async function getQuoteById(id: string): Promise<Quote | null> {
 
 export async function getQuoteByNumber(quoteNumber: string): Promise<Quote | null> {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from('quotes')
       .select('*')
       .eq('quote_number', quoteNumber.trim().toUpperCase())
@@ -980,7 +980,7 @@ export async function updateQuoteStatus(
 ): Promise<boolean> {
   try {
     const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
-    let quoteQuery = supabase.from('quotes').select('id, quote_number, email, customer_id, total_amount');
+    let quoteQuery = db.from('quotes').select('id, quote_number, email, customer_id, total_amount');
     
     if (isUuid) {
       quoteQuery = quoteQuery.eq('id', id);
@@ -994,7 +994,7 @@ export async function updateQuoteStatus(
     let customerId = quoteRecord?.customer_id || updates.customer_id;
 
     if (!customerId && targetEmail) {
-      const { data: profile } = await supabase.from('profiles').select('id').ilike('email', targetEmail.trim()).maybeSingle();
+      const { data: profile } = await db.from('profiles').select('id').ilike('email', targetEmail.trim()).maybeSingle();
       if (profile) customerId = profile.id;
     }
 
@@ -1016,7 +1016,7 @@ export async function updateQuoteStatus(
       }
     });
 
-    let updateQuery = supabase.from('quotes').update(cleanUpdates);
+    let updateQuery = db.from('quotes').update(cleanUpdates);
     if (quoteRecord?.id) {
       updateQuery = updateQuery.eq('id', quoteRecord.id);
     } else if (isUuid) {
@@ -1027,7 +1027,7 @@ export async function updateQuoteStatus(
 
     const { error } = await updateQuery;
     if (error) {
-      console.error('Supabase updateQuoteStatus error:', error);
+      console.error('Database updateQuoteStatus error:', error);
       
       // Fallback A: Handle Check Constraint Violation (e.g. quotes_status_check constraint error 23514)
       if (error.code === '23514' || (error.message && error.message.toLowerCase().includes('check constraint'))) {
@@ -1039,7 +1039,7 @@ export async function updateQuoteStatus(
           safeUpdates.notes = cleanUpdates.customer_notes || cleanUpdates.admin_notes;
         }
 
-        let retryQuery = supabase.from('quotes').update(safeUpdates);
+        let retryQuery = db.from('quotes').update(safeUpdates);
         if (quoteRecord?.id) {
           retryQuery = retryQuery.eq('id', quoteRecord.id);
         } else if (isUuid) {
@@ -1056,7 +1056,7 @@ export async function updateQuoteStatus(
           if (cleanUpdates.customer_notes || cleanUpdates.admin_notes || cleanUpdates.notes) {
             minimalUpdates.notes = cleanUpdates.customer_notes || cleanUpdates.admin_notes || cleanUpdates.notes;
           }
-          let minQuery = supabase.from('quotes').update(minimalUpdates);
+          let minQuery = db.from('quotes').update(minimalUpdates);
           if (quoteRecord?.id) minQuery = minQuery.eq('id', quoteRecord.id);
           else if (isUuid) minQuery = minQuery.eq('id', id);
           else minQuery = minQuery.eq('quote_number', id.trim().toUpperCase());
@@ -1065,14 +1065,14 @@ export async function updateQuoteStatus(
       } 
       // Fallback B: Handle Column Missing (42703)
       else if (error.code === '42703' || (error.message && error.message.toLowerCase().includes('column'))) {
-        console.warn('Column missing in Supabase DB (42703). Executing fallback update with basic fields...');
+        console.warn('Column missing in the database (42703). Executing fallback update with basic fields...');
         const fallbackUpdates: Record<string, any> = {};
         if (cleanUpdates.status) fallbackUpdates.status = cleanUpdates.status;
         if (cleanUpdates.customer_notes || cleanUpdates.admin_notes) {
           fallbackUpdates.notes = cleanUpdates.customer_notes || cleanUpdates.admin_notes;
         }
 
-        let fallbackQuery = supabase.from('quotes').update(fallbackUpdates);
+        let fallbackQuery = db.from('quotes').update(fallbackUpdates);
         if (quoteRecord?.id) {
           fallbackQuery = fallbackQuery.eq('id', quoteRecord.id);
         } else if (isUuid) {
@@ -1089,7 +1089,7 @@ export async function updateQuoteStatus(
           if (cleanUpdates.customer_notes || cleanUpdates.admin_notes || cleanUpdates.notes) {
             minUpdates.notes = cleanUpdates.customer_notes || cleanUpdates.admin_notes || cleanUpdates.notes;
           }
-          let minQuery = supabase.from('quotes').update(minUpdates);
+          let minQuery = db.from('quotes').update(minUpdates);
           if (quoteRecord?.id) minQuery = minQuery.eq('id', quoteRecord.id);
           else if (isUuid) minQuery = minQuery.eq('id', id);
           else minQuery = minQuery.eq('quote_number', id.trim().toUpperCase());
@@ -1219,7 +1219,7 @@ export async function convertQuoteToOrder(
 
     let orderData: any = null;
 
-    const { data: firstTryData, error: orderErr } = await supabase
+    const { data: firstTryData, error: orderErr } = await db
       .from('orders')
       .insert([newOrder])
       .select()
@@ -1228,7 +1228,7 @@ export async function convertQuoteToOrder(
     if (orderErr) {
       console.warn('First order insert attempt failed, trying resilient fallback insert:', orderErr.message);
       
-      // Resilient fallback: remove optional columns that might not exist in older Supabase schema cache
+      // Resilient fallback: remove optional columns that might not exist in older database schema cache
       const { 
         payment_method, 
         payment_status, 
@@ -1251,7 +1251,7 @@ export async function convertQuoteToOrder(
 
       essentialOrder.notes = fallbackNotes;
 
-      const { data: retryData, error: retryErr } = await supabase
+      const { data: retryData, error: retryErr } = await db
         .from('orders')
         .insert([essentialOrder])
         .select()
@@ -1284,10 +1284,10 @@ export async function convertQuoteToOrder(
       total_price: total
     };
 
-    await supabase.from('order_items').insert([orderItem]);
+    await db.from('order_items').insert([orderItem]);
 
     // Update Quote Status to CONVERTED_TO_ORDER & set order_id
-    await supabase
+    await db
       .from('quotes')
       .update({
         status: 'CONVERTED_TO_ORDER',
@@ -1371,7 +1371,7 @@ export async function createOrder(orderData: {
 
     let finalOrderRecord: any = null;
 
-    const { data: orderResult, error: orderErr } = await supabase
+    const { data: orderResult, error: orderErr } = await db
       .from('orders')
       .insert([newOrder])
       .select()
@@ -1384,7 +1384,7 @@ export async function createOrder(orderData: {
         const paymentNote = `Payment Method: ${orderData.payment_method || 'invoice'}`;
         cleanOrder.notes = cleanOrder.notes ? `${cleanOrder.notes} | ${paymentNote}` : paymentNote;
 
-        const { data: retryData, error: retryErr } = await supabase
+        const { data: retryData, error: retryErr } = await db
           .from('orders')
           .insert([cleanOrder])
           .select()
@@ -1414,7 +1414,7 @@ export async function createOrder(orderData: {
         total_price: item.total_price
       }));
 
-      await supabase.from('order_items').insert(itemsToInsert);
+      await db.from('order_items').insert(itemsToInsert);
 
       return {
         ...finalOrderRecord,
@@ -1431,7 +1431,7 @@ export async function createOrder(orderData: {
 
 export async function getOrders(statusFilter?: string): Promise<Order[]> {
   try {
-    let query = supabase
+    let query = db
       .from('orders')
       .select('*, order_items(*)')
       .order('created_at', { ascending: false });
@@ -1466,7 +1466,7 @@ export async function updateOrderFulfillmentDetails(
     const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
 
     // 1. Attempt updating orders table
-    let orderQuery = supabase.from('orders').update(updates);
+    let orderQuery = db.from('orders').update(updates);
     if (isUuid) {
       orderQuery = orderQuery.eq('id', id);
     } else {
@@ -1499,7 +1499,7 @@ export async function updateOrderFulfillmentDetails(
     }
 
     // 2. Fallback: Update quotes table if reference is a quotation
-    let quoteQuery = supabase.from('quotes').update({
+    let quoteQuery = db.from('quotes').update({
       expected_delivery_date: updates.expected_delivery_date,
       courier_partner: updates.courier_partner,
       tracking_number: updates.tracking_number,
@@ -1776,7 +1776,7 @@ export async function getGalleryItems(): Promise<GalleryItem[]> {
   let items: GalleryItem[] = [];
   try {
     // Check gallery_items table first, then fallback to gallery table
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from('gallery_items')
       .select('*')
       .order('display_order', { ascending: true });
@@ -1784,7 +1784,7 @@ export async function getGalleryItems(): Promise<GalleryItem[]> {
     if (!error && data && data.length > 0) {
       items = data as GalleryItem[];
     } else {
-      const { data: altData, error: altError } = await supabase
+      const { data: altData, error: altError } = await db
         .from('gallery')
         .select('*')
         .order('display_order', { ascending: true });
@@ -1849,7 +1849,7 @@ export async function createGalleryItem(item: Partial<GalleryItem>): Promise<Gal
       delete payload.id;
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from('gallery')
       .insert([payload])
       .select()
@@ -1858,7 +1858,7 @@ export async function createGalleryItem(item: Partial<GalleryItem>): Promise<Gal
     if (error) throw error;
     return data as GalleryItem;
   } catch (err) {
-    console.error('Error adding gallery item to Supabase:', err);
+    console.error('Error adding gallery item to the database:', err);
     // Fallback: create locally
     const fallbackItem: GalleryItem = {
       id: `custom-g-${Date.now()}`,
@@ -1890,7 +1890,7 @@ export async function updateGalleryItem(id: string, updates: Partial<GalleryItem
   let updatedItem: GalleryItem | null = null;
   try {
     if (isUuid(id)) {
-      const { data, error } = await supabase
+      const { data, error } = await db
         .from('gallery')
         .update(updates)
         .eq('id', id)
@@ -1922,14 +1922,14 @@ export async function updateGalleryItem(id: string, updates: Partial<GalleryItem
 
 export async function deleteGalleryItem(id: string, imageUrl?: string): Promise<boolean> {
 
-  // Attempt database deletion in Supabase if connected
+  // Attempt database deletion in the database if connected
   try {
     if (isUuid(id)) {
-      await supabase.from('gallery_items').delete().eq('id', id);
-      await supabase.from('gallery').delete().eq('id', id);
+      await db.from('gallery_items').delete().eq('id', id);
+      await db.from('gallery').delete().eq('id', id);
     } else if (imageUrl) {
-      await supabase.from('gallery_items').delete().eq('image_url', imageUrl);
-      await supabase.from('gallery').delete().eq('image_url', imageUrl);
+      await db.from('gallery_items').delete().eq('image_url', imageUrl);
+      await db.from('gallery').delete().eq('image_url', imageUrl);
     }
   } catch (err) {
     console.warn('Database gallery delete exception:', err);
@@ -1963,7 +1963,7 @@ export function restoreDefaultGalleryItems(): void {
 // --- INDUSTRIES SERVICE ---
 export async function getIndustries(): Promise<Industry[]> {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from('industries')
       .select('*')
       .eq('status', 'published')
@@ -1981,7 +1981,7 @@ export async function getIndustries(): Promise<Industry[]> {
 
 export async function getIndustryBySlug(slug: string): Promise<Industry | null> {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from('industries')
       .select('*')
       .eq('slug', slug)
@@ -2003,10 +2003,10 @@ export async function getIndustryBySlug(slug: string): Promise<Industry | null> 
  * Optimizes an uploaded file into a high-performance, web-ready Data URL.
  * Automatically resizes large images to max dimensions and compresses to JPEG/WebP
  * so that uploads remain instantaneous, lightweight, and resilient even when
- * Supabase Storage buckets or reverse proxies return errors like HTTP 520.
+ * storage buckets or reverse proxies return errors like HTTP 520.
  */
 
-export async function uploadFileToSupabase(
+export async function uploadFile(
   file: File, 
   bucket: 'product-images' | 'gallery-images' | 'quote-attachments' | 'settings-assets' | 'media' | 'category-images' | 'hero-images' | string
 ): Promise<string | null> {
@@ -2019,7 +2019,7 @@ export async function uploadFileToSupabase(
   const cleanFileName = `${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
 
   const filePath = cleanFileName;
-  const { data: uploadData, error: uploadError } = await supabase.storage
+  const { data: uploadData, error: uploadError } = await db.storage
     .from(bucket)
     .upload(filePath, file, { cacheControl: '3600', upsert: true });
 
@@ -2033,7 +2033,7 @@ export async function uploadFileToSupabase(
     throw new Error(`Upload to bucket "${bucket}" failed: ${reason}`);
   }
 
-  const { data: publicUrlData } = supabase.storage.from(bucket).getPublicUrl(filePath);
+  const { data: publicUrlData } = db.storage.from(bucket).getPublicUrl(filePath);
   if (!publicUrlData?.publicUrl) {
     throw new Error(`Uploaded to "${bucket}" but could not resolve a public URL`);
   }
@@ -2041,8 +2041,8 @@ export async function uploadFileToSupabase(
 }
 
 
-// --- MEDIA LIBRARY (Supabase Storage driven) ---
-// The media library lists what is actually in Supabase Storage, across every
+// --- MEDIA LIBRARY (storage driven) ---
+// The media library lists what is actually in storage, across every
 // content bucket, and cross-references each file against the rows that use
 // it. Previously it only listed rows from the `media` table, which is only
 // written by the media page itself, so images uploaded via Products,
@@ -2091,12 +2091,12 @@ async function collectImageUsages(): Promise<Map<string, AssetUsage[]>> {
   };
 
   const [products, categories, gallery, sections, industries, settings] = await Promise.all([
-    supabase.from('products').select('slug, name, images'),
-    supabase.from('categories').select('slug, name, image_url'),
-    supabase.from('gallery_items').select('id, title, image_url'),
-    supabase.from('homepage_sections').select('section_key, image_url'),
-    supabase.from('industries').select('slug, title, image_url'),
-    supabase.from('settings').select('key, value').eq('key', 'logo_url'),
+    db.from('products').select('slug, name, images'),
+    db.from('categories').select('slug, name, image_url'),
+    db.from('gallery_items').select('id, title, image_url'),
+    db.from('homepage_sections').select('section_key, image_url'),
+    db.from('industries').select('slug, title, image_url'),
+    db.from('settings').select('key, value').eq('key', 'logo_url'),
   ]);
 
   (products.data || []).forEach((p: any) =>
@@ -2124,7 +2124,7 @@ export async function getMediaLibraryReport(): Promise<MediaLibraryReport> {
   const bucketErrors: MediaLibraryReport['bucketErrors'] = [];
 
   await Promise.all(CONTENT_BUCKETS.map(async ({ id: bucket }) => {
-    const { data, error } = await supabase.storage
+    const { data, error } = await db.storage
       .from(bucket)
       .list('', { limit: 1000, sortBy: { column: 'created_at', order: 'desc' } });
     if (error) {
@@ -2134,7 +2134,7 @@ export async function getMediaLibraryReport(): Promise<MediaLibraryReport> {
     (data || [])
       .filter((f) => f.id !== null && !f.name.startsWith('.')) // skip folders + placeholders
       .forEach((f) => {
-        const { data: pub } = supabase.storage.from(bucket).getPublicUrl(f.name);
+        const { data: pub } = db.storage.from(bucket).getPublicUrl(f.name);
         const url = pub.publicUrl;
         assets.push({
           bucket,
@@ -2161,7 +2161,7 @@ export async function getMediaLibraryReport(): Promise<MediaLibraryReport> {
 }
 
 export async function deleteStorageAsset(bucket: ContentBucketId, path: string): Promise<boolean> {
-  const { error } = await supabase.storage.from(bucket).remove([path]);
+  const { error } = await db.storage.from(bucket).remove([path]);
   if (error) {
     console.error('Error deleting storage asset:', error);
     return false;
@@ -2195,7 +2195,7 @@ export async function getOrderByNumberAndPhone(orderNumber: string, phone: strin
     };
 
     // 1. Search in orders table by order_number
-    const { data: orders, error: orderErr } = await supabase
+    const { data: orders, error: orderErr } = await db
       .from('orders')
       .select('*, order_items(*)')
       .ilike('order_number', cleanNum);
@@ -2213,7 +2213,7 @@ export async function getOrderByNumberAndPhone(orderNumber: string, phone: strin
     }
 
     // 2. Search in orders table by notes or quote reference
-    const { data: ordersByNote } = await supabase
+    const { data: ordersByNote } = await db
       .from('orders')
       .select('*, order_items(*)')
       .ilike('notes', `%${cleanNum}%`);
@@ -2230,7 +2230,7 @@ export async function getOrderByNumberAndPhone(orderNumber: string, phone: strin
 
     // 3. Search in quotes table by quote_number or ID
     const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(cleanNum);
-    let quoteQuery = supabase.from('quotes').select('*');
+    let quoteQuery = db.from('quotes').select('*');
     if (isUuid) {
       quoteQuery = quoteQuery.eq('id', cleanNum);
     } else {
@@ -2328,7 +2328,7 @@ export async function checkIsAdmin(userId?: string | null, userEmail?: string | 
 
   if (userId) {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await db
         .from('profiles')
         .select('role')
         .eq('id', userId)
@@ -2347,7 +2347,7 @@ export async function checkIsAdmin(userId?: string | null, userEmail?: string | 
 
 export async function getUserProfile(userId: string): Promise<UserProfile | null> {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from('profiles')
       .select('*')
       .eq('id', userId)
@@ -2362,7 +2362,7 @@ export async function getUserProfile(userId: string): Promise<UserProfile | null
 
 export async function updateUserProfile(userId: string, updates: Partial<UserProfile>): Promise<boolean> {
   try {
-    const { error } = await supabase
+    const { error } = await db
       .from('profiles')
       .upsert({ id: userId, ...updates, updated_at: new Date().toISOString() });
 
@@ -2380,14 +2380,14 @@ export async function syncCustomerRecords(userId: string, email: string): Promis
     if (!cleanEmail || !userId) return;
 
     // Auto-link unlinked quotes matching customer email
-    await supabase
+    await db
       .from('quotes')
       .update({ customer_id: userId })
       .ilike('email', cleanEmail)
       .is('customer_id', null);
 
     // Auto-link unlinked orders matching customer email
-    await supabase
+    await db
       .from('orders')
       .update({ customer_id: userId })
       .ilike('email', cleanEmail)
@@ -2403,7 +2403,7 @@ export async function getCustomerOrders(email: string, userId?: string): Promise
     
     // First try with combined OR query
     if (userId && cleanEmail) {
-      const { data, error } = await supabase
+      const { data, error } = await db
         .from('orders')
         .select('*, order_items(*)')
         .or(`customer_id.eq.${userId},email.ilike.${cleanEmail}`)
@@ -2415,7 +2415,7 @@ export async function getCustomerOrders(email: string, userId?: string): Promise
     }
 
     // Fallback query if OR query returned empty or failed
-    let query = supabase.from('orders').select('*, order_items(*)');
+    let query = db.from('orders').select('*, order_items(*)');
     if (userId) {
       query = query.eq('customer_id', userId);
     } else if (cleanEmail) {
@@ -2426,7 +2426,7 @@ export async function getCustomerOrders(email: string, userId?: string): Promise
 
     const { data, error } = await query.order('created_at', { ascending: false });
     if (error) {
-      console.error('Supabase fetch customer orders error:', error);
+      console.error('Database fetch customer orders error:', error);
       return [];
     }
     return (data || []) as Order[];
@@ -2442,7 +2442,7 @@ export async function getCustomerQuotes(email: string, userId?: string): Promise
     
     // First try combined query
     if (userId && cleanEmail) {
-      const { data, error } = await supabase
+      const { data, error } = await db
         .from('quotes')
         .select('*')
         .or(`customer_id.eq.${userId},email.ilike.${cleanEmail}`)
@@ -2454,7 +2454,7 @@ export async function getCustomerQuotes(email: string, userId?: string): Promise
     }
 
     // Fallback query if OR query returned empty or failed
-    let query = supabase.from('quotes').select('*');
+    let query = db.from('quotes').select('*');
     if (userId) {
       query = query.eq('customer_id', userId);
     } else if (cleanEmail) {
@@ -2465,7 +2465,7 @@ export async function getCustomerQuotes(email: string, userId?: string): Promise
 
     const { data, error } = await query.order('created_at', { ascending: false });
     if (error) {
-      console.error('Supabase fetch customer quotes error:', error);
+      console.error('Database fetch customer quotes error:', error);
       return [];
     }
     return (data || []) as Quote[];
@@ -2477,7 +2477,7 @@ export async function getCustomerQuotes(email: string, userId?: string): Promise
 
 export async function getCustomerAddresses(userId: string): Promise<CustomerAddress[]> {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from('addresses')
       .select('*')
       .eq('user_id', userId)
@@ -2492,7 +2492,7 @@ export async function getCustomerAddresses(userId: string): Promise<CustomerAddr
 
 export async function saveCustomerAddress(userId: string, address: Partial<CustomerAddress>): Promise<CustomerAddress | null> {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from('addresses')
       .upsert([{ ...address, user_id: userId, updated_at: new Date().toISOString() }])
       .select()
@@ -2508,7 +2508,7 @@ export async function saveCustomerAddress(userId: string, address: Partial<Custo
 
 export async function deleteCustomerAddress(addressId: string, userId: string): Promise<boolean> {
   try {
-    const { error } = await supabase
+    const { error } = await db
       .from('addresses')
       .delete()
       .eq('id', addressId)
@@ -2531,7 +2531,7 @@ export async function saveCategory(category: Partial<Category>): Promise<Categor
       delete payload.id;
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from('categories')
       .upsert([payload], { onConflict: 'slug' })
       .select()
@@ -2550,13 +2550,13 @@ export async function deleteCategory(id: string, slug?: string): Promise<boolean
     if (isSeedId(id)) {
       // Seed category - only remove a persisted row if one shares the slug.
       if (slug) {
-        const { error } = await supabase.from('categories').delete().eq('slug', slug);
+        const { error } = await db.from('categories').delete().eq('slug', slug);
         if (error) throw error;
       }
       return true;
     }
 
-    const { error } = await supabase.from('categories').delete().eq('id', id);
+    const { error } = await db.from('categories').delete().eq('id', id);
     if (error) throw error;
     return true;
   } catch (err) {
@@ -2680,7 +2680,7 @@ export const DEFAULT_HOMEPAGE_SECTIONS: Record<string, HomepageSection> = {
 
 export async function getHomepageSections(): Promise<Record<string, HomepageSection>> {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from('homepage_sections')
       .select('*')
       .order('display_order', { ascending: true });
@@ -2717,7 +2717,7 @@ export async function updateHomepageSection(sectionKey: string, sectionData: Par
       delete payload.id;
     }
 
-    const { error } = await supabase
+    const { error } = await db
       .from('homepage_sections')
       .upsert([payload], { onConflict: 'section_key' });
 
@@ -2732,7 +2732,7 @@ export async function updateHomepageSection(sectionKey: string, sectionData: Par
 // --- TESTIMONIALS SERVICE ---
 export async function getTestimonials(onlyPublished = true): Promise<Testimonial[]> {
   try {
-    let query = supabase.from('testimonials').select('*');
+    let query = db.from('testimonials').select('*');
     if (onlyPublished) {
       query = query.in('status', ['published', 'approved']).order('display_order', { ascending: true }).order('created_at', { ascending: false });
     } else {
@@ -2782,7 +2782,7 @@ export async function submitClientFeedback(feedback: {
     };
 
     // Insert feedback directly without .select() so public users do not trigger SELECT RLS checks on unapproved rows
-    const { error } = await supabase
+    const { error } = await db
       .from('testimonials')
       .insert([payload]);
 
@@ -2827,7 +2827,7 @@ export async function updateTestimonialStatus(
   status: 'published' | 'approved' | 'rejected' | 'pending' | 'draft'
 ): Promise<boolean> {
   try {
-    const { error } = await supabase
+    const { error } = await db
       .from('testimonials')
       .update({ status })
       .eq('id', id);
@@ -2850,7 +2850,7 @@ export async function saveTestimonial(testimonial: Partial<Testimonial>): Promis
       status: testimonial.status || 'published'
     };
 
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from('testimonials')
       .upsert([payload])
       .select()
@@ -2871,7 +2871,7 @@ export async function saveTestimonial(testimonial: Partial<Testimonial>): Promis
 
 export async function deleteTestimonial(id: string): Promise<boolean> {
   try {
-    const { error } = await supabase.from('testimonials').delete().eq('id', id);
+    const { error } = await db.from('testimonials').delete().eq('id', id);
     if (error) throw error;
     return true;
   } catch (err) {
@@ -2907,12 +2907,12 @@ export async function createNotification(notifData: {
       read: false
     };
 
-    const { error } = await supabase.from('notifications').insert([notifPayload]);
+    const { error } = await db.from('notifications').insert([notifPayload]);
 
     if (error) {
       console.warn('First notification insert failed, trying fallback insert:', error.message);
       delete notifPayload.recipient_role;
-      const { error: fallbackErr } = await supabase.from('notifications').insert([notifPayload]);
+      const { error: fallbackErr } = await db.from('notifications').insert([notifPayload]);
       if (fallbackErr) {
         console.error('Notification fallback insert error:', fallbackErr);
         return false;
@@ -2937,7 +2937,7 @@ export async function getCustomerNotifications(email: string, userId?: string, i
 
     if (isAdmin) {
       // ADMIN NOTIFICATIONS: Admins see admin desk notifications (recipient_role = 'admin') OR direct notifications.
-      let query = supabase
+      let query = db
         .from('notifications')
         .select('*')
         .order('created_at', { ascending: false });
@@ -2954,7 +2954,7 @@ export async function getCustomerNotifications(email: string, userId?: string, i
       if (!error && data) return data as AppNotification[];
 
       // Resilient fallback for older schemas
-      const { data: fallbackData } = await supabase
+      const { data: fallbackData } = await db
         .from('notifications')
         .select('*')
         .or(`email.ilike."${cleanEmail}",user_id.eq.${userId || '00000000-0000-0000-0000-000000000000'}`)
@@ -2963,7 +2963,7 @@ export async function getCustomerNotifications(email: string, userId?: string, i
       return (fallbackData || []) as AppNotification[];
     } else {
       // CUSTOMER NOTIFICATIONS: Regular customers ONLY see notifications explicitly matching user_id or email, AND recipient_role != 'admin'.
-      let query = supabase
+      let query = db
         .from('notifications')
         .select('*')
         .neq('recipient_role', 'admin') // STRICT SECURITY GUARD
@@ -2981,7 +2981,7 @@ export async function getCustomerNotifications(email: string, userId?: string, i
       if (!error && data) return data as AppNotification[];
 
       // Fallback filtering if recipient_role column doesn't exist on older schema cache
-      let fallbackQuery = supabase.from('notifications').select('*').order('created_at', { ascending: false });
+      let fallbackQuery = db.from('notifications').select('*').order('created_at', { ascending: false });
       if (userId && cleanEmail) {
         fallbackQuery = fallbackQuery.or(`user_id.eq.${userId},email.ilike."${cleanEmail}"`);
       } else if (userId) {
@@ -3008,7 +3008,7 @@ export async function getCustomerNotifications(email: string, userId?: string, i
 
 export async function markNotificationAsRead(id: string): Promise<boolean> {
   try {
-    const { error } = await supabase.from('notifications').update({ read: true }).eq('id', id);
+    const { error } = await db.from('notifications').update({ read: true }).eq('id', id);
     return !error;
   } catch (err) {
     return false;
@@ -3018,7 +3018,7 @@ export async function markNotificationAsRead(id: string): Promise<boolean> {
 export async function markAllNotificationsAsRead(email: string, userId?: string): Promise<boolean> {
   try {
     const cleanEmail = (email || '').trim().toLowerCase();
-    let query = supabase.from('notifications').update({ read: true });
+    let query = db.from('notifications').update({ read: true });
 
     if (userId && cleanEmail) {
       query = query.or(`user_id.eq.${userId},email.ilike."${cleanEmail}"`);
@@ -3044,9 +3044,9 @@ export interface ProvisionLog {
   message: string;
 }
 
-export async function provisionSupabaseStorageAndSchema(): Promise<{ success: boolean; logs: ProvisionLog[] }> {
+export async function provisionStorageAndSchema(): Promise<{ success: boolean; logs: ProvisionLog[] }> {
   const logs: ProvisionLog[] = [];
-  logs.push({ step: 'Initialize', status: 'info', message: 'Starting Supabase storage buckets and media schema auto-provisioning...' });
+  logs.push({ step: 'Initialize', status: 'info', message: 'Starting database storage buckets and media schema auto-provisioning...' });
 
   const buckets = [
     'media',
@@ -3064,7 +3064,7 @@ export async function provisionSupabaseStorageAndSchema(): Promise<{ success: bo
   for (const bucketId of buckets) {
     try {
       // Attempt to create bucket
-      const { data, error } = await supabase.storage.createBucket(bucketId, {
+      const { data, error } = await db.storage.createBucket(bucketId, {
         public: true,
         fileSizeLimit: 10485760
       });
@@ -3073,7 +3073,7 @@ export async function provisionSupabaseStorageAndSchema(): Promise<{ success: bo
         const errMsg = error.message || '';
         if (errMsg.toLowerCase().includes('already exists') || errMsg.toLowerCase().includes('duplicate') || (error as any).statusCode === 409) {
           // Explicitly set public access for existing bucket
-          const { error: updateErr } = await supabase.storage.updateBucket(bucketId, { public: true });
+          const { error: updateErr } = await db.storage.updateBucket(bucketId, { public: true });
           if (!updateErr) {
             logs.push({
               step: `Bucket '${bucketId}'`,
@@ -3085,7 +3085,7 @@ export async function provisionSupabaseStorageAndSchema(): Promise<{ success: bo
             logs.push({
               step: `Bucket '${bucketId}'`,
               status: 'success',
-              message: `Bucket exists in Supabase storage.`
+              message: `Bucket exists in the database storage.`
             });
             successCount++;
           }
@@ -3115,7 +3115,7 @@ export async function provisionSupabaseStorageAndSchema(): Promise<{ success: bo
 
   // Ping & Verify Media Table
   try {
-    const { data, error } = await supabase.from('media').select('id').limit(1);
+    const { data, error } = await db.from('media').select('id').limit(1);
     if (error) {
       logs.push({
         step: 'Media Table',
@@ -3139,7 +3139,7 @@ export async function provisionSupabaseStorageAndSchema(): Promise<{ success: bo
 
   // Ping & Verify Homepage Sections Table
   try {
-    const { data, error } = await supabase.from('homepage_sections').select('id').limit(1);
+    const { data, error } = await db.from('homepage_sections').select('id').limit(1);
     if (error) {
       logs.push({
         step: 'Homepage Sections Table',
@@ -3164,7 +3164,7 @@ export async function provisionSupabaseStorageAndSchema(): Promise<{ success: bo
   logs.push({
     step: 'Completion',
     status: 'info',
-    message: `Provisioning complete! ${successCount}/${buckets.length} storage buckets explicitly active in Supabase.`
+    message: `Provisioning complete! ${successCount}/${buckets.length} storage buckets explicitly active in the database.`
   });
 
   return {

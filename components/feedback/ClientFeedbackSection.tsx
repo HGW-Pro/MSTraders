@@ -22,7 +22,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { submitClientFeedback } from '@/lib/supabase/services';
+import { submitClientFeedback } from '@/lib/db/services';
 import { Testimonial, HomepageSection } from '@/types';
 import { cn } from '@/lib/utils';
 

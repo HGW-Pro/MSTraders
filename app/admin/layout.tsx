@@ -23,8 +23,8 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { supabase } from '@/lib/supabase/client';
-import { checkIsAdmin } from '@/lib/supabase/services';
+import { db } from '@/lib/db/client';
+import { checkIsAdmin } from '@/lib/db/services';
 import { toast } from 'sonner';
 
 const adminNav = [
@@ -84,13 +84,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       }
     }
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    db.auth.getSession().then(({ data: { session } }) => {
       if (active) {
         verifyAdminAccess(session);
       }
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = db.auth.onAuthStateChange((_event, session) => {
       if (active) {
         verifyAdminAccess(session);
       }
@@ -104,7 +104,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const handleLogout = async () => {
     try {
-      await supabase.auth.signOut();
+      await db.auth.signOut();
       toast.success('Signed out successfully');
       router.push('/admin/login');
     } catch (err: any) {

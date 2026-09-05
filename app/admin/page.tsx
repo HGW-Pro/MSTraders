@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { Package, FileText, ShoppingBag, IndianRupee, TrendingUp, ArrowUpRight } from 'lucide-react';
 import Link from 'next/link';
-import { getProducts, getQuotes, getOrders } from '@/lib/supabase/services';
+import { getProducts, getQuotes, getOrders } from '@/lib/db/services';
 import { Product, Quote, Order } from '@/types';
 
 export default function AdminDashboardPage() {

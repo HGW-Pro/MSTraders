@@ -8,9 +8,9 @@ import {
   updateGalleryItem,
   deleteGalleryItem,
   restoreDefaultGalleryItems,
-  uploadFileToSupabase,
+  uploadFile,
   DEFAULT_GALLERY_ITEMS
-} from '@/lib/supabase/services';
+} from '@/lib/db/services';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -101,7 +101,7 @@ export default function AdminGalleryPage() {
     setUploadingId(item.id);
     toast.info(`Uploading image for "${item.title}"...`);
     try {
-      const url = await uploadFileToSupabase(file, 'gallery-images');
+      const url = await uploadFile(file, 'gallery-images');
       if (url) {
         const updated = await updateGalleryItem(item.id, { image_url: url });
         if (updated) {
@@ -126,7 +126,7 @@ export default function AdminGalleryPage() {
 
     toast.info('Uploading image...');
     try {
-      const url = await uploadFileToSupabase(file, 'gallery-images');
+      const url = await uploadFile(file, 'gallery-images');
       if (url) {
         setFormData(prev => ({ ...prev, image_url: url }));
         toast.success('Image uploaded to storage');

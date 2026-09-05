@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { BusinessSettings } from '@/types';
-import { getSettings, updateSettings } from '@/lib/supabase/services';
+import { getSettings, updateSettings } from '@/lib/db/services';
 import { useSettings } from '@/components/settings-provider';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -85,7 +85,7 @@ export default function AdminSettingsPage() {
     try {
       const success = await updateSettings(settings);
       if (success) {
-        toast.success('Business settings updated in Supabase');
+        toast.success('Business settings saved');
         await refreshSettings();
       } else {
         toast.error('Failed to save settings');
@@ -98,7 +98,7 @@ export default function AdminSettingsPage() {
   };
 
   if (loading) {
-    return <div className="p-12 text-center text-muted-foreground animate-pulse">Loading settings from Supabase...</div>;
+    return <div className="p-12 text-center text-muted-foreground animate-pulse">Loading settings...</div>;
   }
 
   return (
@@ -410,7 +410,7 @@ export default function AdminSettingsPage() {
             className="bg-brand-green text-white hover:bg-brand-green/90 h-11 px-8 text-base font-semibold shadow-md"
           >
             <Save className="mr-2 h-5 w-5" />
-            {isSaving ? 'Saving Changes...' : 'Save Settings to Supabase'}
+            {isSaving ? 'Saving Changes...' : 'Save Settings'}
           </Button>
         </div>
       </form>

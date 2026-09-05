@@ -36,7 +36,7 @@ import {
   saveTestimonial, 
   updateTestimonialStatus, 
   deleteTestimonial 
-} from '@/lib/supabase/services';
+} from '@/lib/db/services';
 import { Testimonial } from '@/types';
 import { cn } from '@/lib/utils';
 

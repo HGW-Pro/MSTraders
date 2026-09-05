@@ -4,7 +4,7 @@ import * as React from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { Quote, BusinessSettings } from '@/types';
-import { getQuoteById, getQuoteByNumber, updateQuoteStatus, convertQuoteToOrder, getSettings } from '@/lib/supabase/services';
+import { getQuoteById, getQuoteByNumber, updateQuoteStatus, convertQuoteToOrder, getSettings } from '@/lib/db/services';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';

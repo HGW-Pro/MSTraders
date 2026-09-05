@@ -27,7 +27,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { getOrderByNumberAndPhone } from '@/lib/supabase/services';
+import { getOrderByNumberAndPhone } from '@/lib/db/services';
 import { Order, OrderStatus } from '@/types';
 import { cn } from '@/lib/utils';
 

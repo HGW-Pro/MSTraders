@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Product } from '@/types';
-import { getProductBySlug } from '@/lib/supabase/services';
+import { getProductBySlug } from '@/lib/db/services';
 import { getPricing, formatInr } from '@/lib/utils';
 import { useCartStore } from '@/lib/store';
 import { ChevronRight, Info, ShoppingCart, MessageSquare, ArrowLeft, CheckCircle2 } from 'lucide-react';
@@ -45,7 +45,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
   if (loading) {
     return (
       <div className="min-h-screen bg-background pt-24 pb-32 flex items-center justify-center text-muted-foreground animate-pulse">
-        Loading product specification from Supabase...
+        Loading product specification...
       </div>
     );
   }

@@ -15,9 +15,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 import {
-  getMediaLibraryReport, deleteStorageAsset, uploadFileToSupabase,
+  getMediaLibraryReport, deleteStorageAsset, uploadFile,
   CONTENT_BUCKETS, type ContentBucketId, type StorageAsset, type MediaLibraryReport, type AssetUsage
-} from '@/lib/supabase/services';
+} from '@/lib/db/services';
 import { cn } from '@/lib/utils';
 
 type Filter = 'ALL' | ContentBucketId | 'UNUSED';
@@ -55,7 +55,7 @@ export default function AdminMediaLibraryPage() {
     try {
       setReport(await getMediaLibraryReport());
     } catch {
-      toast.error('Could not read Supabase Storage');
+      toast.error('Could not read media storage');
     } finally {
       setLoading(false);
     }
@@ -65,7 +65,7 @@ export default function AdminMediaLibraryPage() {
     let active = true;
     getMediaLibraryReport()
       .then((r) => { if (active) setReport(r); })
-      .catch(() => { if (active) toast.error('Could not read Supabase Storage'); })
+      .catch(() => { if (active) toast.error('Could not read media storage'); })
       .finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
   }, []);
@@ -113,7 +113,7 @@ export default function AdminMediaLibraryPage() {
     let done = 0;
     for (const f of uploadFiles) {
       try {
-        await uploadFileToSupabase(f, uploadBucket);
+        await uploadFile(f, uploadBucket);
         done++;
       } catch (err: any) {
         toast.error(err?.message || `Failed to upload ${f.name}`);
@@ -135,7 +135,7 @@ export default function AdminMediaLibraryPage() {
         <div>
           <h1 className="font-heading text-2xl sm:text-3xl font-bold text-brand-charcoal">Media Library</h1>
           <p className="text-xs text-muted-foreground mt-1">
-            Every image in Supabase Storage, and where each one is used on the site.
+            Every uploaded image, and where each one is used on the site.
           </p>
         </div>
         <div className="flex gap-2">
@@ -166,7 +166,7 @@ export default function AdminMediaLibraryPage() {
           {report.bucketErrors.map((e) => (
             <div key={e.bucket}><code className="font-mono">{e.bucket}</code>: {e.message}</div>
           ))}
-          <div className="mt-1">Run the storage section of <code className="font-mono">supabase-update-cms.sql</code> to create missing buckets.</div>
+          <div className="mt-1">Run the storage section of <code className="font-mono">database-migrations.sql</code> to create missing buckets.</div>
         </Notice>
       )}
       {!loading && embedded.length > 0 && (
@@ -206,7 +206,7 @@ export default function AdminMediaLibraryPage() {
       {loading ? (
         <div className="py-20 text-center">
           <div className="w-8 h-8 border-4 border-brand-green border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-          <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Reading Supabase Storage…</p>
+          <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Reading media storage…</p>
         </div>
       ) : visible.length === 0 ? (
         <div className="bg-white border border-border rounded-2xl p-12 text-center space-y-3 shadow-xs">
@@ -275,7 +275,7 @@ export default function AdminMediaLibraryPage() {
       <Dialog open={showUpload} onOpenChange={setShowUpload}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle className="font-heading text-lg font-bold">Upload to Storage</DialogTitle>
+            <DialogTitle className="font-heading text-lg font-bold">Upload Image</DialogTitle>
           </DialogHeader>
           <form onSubmit={submitUpload} className="space-y-4 text-xs">
             <div className="space-y-1.5">

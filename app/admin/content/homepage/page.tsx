@@ -21,7 +21,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
-import { getHomepageSections, updateHomepageSection, uploadFileToSupabase } from '@/lib/supabase/services';
+import { getHomepageSections, updateHomepageSection, uploadFile } from '@/lib/db/services';
 import { HomepageSection } from '@/types';
 import { cn } from '@/lib/utils';
 
@@ -96,10 +96,10 @@ export default function AdminHomepageContentPage() {
 
     setUploadingImage(true);
     try {
-      const publicUrl = await uploadFileToSupabase(file, 'hero-images');
+      const publicUrl = await uploadFile(file, 'hero-images');
       if (publicUrl) {
         handleFieldChange('hero', 'image_url', publicUrl);
-        toast.success('Hero image uploaded to Supabase Storage');
+        toast.success('Hero image uploaded');
       } else {
         toast.error('Upload failed');
       }
@@ -212,13 +212,13 @@ export default function AdminHomepageContentPage() {
             {activeTab === 'hero' && (
               <div className="bg-slate-50 border border-slate-200 p-6 rounded-2xl space-y-4">
                 <h3 className="font-heading text-base font-bold text-brand-charcoal flex items-center gap-2">
-                  <ImageIcon className="h-4 w-4 text-brand-green" /> Editable Hero Image (Supabase Storage)
+                  <ImageIcon className="h-4 w-4 text-brand-green" /> Editable Hero Image
                 </h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
                   <div className="space-y-3">
                     <p className="text-xs text-muted-foreground leading-relaxed">
-                      Upload or replace the main hero banner shown on your homepage. Image is stored securely in Supabase Storage.
+                      Upload or replace the main hero banner shown on your homepage. The image is stored securely in cloud storage.
                     </p>
 
                     <div className="flex items-center gap-3">

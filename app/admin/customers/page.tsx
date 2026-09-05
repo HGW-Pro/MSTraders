@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { getQuotes, getOrders } from '@/lib/supabase/services';
+import { getQuotes, getOrders } from '@/lib/db/services';
 import { Input } from '@/components/ui/input';
 import { Search, Users, Mail, Phone, Building2, ShoppingBag, FileText } from 'lucide-react';
 
@@ -163,7 +163,7 @@ export default function AdminCustomersPage() {
 
       <div className="bg-white border border-border rounded-xl shadow-xs overflow-hidden">
         {loading ? (
-          <div className="p-12 text-center text-muted-foreground animate-pulse">Aggregating customer directory from Supabase...</div>
+          <div className="p-12 text-center text-muted-foreground animate-pulse">Aggregating customer directory...</div>
         ) : filtered.length === 0 ? (
           <div className="p-12 text-center text-muted-foreground">No customers found in directory.</div>
         ) : (
