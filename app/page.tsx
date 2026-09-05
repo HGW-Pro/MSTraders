@@ -112,7 +112,7 @@ export default function HomePage() {
     <>
       {/* 1. HERO SECTION */}
       {hero.enabled !== false && (
-        <section className="relative overflow-hidden bg-brand-cream pb-12 pt-16 sm:pb-16 sm:pt-24 md:pb-24 md:pt-32">
+        <section className="relative overflow-hidden bg-brand-cream pb-10 pt-10 sm:pb-14 sm:pt-14 md:pb-16 md:pt-16">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
               <div className="max-w-2xl">
@@ -121,10 +121,10 @@ export default function HomePage() {
                     {hero.subtitle}
                   </span>
                 )}
-                <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl lg:text-[4rem] font-bold tracking-tight text-brand-charcoal leading-[1.1] mb-4 sm:mb-6">
+                <h1 className="font-heading text-[clamp(2rem,4.2vw,3.5rem)] font-bold text-brand-charcoal mb-4 sm:mb-5">
                   {hero.title || 'Bags that carry your brand'}
                 </h1>
-                <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-6 sm:mb-8 max-w-lg">
+                <p className="text-base sm:text-lg text-muted-foreground mb-5 sm:mb-6 max-w-lg">
                   {hero.description}
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
@@ -145,7 +145,7 @@ export default function HomePage() {
                 </div>
               </div>
               
-              <div className="relative aspect-[4/3] md:aspect-square w-full rounded-2xl overflow-hidden shadow-2xl">
+              <div className="relative aspect-[4/3] md:aspect-[5/4] w-full max-h-[min(58vh,520px)] rounded-2xl overflow-hidden shadow-2xl">
                 <Image 
                   src={hero.image_url || '/images/products/rajputi-saafe-luxury-bag.svg'} 
                   alt={hero.metadata?.alt_text || hero.title}
