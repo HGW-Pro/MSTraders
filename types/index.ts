@@ -11,6 +11,13 @@ export interface Product {
   category: string;
   sku: string | null;
   material: string | null;
+  /**
+   * Broad material family, independent of `category`. The categories mix
+   * material (Paper, Kraft, Non-Woven), handle type (W-Cut, D-Cut) and
+   * purpose (Designer, Gift), so a non-woven W-Cut bag can only live in one
+   * of them. This lets "show me everything non-woven" work regardless.
+   */
+  material_type?: 'paper' | 'kraft' | 'non-woven' | 'mixed' | null;
   moq: number | null;
   is_featured: boolean;
   is_customizable: boolean;

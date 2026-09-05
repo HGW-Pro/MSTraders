@@ -16,6 +16,7 @@ export default function ShopPage() {
   const [loading, setLoading] = React.useState(true);
   const [search, setSearch] = React.useState('');
   const [selectedCategory, setSelectedCategory] = React.useState<string | null>(null);
+  const [selectedMaterial, setSelectedMaterial] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     async function loadShopData() {
@@ -42,7 +43,10 @@ export default function ShopPage() {
     const matchesCategory = selectedCategory 
       ? p.category.toLowerCase() === selectedCategory.toLowerCase() 
       : true;
-    return matchesSearch && matchesCategory;
+    const matchesMaterial = selectedMaterial
+      ? p.material_type === selectedMaterial
+      : true;
+    return matchesSearch && matchesCategory && matchesMaterial;
   });
 
   return (
@@ -108,6 +112,33 @@ export default function ShopPage() {
                   </li>
                 ))}
               </ul>
+
+              <h3 className="font-semibold text-sm text-brand-charcoal mt-6 mb-4 border-b border-border pb-2">
+                Material
+              </h3>
+              <ul className="space-y-1.5">
+                {([[null, 'Any material'], ['paper', 'Paper'], ['kraft', 'Kraft'], ['non-woven', 'Non-woven']] as [string | null, string][])
+                  .map(([value, label]) => {
+                    const count = value
+                      ? products.filter(p => p.material_type === value).length
+                      : products.length;
+                    return (
+                      <li key={label}>
+                        <button
+                          onClick={() => setSelectedMaterial(value)}
+                          className={`w-full text-left px-3 py-2 rounded-lg text-xs font-semibold transition-colors flex justify-between items-center ${
+                            selectedMaterial === value
+                              ? 'bg-brand-green text-white font-bold'
+                              : 'text-slate-700 hover:bg-slate-100'
+                          }`}
+                        >
+                          <span>{label}</span>
+                          <span className="opacity-70 font-normal">{count}</span>
+                        </button>
+                      </li>
+                    );
+                  })}
+              </ul>
             </div>
           </div>
 
@@ -118,7 +149,7 @@ export default function ShopPage() {
             ) : filteredProducts.length === 0 ? (
               <div className="text-center py-20 bg-white border border-border rounded-2xl p-8">
                 <p className="text-base text-muted-foreground mb-4">No products found matching your search criteria.</p>
-                <Button onClick={() => { setSearch(''); setSelectedCategory(null); }}>Reset All Filters</Button>
+                <Button onClick={() => { setSearch(''); setSelectedCategory(null); setSelectedMaterial(null); }}>Reset All Filters</Button>
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">

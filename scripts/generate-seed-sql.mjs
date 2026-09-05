@@ -62,6 +62,7 @@ END $$;
 -- 1. CATEGORIES
 -- ---------------------------------------------------------------------
 ALTER TABLE categories ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT true;
+ALTER TABLE products   ADD COLUMN IF NOT EXISTS material_type TEXT;
 
 INSERT INTO categories (name, slug, description, image_url, display_order, is_active) VALUES
 `;
@@ -89,13 +90,13 @@ WHERE image_url IS NULL
 -- 2. PRODUCTS
 -- ---------------------------------------------------------------------
 INSERT INTO products
-  (name, slug, description, price, sale_price, category, sku, material, moq,
+  (name, slug, description, price, sale_price, category, sku, material, material_type, moq,
    is_featured, is_customizable, status, images, sizes, colors, handles, printing_options) VALUES
 `;
 
 out += prods.map(p =>
   `  (${q(p.name)}, ${q(p.slug)}, ${q(p.description)}, ${num(p.price ?? null)}, ${num(p.sale_price ?? null)}, ` +
-  `${q(p.category)}, ${q(p.sku ?? null)}, ${q(p.material ?? null)}, ${num(p.moq ?? 100)}, ` +
+  `${q(p.category)}, ${q(p.sku ?? null)}, ${q(p.material ?? null)}, ${q(p.material_type ?? null)}, ${num(p.moq ?? 100)}, ` +
   `${bool(p.is_featured)}, ${bool(p.is_customizable !== false)}, ${q(p.status || 'published')}, ` +
   `${arr(p.images)}, ${arr(p.sizes)}, ${arr(p.colors)}, ${arr(p.handles)}, ${arr(p.printing_options)})`
 ).join(',\n');
@@ -103,6 +104,7 @@ out += prods.map(p =>
 out += `
 ON CONFLICT (slug) DO UPDATE SET
   name             = EXCLUDED.name,
+  material_type    = EXCLUDED.material_type,
   description      = EXCLUDED.description,
   category         = EXCLUDED.category,
   material         = EXCLUDED.material,
