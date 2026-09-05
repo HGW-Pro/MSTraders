@@ -24,31 +24,31 @@ export function Footer() {
           {/* Quick Links */}
           <div>
             <h4 className="font-heading text-lg font-semibold mb-4 text-brand-gold">Quick Links</h4>
-            <ul className="space-y-2 text-sm text-gray-400">
-              <li><Link href="/shop" className="hover:text-white transition-colors">Shop Catalog</Link></li>
-              <li><Link href="/customize" className="hover:text-white transition-colors">Customize Bags</Link></li>
-              <li><Link href="/industries" className="hover:text-white transition-colors">Industries Served</Link></li>
-              <li><Link href="/our-work" className="hover:text-white transition-colors">Our Work & Gallery</Link></li>
-              <li><Link href="/about" className="hover:text-white transition-colors">About Us</Link></li>
+            <ul className="space-y-0.5 text-sm text-gray-400">
+              <li><Link href="/shop" className="block py-2 -my-0.5 hover:text-white transition-colors">Shop Catalog</Link></li>
+              <li><Link href="/customize" className="block py-2 -my-0.5 hover:text-white transition-colors">Customize Bags</Link></li>
+              <li><Link href="/industries" className="block py-2 -my-0.5 hover:text-white transition-colors">Industries Served</Link></li>
+              <li><Link href="/our-work" className="block py-2 -my-0.5 hover:text-white transition-colors">Our Work & Gallery</Link></li>
+              <li><Link href="/about" className="block py-2 -my-0.5 hover:text-white transition-colors">About Us</Link></li>
             </ul>
           </div>
 
           {/* Industry Links */}
           <div>
             <h4 className="font-heading text-lg font-semibold mb-4 text-brand-gold">Industry Solutions</h4>
-            <ul className="space-y-2 text-sm text-gray-400">
-              <li><Link href="/industries/hotels" className="hover:text-white transition-colors">Hotels & Hospitality</Link></li>
-              <li><Link href="/industries/restaurants" className="hover:text-white transition-colors">Restaurants & Food</Link></li>
-              <li><Link href="/industries/clothing" className="hover:text-white transition-colors">Clothing & Boutiques</Link></li>
-              <li><Link href="/industries/retail" className="hover:text-white transition-colors">Supermarkets & Retail</Link></li>
-              <li><Link href="/industries/medical-pharma" className="hover:text-white transition-colors">Medical & Pharmacies</Link></li>
+            <ul className="space-y-0.5 text-sm text-gray-400">
+              <li><Link href="/industries/hotels" className="block py-2 -my-0.5 hover:text-white transition-colors">Hotels & Hospitality</Link></li>
+              <li><Link href="/industries/restaurants" className="block py-2 -my-0.5 hover:text-white transition-colors">Restaurants & Food</Link></li>
+              <li><Link href="/industries/clothing" className="block py-2 -my-0.5 hover:text-white transition-colors">Clothing & Boutiques</Link></li>
+              <li><Link href="/industries/retail" className="block py-2 -my-0.5 hover:text-white transition-colors">Supermarkets & Retail</Link></li>
+              <li><Link href="/industries/medical-pharma" className="block py-2 -my-0.5 hover:text-white transition-colors">Medical & Pharmacies</Link></li>
             </ul>
           </div>
 
           {/* Contact */}
           <div>
             <h4 className="font-heading text-lg font-semibold mb-4 text-brand-gold">Contact Us</h4>
-            <ul className="space-y-2 text-sm text-gray-400">
+            <ul className="space-y-0.5 text-sm text-gray-400">
               <li><span className="text-gray-300 font-medium">Phone:</span> {settings.phone}</li>
               <li>
                 <span className="text-gray-300 font-medium">WhatsApp:</span>{' '}
@@ -56,7 +56,7 @@ export function Footer() {
                   href={`https://wa.me/${settings.whatsapp}`} 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="hover:text-brand-gold underline"
+                  className="inline-block py-2 hover:text-brand-gold underline"
                 >
                   +{settings.whatsapp}
                 </a>
@@ -74,13 +74,13 @@ export function Footer() {
           <p>&copy; {new Date().getFullYear()} {settings.business_name}. All rights reserved.</p>
           <div className="flex items-center gap-6 mt-4 md:mt-0">
             {settings.social_instagram && (
-              <a href={settings.social_instagram} target="_blank" rel="noopener noreferrer" className="hover:text-brand-gold transition-colors">Instagram</a>
+              <a href={settings.social_instagram} target="_blank" rel="noopener noreferrer" className="inline-block py-2 hover:text-brand-gold transition-colors">Instagram</a>
             )}
             {settings.social_facebook && (
-              <a href={settings.social_facebook} target="_blank" rel="noopener noreferrer" className="hover:text-brand-gold transition-colors">Facebook</a>
+              <a href={settings.social_facebook} target="_blank" rel="noopener noreferrer" className="inline-block py-2 hover:text-brand-gold transition-colors">Facebook</a>
             )}
             {settings.social_linkedin && (
-              <a href={settings.social_linkedin} target="_blank" rel="noopener noreferrer" className="hover:text-brand-gold transition-colors">LinkedIn</a>
+              <a href={settings.social_linkedin} target="_blank" rel="noopener noreferrer" className="inline-block py-2 hover:text-brand-gold transition-colors">LinkedIn</a>
             )}
           </div>
         </div>
