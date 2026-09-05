@@ -54,9 +54,9 @@ export default function ContactPage() {
     }
   };
 
-  const phone = settings.phone || '+91 99999 99999';
-  const whatsapp = settings.whatsapp || '919999999999';
-  const email = settings.email || 'contact@example.com';
+  const phone = settings.phone || '+91 91312 68724';
+  const whatsapp = settings.whatsapp || '919131268724';
+  const email = settings.email || 'contact@mstradersujjain.com';
   const hours = settings.business_hours || 'Monday to Saturday, 9:30 AM to 8:30 PM';
 
   const channels = [
@@ -128,7 +128,7 @@ export default function ContactPage() {
                     <div className="min-w-0">
                       <h3 className="font-semibold text-brand-charcoal mb-1">Workshop &amp; office</h3>
                       <p className="text-sm text-muted-foreground leading-relaxed">
-                        {settings.address || '57, Kalasari, Dabripitha'}<br />
+                        {settings.address || '57 Kalalseri, Behind Power House, Dabri Pitha'}<br />
                         {settings.city || 'Ujjain'}, {settings.state || 'Madhya Pradesh'} {settings.pincode || '456006'}
                       </p>
                     </div>

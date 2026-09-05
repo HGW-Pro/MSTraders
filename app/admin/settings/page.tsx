@@ -30,9 +30,9 @@ export default function AdminSettingsPage() {
   const [settings, setSettingsData] = React.useState<BusinessSettings>({
     business_name: 'MS TRADERS',
     tagline: 'Wholesale & Retail Bag Supplier in Ujjain (M.P)',
-    phone: '+91 99999 99999',
-    whatsapp: '919999999999',
-    email: 'contact@example.com',
+    phone: '+91 91312 68724 / +91 90094 46352',
+    whatsapp: '919131268724',
+    email: 'contact@mstradersujjain.com',
     address: '57 Kalalseri, Behind Power House, Dabri Pitha',
     city: 'Ujjain',
     state: 'Madhya Pradesh',
@@ -186,7 +186,7 @@ export default function AdminSettingsPage() {
                 type="email"
                 value={settings.email} 
                 onChange={(e) => handleChange('email', e.target.value)}
-                placeholder="contact@example.com"
+                placeholder="contact@mstradersujjain.com"
                 required
               />
             </div>
