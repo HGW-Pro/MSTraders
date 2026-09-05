@@ -4,7 +4,10 @@ import * as React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, CheckCircle2, Star, Quote, Truck, ShieldCheck, Printer, RefreshCw } from 'lucide-react';
+import {
+  CheckCircle2, Star, Quote, Truck, ShieldCheck, Printer, RefreshCw,
+  BedDouble, UtensilsCrossed, Shirt, Store, Stethoscope, Building2, Gift, Briefcase, Leaf
+} from 'lucide-react';
 import { getHomepageSections, getCategories, getTestimonials, DEFAULT_CATEGORIES } from '@/lib/db/services';
 import { HomepageSection, Category, Testimonial } from '@/types';
 import { ClientFeedbackSection } from '@/components/feedback/ClientFeedbackSection';
@@ -38,65 +41,65 @@ export default function HomePage() {
 
   const hero = sections.hero || {
     title: 'Customized Paper Bags & Non-Woven Carry Bags',
-    subtitle: 'WHOLESALE & RETAIL SUPPLIER IN UJJAIN',
+    subtitle: 'Wholesale & retail supplier in Ujjain',
     description: 'Wholesale & retail supplier of high-quality paper bags, W-cut vest bags, D-cut punch bags, luxury laminated boutique gift bags, and envelope pouches in Ujjain.',
     image_url: '/images/products/rajputi-saafe-luxury-bag.svg',
-    primary_cta_text: 'GET CUSTOM QUOTE',
+    primary_cta_text: 'Get a custom quote',
     primary_cta_link: '/customize',
-    secondary_cta_text: 'EXPLORE CATALOG',
+    secondary_cta_text: 'Browse the catalogue',
     secondary_cta_link: '/shop',
     enabled: true
   };
 
   const catSec = sections.categories || {
-    title: 'FIND THE RIGHT BAG FOR YOUR BUSINESS',
-    subtitle: 'BROWSE OUR RANGE',
+    title: 'Find the right bag for your business',
+    subtitle: 'Our range',
     description: 'Explore our premium collection of ready-to-ship and customizable bags.',
     enabled: true
   };
 
   const customSec = sections.customization || {
-    title: 'PUT YOUR BRAND ON IT.',
-    subtitle: 'CUSTOM BRANDING & PRINTS',
+    title: 'Put your brand on it',
+    subtitle: 'Custom branding & prints',
     description: 'Your size. Your colors. Your logo. Your bag.',
     enabled: true
   };
 
   const indSec = sections.industries || {
-    title: 'MADE FOR YOUR BUSINESS',
-    subtitle: 'INDUSTRIES WE SERVE',
+    title: 'Made for your business',
+    subtitle: 'Industries we serve',
     description: 'We provide tailored packaging solutions for diverse industries.',
     enabled: true
   };
 
   const processSec = sections.process || {
-    title: 'SIMPLE. TRANSPARENT. FAST.',
-    subtitle: 'HOW BULK ORDERS WORK',
+    title: 'Simple, transparent, fast',
+    subtitle: 'How bulk orders work',
     description: 'How to get your custom branded bags.',
     enabled: true
   };
 
   const whySec = sections.why_us || {
-    title: 'TRUST • QUALITY • VALUE',
-    subtitle: 'OUR PROMISE TO YOU',
+    title: 'Built to carry your brand',
+    subtitle: 'Our promise to you',
     description: 'Wholesale & Retail Supplier of Paper Bags, Non-Woven Bags, Customized Bags & Designer Bags',
     enabled: true
   };
 
   const testSec = sections.testimonials || {
     title: 'What Our Clients Say',
-    subtitle: 'CLIENT FEEDBACK',
+    subtitle: 'Client feedback',
     description: 'Genuine reviews from business owners and store managers.',
     enabled: true
   };
 
   const finalCta = sections.final_cta || {
     title: 'Ready to Upgrade Your Brand Packaging?',
-    subtitle: 'BULK WHOLESALE INQUIRIES',
+    subtitle: 'Bulk wholesale enquiries',
     description: 'Get in touch with MS TRADERS today for custom sample kits and bulk pricing quotes.',
-    primary_cta_text: 'REQUEST WHOLESALE QUOTE',
+    primary_cta_text: 'Request a wholesale quote',
     primary_cta_link: '/customize',
-    secondary_cta_text: 'CONTACT SALES DESK',
+    secondary_cta_text: 'Contact the sales desk',
     secondary_cta_link: '/contact',
     enabled: true
   };
@@ -119,7 +122,7 @@ export default function HomePage() {
                   </span>
                 )}
                 <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl lg:text-[4rem] font-bold tracking-tight text-brand-charcoal leading-[1.1] mb-4 sm:mb-6">
-                  {hero.title || 'BAGS THAT CARRY YOUR BRAND.'}
+                  {hero.title || 'Bags that carry your brand'}
                 </h1>
                 <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-6 sm:mb-8 max-w-lg">
                   {hero.description}
@@ -128,7 +131,7 @@ export default function HomePage() {
                   {hero.primary_cta_text && (
                     <Button size="lg" className="w-full sm:w-auto justify-center bg-brand-green hover:bg-emerald-700 text-white font-bold" asChild>
                       <Link href={hero.primary_cta_link || '/customize'}>
-                        {hero.primary_cta_text} <ArrowRight className="ml-2 h-5 w-5" />
+                        {hero.primary_cta_text}
                       </Link>
                     </Button>
                   )}
@@ -163,8 +166,8 @@ export default function HomePage() {
         <section className="py-20 bg-white">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-3xl mx-auto mb-16">
-              <span className="text-xs font-bold tracking-widest text-brand-green uppercase mb-2 block">
-                {catSec.subtitle || 'BROWSE OUR RANGE'}
+              <span className="text-sm font-medium text-brand-green/80 mb-3 block">
+                {catSec.subtitle || 'Our range'}
               </span>
               <h2 className="font-heading text-3xl md:text-5xl font-bold text-brand-charcoal mb-4">
                 {catSec.title}
@@ -174,7 +177,7 @@ export default function HomePage() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {displayCategories.map((category) => (
                 <Link 
                   key={category.id} 
@@ -194,11 +197,11 @@ export default function HomePage() {
                     <h3 className="font-heading text-xl font-semibold text-brand-charcoal mb-2">
                       {category.name}
                     </h3>
-                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2 leading-relaxed">
                       {category.description || 'Custom wholesale carry bag'}
                     </p>
-                    <span className="text-brand-green text-sm font-medium flex items-center group-hover:underline">
-                      Explore <ArrowRight className="ml-1 h-4 w-4" />
+                    <span className="text-brand-green text-sm font-medium group-hover:underline underline-offset-4">
+                      View range
                     </span>
                   </div>
                 </Link>
@@ -214,8 +217,8 @@ export default function HomePage() {
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
               <div>
-                <span className="text-xs font-bold tracking-widest text-brand-gold uppercase mb-2 block">
-                  {customSec.subtitle || 'CUSTOM BRANDING & PRINTS'}
+                <span className="text-sm font-medium text-brand-gold/90 mb-3 block">
+                  {customSec.subtitle || 'Custom branding & prints'}
                 </span>
                 <h2 className="font-heading text-4xl md:text-5xl font-bold mb-6 text-brand-gold">
                   {customSec.title}
@@ -242,7 +245,7 @@ export default function HomePage() {
                 
                 <Button size="lg" className="bg-brand-gold text-brand-charcoal hover:bg-brand-gold/90 font-bold" asChild>
                   <Link href="/customize">
-                    CREATE YOUR CUSTOM BAG <ArrowRight className="ml-2 h-5 w-5" />
+                    Design your custom bag
                   </Link>
                 </Button>
               </div>
@@ -269,8 +272,8 @@ export default function HomePage() {
         <section className="py-20 bg-brand-cream">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-3xl mx-auto mb-16">
-              <span className="text-xs font-bold tracking-widest text-brand-green uppercase mb-2 block">
-                {indSec.subtitle || 'INDUSTRIES WE SERVE'}
+              <span className="text-sm font-medium text-brand-green/80 mb-3 block">
+                {indSec.subtitle || 'Industries we serve'}
               </span>
               <h2 className="font-heading text-3xl md:text-5xl font-bold text-brand-charcoal mb-4">
                 {indSec.title}
@@ -282,21 +285,21 @@ export default function HomePage() {
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
               {[
-                { name: 'Hotels', icon: '🏨', link: '/industries/hotels' },
-                { name: 'Restaurants', icon: '🍽️', link: '/industries/restaurants' },
-                { name: 'Clothing & Fashion', icon: '👗', link: '/industries/clothing' },
-                { name: 'Retail Stores', icon: '🛍️', link: '/industries/retail' },
-                { name: 'Medical & Pharma', icon: '⚕️', link: '/industries/medical-pharma' },
-                { name: 'Corporate', icon: '🏢', link: '/industries/corporate' },
-                { name: 'Events & Gifting', icon: '🎁', link: '/industries/events' },
-                { name: 'Other Businesses', icon: '💼', link: '/industries/other' }
+                { name: 'Hotels', icon: BedDouble, link: '/industries/hotels' },
+                { name: 'Restaurants', icon: UtensilsCrossed, link: '/industries/restaurants' },
+                { name: 'Clothing & Fashion', icon: Shirt, link: '/industries/clothing' },
+                { name: 'Retail Stores', icon: Store, link: '/industries/retail' },
+                { name: 'Medical & Pharma', icon: Stethoscope, link: '/industries/medical-pharma' },
+                { name: 'Corporate', icon: Building2, link: '/industries/corporate' },
+                { name: 'Events & Gifting', icon: Gift, link: '/industries/events' },
+                { name: 'Other Businesses', icon: Briefcase, link: '/industries/other' }
               ].map((industry) => (
                 <Link 
                   key={industry.name} 
                   href={industry.link}
                   className="bg-white p-8 rounded-2xl shadow-sm border border-border/50 text-center hover:shadow-md transition-all group"
                 >
-                  <div className="text-4xl mb-4 transform group-hover:scale-110 transition-transform">{industry.icon}</div>
+                  <industry.icon className="h-7 w-7 mb-4 text-brand-green" strokeWidth={1.5} aria-hidden />
                   <h3 className="font-semibold text-brand-charcoal">{industry.name}</h3>
                 </Link>
               ))}
@@ -310,8 +313,8 @@ export default function HomePage() {
         <section className="py-16 bg-brand-green text-white relative overflow-hidden">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div className="text-center max-w-3xl mx-auto mb-12">
-              <span className="text-brand-gold text-xs font-bold tracking-[0.2em] uppercase mb-2 block">
-                {whySec.subtitle || 'OUR PROMISE TO YOU'}
+              <span className="text-brand-gold/90 text-sm font-medium mb-3 block">
+                {whySec.subtitle || 'Our promise to you'}
               </span>
               <h2 className="font-heading text-3xl md:text-5xl font-bold text-white mb-3">
                 {whySec.title}
@@ -323,31 +326,31 @@ export default function HomePage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 text-center">
               <div className="bg-white/10 backdrop-blur-xs p-6 rounded-xl border border-white/10">
-                <div className="w-12 h-12 rounded-full bg-brand-gold/20 text-brand-gold mx-auto flex items-center justify-center font-bold text-xl mb-3">
-                  ✓
+                <div className="w-12 h-12 rounded-full bg-brand-gold/15 text-brand-gold mx-auto flex items-center justify-center mb-3">
+                  <ShieldCheck className="h-5 w-5" strokeWidth={1.5} aria-hidden />
                 </div>
-                <h3 className="font-heading font-semibold text-lg text-brand-gold mb-1">PREMIUM QUALITY</h3>
+                <h3 className="font-heading font-semibold text-lg text-brand-gold mb-1">Premium quality</h3>
                 <p className="text-xs text-white/80">High-load bearing capacity & top-grade paper & fabric</p>
               </div>
               <div className="bg-white/10 backdrop-blur-xs p-6 rounded-xl border border-white/10">
-                <div className="w-12 h-12 rounded-full bg-brand-gold/20 text-brand-gold mx-auto flex items-center justify-center font-bold text-xl mb-3">
-                  🍃
+                <div className="w-12 h-12 rounded-full bg-brand-gold/15 text-brand-gold mx-auto flex items-center justify-center mb-3">
+                  <Leaf className="h-5 w-5" strokeWidth={1.5} aria-hidden />
                 </div>
-                <h3 className="font-heading font-semibold text-lg text-brand-gold mb-1">ECO-FRIENDLY</h3>
+                <h3 className="font-heading font-semibold text-lg text-brand-gold mb-1">Eco-friendly</h3>
                 <p className="text-xs text-white/80">Reusable, 100% recyclable & planet-conscious materials</p>
               </div>
               <div className="bg-white/10 backdrop-blur-xs p-6 rounded-xl border border-white/10">
-                <div className="w-12 h-12 rounded-full bg-brand-gold/20 text-brand-gold mx-auto flex items-center justify-center font-bold text-xl mb-3">
-                  🖨️
+                <div className="w-12 h-12 rounded-full bg-brand-gold/15 text-brand-gold mx-auto flex items-center justify-center mb-3">
+                  <Printer className="h-5 w-5" strokeWidth={1.5} aria-hidden />
                 </div>
-                <h3 className="font-heading font-semibold text-lg text-brand-gold mb-1">CUSTOM PRINTING</h3>
+                <h3 className="font-heading font-semibold text-lg text-brand-gold mb-1">Custom printing</h3>
                 <p className="text-xs text-white/80">Precision logo reproduction in all sizes & color variants</p>
               </div>
               <div className="bg-white/10 backdrop-blur-xs p-6 rounded-xl border border-white/10">
-                <div className="w-12 h-12 rounded-full bg-brand-gold/20 text-brand-gold mx-auto flex items-center justify-center font-bold text-xl mb-3">
-                  🚚
+                <div className="w-12 h-12 rounded-full bg-brand-gold/15 text-brand-gold mx-auto flex items-center justify-center mb-3">
+                  <Truck className="h-5 w-5" strokeWidth={1.5} aria-hidden />
                 </div>
-                <h3 className="font-heading font-semibold text-lg text-brand-gold mb-1">RELIABLE SERVICE</h3>
+                <h3 className="font-heading font-semibold text-lg text-brand-gold mb-1">Reliable service</h3>
                 <p className="text-xs text-white/80">Wholesale pricing with guaranteed on-time dispatch</p>
               </div>
             </div>
@@ -360,8 +363,8 @@ export default function HomePage() {
         <section className="py-24 bg-white">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-3xl mx-auto mb-16">
-              <span className="text-xs font-bold tracking-widest text-brand-green uppercase mb-2 block">
-                {processSec.subtitle || 'HOW BULK ORDERS WORK'}
+              <span className="text-sm font-medium text-brand-green/80 mb-3 block">
+                {processSec.subtitle || 'How bulk orders work'}
               </span>
               <h2 className="font-heading text-3xl md:text-5xl font-bold text-brand-charcoal mb-4">
                 {processSec.title}
@@ -373,11 +376,11 @@ export default function HomePage() {
 
             <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
               {[
-                { num: '01', title: 'CHOOSE YOUR BAG', desc: 'Select your bag category, size, quantity and material requirements.' },
-                { num: '02', title: 'ADD YOUR BRAND', desc: 'Upload your logo or artwork design for custom printing.' },
-                { num: '03', title: 'GET YOUR QUOTE', desc: 'Our team reviews your specs and sends an instant formal quote.' },
-                { num: '04', title: 'APPROVE & PREPARE', desc: 'Once approved, we prepare and print your branded bags.' },
-                { num: '05', title: 'SAFE DELIVERY', desc: 'Your finished order is safely delivered to your doorstep.' }
+                { num: '01', title: 'Choose your bag', desc: 'Select your bag category, size, quantity and material requirements.' },
+                { num: '02', title: 'Add your brand', desc: 'Upload your logo or artwork design for custom printing.' },
+                { num: '03', title: 'Get your quote', desc: 'Our team reviews your specs and sends an instant formal quote.' },
+                { num: '04', title: 'Approve & prepare', desc: 'Once approved, we prepare and print your branded bags.' },
+                { num: '05', title: 'Safe delivery', desc: 'Your finished order is safely delivered to your doorstep.' }
               ].map((step, i) => (
                 <div key={step.num} className="relative">
                   {i !== 4 && (
@@ -410,8 +413,8 @@ export default function HomePage() {
       {finalCta.enabled !== false && (
         <section className="py-20 bg-brand-charcoal text-white text-center relative overflow-hidden">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl relative z-10">
-            <span className="text-xs font-bold tracking-widest text-brand-gold uppercase mb-3 block">
-              {finalCta.subtitle || 'BULK WHOLESALE INQUIRIES'}
+            <span className="text-sm font-medium text-brand-gold/90 mb-3 block">
+              {finalCta.subtitle || 'Bulk wholesale enquiries'}
             </span>
             <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl font-bold mb-4 text-white">
               {finalCta.title}
@@ -423,7 +426,7 @@ export default function HomePage() {
               {finalCta.primary_cta_text && (
                 <Button size="lg" className="w-full sm:w-auto bg-brand-green hover:bg-emerald-700 text-white font-bold h-12 px-8" asChild>
                   <Link href={finalCta.primary_cta_link || '/customize'}>
-                    {finalCta.primary_cta_text} <ArrowRight className="ml-2 h-5 w-5" />
+                    {finalCta.primary_cta_text}
                   </Link>
                 </Button>
               )}

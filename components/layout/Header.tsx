@@ -193,7 +193,7 @@ export function Header() {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    'px-2 xl:px-3 py-1.5 rounded-full text-[10px] xl:text-xs font-bold uppercase tracking-wider transition-all duration-200 whitespace-nowrap',
+                    'px-2 xl:px-3 py-1.5 rounded-full text-xs xl:text-sm font-medium transition-all duration-200 whitespace-nowrap',
                     isActive
                       ? 'bg-brand-green/10 text-brand-green font-bold'
                       : 'text-slate-700 hover:text-brand-green hover:bg-brand-cream/60'
@@ -358,7 +358,7 @@ export function Header() {
 
             {/* Get Quote CTA */}
             <Button size="sm" className="hidden sm:inline-flex bg-brand-green hover:bg-emerald-700 text-white font-bold text-[10px] xl:text-xs rounded-full px-3 xl:px-4 shadow-2xs whitespace-nowrap" asChild>
-              <Link href="/customize">GET QUOTE</Link>
+              <Link href="/customize">Get a quote</Link>
             </Button>
 
             {/* Mobile / Tablet Menu Toggle */}
@@ -457,7 +457,7 @@ export function Header() {
 
                 {/* Contact Quick Support in Mobile Menu */}
                 <div className="bg-slate-50 rounded-xl p-3 text-center border border-slate-200">
-                  <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Direct Wholesale Inquiry</p>
+                  <p className="text-xs font-medium text-slate-500 mb-1">Direct wholesale enquiry</p>
                   <a href="tel:+919131268724" className="text-sm font-bold text-brand-green hover:underline flex items-center justify-center gap-1.5">
                     <Phone className="h-3.5 w-3.5" /> +91 91312 68724 / +91 90094 46352
                   </a>

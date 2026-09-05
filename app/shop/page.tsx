@@ -50,8 +50,8 @@ export default function ShopPage() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6 border-b border-border pb-8">
           <div>
-            <span className="text-xs font-bold uppercase tracking-widest text-brand-green mb-1 block">Product Catalog</span>
-            <h1 className="font-heading text-3xl sm:text-4xl font-bold text-brand-charcoal">Eco-Friendly Bag Collection</h1>
+            <span className="text-sm font-medium text-brand-green/80 mb-2 block">Product catalogue</span>
+            <h1 className="font-heading text-3xl sm:text-4xl font-bold text-brand-charcoal">Our bag collection</h1>
             <p className="text-muted-foreground text-sm mt-1">Wholesale pricing for bulk custom printed carry bags & luxury packaging.</p>
           </div>
           
@@ -77,7 +77,7 @@ export default function ShopPage() {
           {/* Category Filter Sidebar */}
           <div className="w-full lg:w-64 flex-shrink-0 space-y-6">
             <div className="bg-white border border-border rounded-xl p-5 shadow-xs">
-              <h3 className="font-bold text-sm text-brand-charcoal uppercase tracking-wider mb-4 border-b border-border pb-2">
+              <h3 className="font-semibold text-sm text-brand-charcoal mb-4 border-b border-border pb-2">
                 Categories
               </h3>
               <ul className="space-y-1.5">
@@ -150,7 +150,7 @@ export default function ShopPage() {
                     </div>
                     <div className="p-5 flex-1 flex flex-col justify-between">
                       <div>
-                        <div className="text-[10px] font-bold text-brand-green uppercase tracking-wider mb-1">
+                        <div className="text-[11px] font-medium text-brand-green/80 mb-1">
                           {product.category}
                         </div>
                         <h3 className="font-heading font-bold text-base text-brand-charcoal mb-2 line-clamp-1 group-hover:text-brand-green transition-colors">

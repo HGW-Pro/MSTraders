@@ -28,8 +28,13 @@
   --color-accent: #E5DFCF;
   --color-accent-foreground: var(--color-brand-charcoal);
 
-  --font-sans: 'Inter', system-ui, sans-serif;
-  --font-heading: 'Playfair Display', Georgia, serif;
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-heading: 'Playfair Display', Georgia, 'Times New Roman', serif;
+
+  /* Surfaces: cream is the page, warm white is for cards, so panels lift off
+     the background instead of relying on shadows alone. */
+  --color-surface: #FFFDF8;
+  --color-surface-sunken: #F0E9D6;
 }
 
 @layer base {
@@ -49,5 +54,39 @@
   
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-heading);
+    font-weight: 600;
+    /* Playfair is a high-contrast display face: it needs negative tracking at
+       large sizes and tighter leading than a UI sans to look set, not typed. */
+    letter-spacing: -0.02em;
+    line-height: 1.12;
+    text-wrap: balance;
+  }
+
+  h1 { letter-spacing: -0.03em; }
+  h4, h5, h6 { letter-spacing: -0.01em; line-height: 1.25; }
+
+  /* Body copy: keep measure under ~72 characters wherever prose runs long. */
+  p { text-wrap: pretty; }
+
+  /* Every interactive element gets a visible keyboard focus ring. Previously
+     only inputs had one, so keyboard users lost their place on links. */
+  a:focus-visible,
+  button:focus-visible,
+  [role='button']:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    outline: 2px solid var(--color-brand-green);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
