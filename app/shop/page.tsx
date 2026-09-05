@@ -143,7 +143,7 @@ export default function ShopPage() {
                         </div>
                       )}
                       {product.is_customizable && (
-                        <div className="absolute top-3 left-3 bg-brand-gold text-brand-charcoal text-[10px] font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider shadow-xs">
+                        <div className="absolute top-3 left-3 bg-brand-gold text-brand-charcoal text-[11px] font-semibold px-2.5 py-1 rounded-full shadow-xs">
                           Custom Print Available
                         </div>
                       )}
@@ -151,9 +151,10 @@ export default function ShopPage() {
                     <div className="p-5 flex-1 flex flex-col justify-between">
                       <div>
                         <div className="text-[11px] font-medium text-brand-green/80 mb-1">
-                          {product.category}
+                          {categories.find(c => c.slug === product.category)?.name
+                            ?? product.category.replace(/-/g, ' ')}
                         </div>
-                        <h3 className="font-heading font-bold text-base text-brand-charcoal mb-2 line-clamp-1 group-hover:text-brand-green transition-colors">
+                        <h3 className="font-heading font-semibold text-base text-brand-charcoal mb-2 line-clamp-2 leading-snug min-h-[2.75rem] group-hover:text-brand-green transition-colors">
                           {product.name}
                         </h3>
                         {product.description && (
