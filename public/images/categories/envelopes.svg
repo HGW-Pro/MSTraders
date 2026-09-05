@@ -1,36 +1,43 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="100%" height="100%">
   <defs>
-    <linearGradient id="pouchGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#d6ab7d" />
-      <stop offset="100%" stop-color="#9a6e3f" />
+    <linearGradient id="enA" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#cfa274"/>
+      <stop offset="100%" stop-color="#a97a48"/>
     </linearGradient>
-    <filter id="pouchShadow" x="-10%" y="-10%" width="120%" height="120%">
-      <feDropShadow dx="4" dy="12" stdDeviation="14" flood-color="#000" flood-opacity="0.2"/>
+    <linearGradient id="enB" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#e7e0d4"/>
+    </linearGradient>
+    <linearGradient id="enC" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e4d6bf"/>
+      <stop offset="100%" stop-color="#c2ad8e"/>
+    </linearGradient>
+    <filter id="soft" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#2a1a0c" flood-opacity="0.28"/>
     </filter>
   </defs>
 
-  <rect width="800" height="800" fill="#faf6f0"/>
+  <rect width="800" height="800" fill="#f5ede3"/>
+  <rect y="600" width="800" height="200" fill="#e7dccd"/>
 
-  <g filter="url(#pouchShadow)">
-    <polygon points="80,180 200,180 180,680 70,680" fill="url(#pouchGrad)"/>
-    <line x1="80" y1="180" x2="200" y2="180" stroke="#68451f" stroke-width="3" stroke-dasharray="3,3"/>
-
-    <polygon points="160,260 280,260 260,680 150,680" fill="url(#pouchGrad)"/>
-    <line x1="160" y1="260" x2="280" y2="260" stroke="#68451f" stroke-width="3" stroke-dasharray="3,3"/>
-
-    <polygon points="240,320 360,320 340,680 230,680" fill="url(#pouchGrad)"/>
-    <line x1="240" y1="320" x2="360" y2="320" stroke="#68451f" stroke-width="3" stroke-dasharray="3,3"/>
-
-    <polygon points="320,380 440,380 420,680 310,680" fill="url(#pouchGrad)"/>
-    <line x1="320" y1="380" x2="440" y2="380" stroke="#68451f" stroke-width="3" stroke-dasharray="3,3"/>
-
-    <polygon points="400,440 520,440 500,680 390,680" fill="url(#pouchGrad)"/>
-    <line x1="400" y1="440" x2="520" y2="440" stroke="#68451f" stroke-width="3" stroke-dasharray="3,3"/>
-
-    <polygon points="480,500 600,500 580,680 470,680" fill="url(#pouchGrad)"/>
-    <line x1="480" y1="500" x2="600" y2="500" stroke="#68451f" stroke-width="3" stroke-dasharray="3,3"/>
-
-    <polygon points="560,560 680,560 660,680 550,680" fill="url(#pouchGrad)"/>
-    <line x1="560" y1="560" x2="680" y2="560" stroke="#68451f" stroke-width="3" stroke-dasharray="3,3"/>
+  <g filter="url(#soft)">
+      <g transform="rotate(-9 265 430)">
+        <rect x="150" y="280" width="230" height="300" rx="8" fill="url(#enC)"/>
+        <path d="M 150 280 L 380 280 L 380 370 L 265 418 L 150 370 Z" fill="#cbb692"/>
+        <line x1="150" y1="370" x2="265" y2="418" stroke="#a68e66" stroke-width="3"/>
+        <line x1="380" y1="370" x2="265" y2="418" stroke="#a68e66" stroke-width="3"/>
+      </g>
+      <g>
+        <rect x="300" y="250" width="240" height="310" rx="8" fill="url(#enA)"/>
+        <path d="M 300 250 L 540 250 L 540 343 L 420 392.6 L 300 343 Z" fill="#b98a56"/>
+        <line x1="300" y1="343" x2="420" y2="392.6" stroke="#8f6437" stroke-width="3"/>
+        <line x1="540" y1="343" x2="420" y2="392.6" stroke="#8f6437" stroke-width="3"/>
+      </g>
+      <g transform="rotate(9 570 435)">
+        <rect x="460" y="290" width="220" height="290" rx="8" fill="url(#enB)"/>
+        <path d="M 460 290 L 680 290 L 680 377 L 570 423.4 L 460 377 Z" fill="#ded6c8"/>
+        <line x1="460" y1="377" x2="570" y2="423.4" stroke="#b8ae9c" stroke-width="3"/>
+        <line x1="680" y1="377" x2="570" y2="423.4" stroke="#b8ae9c" stroke-width="3"/>
+      </g>
   </g>
 </svg>

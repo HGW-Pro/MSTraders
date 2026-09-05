@@ -1,40 +1,33 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="100%" height="100%">
   <defs>
-    <filter id="softShadow" x="-10%" y="-10%" width="120%" height="120%">
-      <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#3c2f23" flood-opacity="0.25"/>
-    </filter>
-    <linearGradient id="whiteKraft" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#ffffff" />
-      <stop offset="80%" stop-color="#f9f7f4" />
-      <stop offset="100%" stop-color="#ece8e1" />
+    <linearGradient id="cuA" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#e6e0d5"/>
     </linearGradient>
+    <linearGradient id="cuB" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4a7f68"/>
+      <stop offset="100%" stop-color="#2c5a47"/>
+    </linearGradient>
+    <filter id="soft" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#2a1a0c" flood-opacity="0.28"/>
+    </filter>
   </defs>
 
-  <rect width="800" height="800" fill="#e9ddcf"/>
-  <rect y="590" width="800" height="210" fill="#cbb79d"/>
+  <rect width="800" height="800" fill="#f5ede3"/>
+  <rect y="600" width="800" height="200" fill="#e7dccd"/>
 
-  <g filter="url(#softShadow)">
-    <path d="M 320 220 C 320 80, 480 80, 480 220" fill="none" stroke="#d5cebe" stroke-width="18" stroke-linecap="round"/>
-    <path d="M 320 220 C 320 80, 480 80, 480 220" fill="none" stroke="#f4efe6" stroke-width="12" stroke-dasharray="12,5" stroke-linecap="round"/>
-
-    <polygon points="210,240 270,200 270,650 210,690" fill="#ded7cb"/>
-    <polygon points="270,200 590,200 590,650 270,650" fill="url(#whiteKraft)"/>
-    
-    <line x1="270" y1="200" x2="590" y2="200" stroke="#b5ad9e" stroke-width="3" stroke-dasharray="4,3"/>
-
-    <circle cx="430" cy="380" r="105" fill="none" stroke="#96172e" stroke-width="4.5"/>
-    <circle cx="430" cy="380" r="97" fill="none" stroke="#96172e" stroke-width="1.5" stroke-dasharray="4,3"/>
-
-    <text x="430" y="325" font-family="sans-serif" font-size="12" font-weight="bold" fill="#96172e" text-anchor="middle" letter-spacing="3">CLOTHING COMPANY</text>
-
-    <text x="430" y="405" font-family="'Playfair Display', Georgia, serif" font-size="52" font-style="italic" font-weight="900" fill="#96172e" text-anchor="middle" letter-spacing="1">JALSA</text>
-
-    <text x="430" y="445" font-family="sans-serif" font-size="11" font-weight="bold" fill="#96172e" text-anchor="middle" letter-spacing="3">CLOTHING COMPANY</text>
-
-    <text x="430" y="525" font-family="sans-serif" font-size="16" font-weight="900" fill="#96172e" text-anchor="middle" letter-spacing="4">CELEBRATE YOURSELF</text>
-
-    <text x="430" y="565" font-family="sans-serif" font-size="12" font-weight="700" fill="#4a423b" text-anchor="middle">📍 26/626 Rajendra Prasad Marg,</text>
-    <text x="430" y="585" font-family="sans-serif" font-size="12" font-weight="700" fill="#4a423b" text-anchor="middle">Do Batti Ratlam, M. P. India</text>
-    <text x="430" y="615" font-family="sans-serif" font-size="14" font-weight="800" fill="#96172e" text-anchor="middle">📞 9343310385</text>
+  <g filter="url(#soft)">
+      <polygon points="480,235 535,205 535,520 480,550" fill="#dbd3c5"/>
+      <polygon points="250,235 305,205 535,205 480,235" fill="#f2ece1"/>
+      <rect x="250" y="235" width="230" height="315" fill="url(#cuA)"/>
+      <path d="M 319 235 C 319 181.45, 411 181.45, 411 235" fill="none" stroke="#9aa79f" stroke-width="10" stroke-linecap="round"/>
+      <rect x="290" y="320" width="150" height="120" fill="none" stroke="#2c5a47" stroke-width="5" stroke-dasharray="16 12" rx="6"/>
+      <circle cx="365" cy="380" r="26" fill="url(#cuB)" opacity="0.85"/>
+      <line x1="250" y1="585" x2="480" y2="585" stroke="#2c5a47" stroke-width="5"/>
+      <line x1="250" y1="570" x2="250" y2="600" stroke="#2c5a47" stroke-width="5"/>
+      <line x1="480" y1="570" x2="480" y2="600" stroke="#2c5a47" stroke-width="5"/>
+      <line x1="545" y1="235" x2="545" y2="550" stroke="#2c5a47" stroke-width="5"/>
+      <line x1="530" y1="235" x2="560" y2="235" stroke="#2c5a47" stroke-width="5"/>
+      <line x1="530" y1="550" x2="560" y2="550" stroke="#2c5a47" stroke-width="5"/>
   </g>
 </svg>

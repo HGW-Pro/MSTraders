@@ -1,43 +1,37 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="100%" height="100%">
   <defs>
-    <filter id="shadowD" x="-10%" y="-10%" width="120%" height="120%">
-      <feDropShadow dx="0" dy="16" stdDeviation="20" flood-color="#000" flood-opacity="0.2"/>
-    </filter>
-    <linearGradient id="nwTexture" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#ffffff" />
-      <stop offset="100%" stop-color="#f4f5f8" />
+    <linearGradient id="dcA" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#d2334a"/>
+      <stop offset="100%" stop-color="#a3132a"/>
     </linearGradient>
+    <linearGradient id="dcB" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#e3ddd3"/>
+    </linearGradient>
+    <linearGradient id="dcC" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3d434b"/>
+      <stop offset="100%" stop-color="#20242a"/>
+    </linearGradient>
+    <filter id="soft" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#2a1a0c" flood-opacity="0.28"/>
+    </filter>
   </defs>
 
-  <rect width="800" height="800" fill="#f8f4f0"/>
+  <rect width="800" height="800" fill="#f5ede3"/>
+  <rect y="600" width="800" height="200" fill="#e7dccd"/>
 
-  <g filter="url(#shadowD)">
-    <rect x="180" y="100" width="440" height="620" rx="14" fill="url(#nwTexture)" stroke="#e2e4e9" stroke-width="2"/>
-    
-    <line x1="180" y1="130" x2="620" y2="130" stroke="#cbd0d8" stroke-width="2" stroke-dasharray="6,4"/>
-    <line x1="180" y1="690" x2="620" y2="690" stroke="#cbd0d8" stroke-width="2" stroke-dasharray="6,4"/>
-
-    <rect x="330" y="145" width="140" height="42" rx="21" fill="#f8f4f0" stroke="#cbd0d8" stroke-width="3"/>
-
-    <text x="210" y="220" font-family="sans-serif" font-size="12" font-weight="bold" fill="#333333">KANIZA MALAK</text>
-    <text x="210" y="238" font-family="sans-serif" font-size="12" font-weight="600" fill="#555555">9303230521</text>
-
-    <text x="590" y="220" font-family="sans-serif" font-size="12" font-weight="bold" fill="#333333" text-anchor="end">FATEMA MALAK</text>
-    <text x="590" y="238" font-family="sans-serif" font-size="12" font-weight="600" fill="#555555" text-anchor="end">+919424830920</text>
-
-    <polygon points="400,270 510,380 400,490 290,380" fill="none" stroke="#e0658b" stroke-width="2" opacity="0.6"/>
-    
-    <path d="M 400 295 Q 408 305 408 320 Q 400 330 392 320 Z" fill="#d84d76"/>
-    <path d="M 390 320 C 375 350, 360 410, 350 460 C 385 470, 415 470, 450 460 C 440 410, 425 350, 410 320 Z" fill="#d84d76" opacity="0.85"/>
-    <path d="M 370 380 Q 400 395 430 380" stroke="#ffffff" stroke-width="2" fill="none"/>
-
-    <text x="400" y="535" font-family="'Brush Script MT', 'Great Vibes', cursive" font-size="44" font-weight="bold" fill="#b02652" text-anchor="middle">Fusion Fashion</text>
-
-    <text x="400" y="570" font-family="sans-serif" font-size="12" font-weight="700" fill="#333333" text-anchor="middle">• Designer Rida •</text>
-    <text x="400" y="590" font-family="sans-serif" font-size="11" font-weight="600" fill="#444444" text-anchor="middle">• Boutique Style Rida • Masallah Bag • Safra</text>
-    <text x="400" y="608" font-family="sans-serif" font-size="11" font-weight="600" fill="#444444" text-anchor="middle">Set • Fancy Jodi</text>
-
-    <text x="400" y="640" font-family="sans-serif" font-size="11" font-weight="bold" fill="#222222" text-anchor="middle">85, saifee nagar opposite garden</text>
-    <text x="400" y="658" font-family="sans-serif" font-size="11" font-weight="bold" fill="#222222" text-anchor="middle">khatiwala tank Indore (M.P.)</text>
+  <g filter="url(#soft)">
+      <polygon points="290,300 330,278 330,528 290,550" fill="#171a1f"/>
+      <polygon points="125,300 165,278 330,278 290,300" fill="#4a515a"/>
+      <rect x="125" y="300" width="165" height="250" fill="url(#dcC)"/>
+      <rect x="179.45" y="315" width="56.1" height="13.75" rx="6.875" fill="#f5ede3"/>
+      <polygon points="515,245 559,221 559,526 515,550" fill="#8c0f23"/>
+      <polygon points="330,245 374,221 559,221 515,245" fill="#e05468"/>
+      <rect x="330" y="245" width="185" height="305" fill="url(#dcA)"/>
+      <rect x="391.05" y="263.3" width="62.900000000000006" height="16.775" rx="8.3875" fill="#f5ede3"/>
+      <polygon points="715,310 753,289 753,529 715,550" fill="#d7cfc2"/>
+      <polygon points="555,310 593,289 753,289 715,310" fill="#f6f2ea"/>
+      <rect x="555" y="310" width="160" height="240" fill="url(#dcB)"/>
+      <rect x="607.8" y="324.4" width="54.400000000000006" height="13.2" rx="6.6" fill="#f5ede3"/>
   </g>
 </svg>

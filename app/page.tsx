@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, CheckCircle2, Star, Quote, Truck, ShieldCheck, Printer, RefreshCw } from 'lucide-react';
-import { getHomepageSections, getCategories, getTestimonials } from '@/lib/supabase/services';
+import { getHomepageSections, getCategories, getTestimonials, DEFAULT_CATEGORIES } from '@/lib/supabase/services';
 import { HomepageSection, Category, Testimonial } from '@/types';
 import { ClientFeedbackSection } from '@/components/feedback/ClientFeedbackSection';
 
@@ -24,7 +24,7 @@ export default function HomePage() {
     ]).then(([secData, catData, testData]) => {
       if (isMounted) {
         setSections(secData);
-        setCategories(catData.filter(c => c.is_active));
+        setCategories(catData.filter(c => c.is_active !== false));
         setTestimonials(testData);
         setLoading(false);
       }
@@ -101,17 +101,9 @@ export default function HomePage() {
     enabled: true
   };
 
-  // Fallback category list if none in database yet
-  const displayCategories = categories.length > 0 ? categories : [
-    { id: '1', name: 'Paper Bags', slug: 'paper-bags', description: 'Eco-friendly retail carry bags', image_url: '/images/categories/paper-bags.svg', is_active: true, display_order: 1 },
-    { id: '2', name: 'Kraft Bags', slug: 'kraft-bags', description: 'Natural unbleached kraft paper', image_url: '/images/categories/kraft-bags.svg', is_active: true, display_order: 2 },
-    { id: '3', name: 'Non-Woven Bags', slug: 'non-woven-bags', description: 'Reusable cloth-feel carry bags', image_url: '/images/categories/non-woven-bags.svg', is_active: true, display_order: 3 },
-    { id: '4', name: 'W-Cut Bags', slug: 'w-cut-bags', description: 'Standard grocery vest handles', image_url: '/images/categories/w-cut-bags.svg', is_active: true, display_order: 4 },
-    { id: '5', name: 'D-Cut Bags', slug: 'd-cut-bags', description: 'Punch handle boutique carry bags', image_url: '/images/categories/d-cut-bags.svg', is_active: true, display_order: 5 },
-    { id: '6', name: 'Designer Bags', slug: 'designer-bags', description: 'Luxury foil printed boutique bags', image_url: '/images/categories/designer-bags.svg', is_active: true, display_order: 6 },
-    { id: '7', name: 'Gift Bags', slug: 'gift-bags', description: 'Celebration & corporate gifting', image_url: '/images/categories/gift-bags.svg', is_active: true, display_order: 7 },
-    { id: '8', name: 'Customized Bags', slug: 'customized-bags', description: 'Tailor-made dimensions & print', image_url: '/images/categories/customized-bags.svg', is_active: true, display_order: 8 }
-  ];
+  // Fallback to the shared seed catalogue so the homepage, shop and admin
+  // never disagree about which categories exist or what they look like.
+  const displayCategories = categories.length > 0 ? categories : DEFAULT_CATEGORIES;
 
   return (
     <>

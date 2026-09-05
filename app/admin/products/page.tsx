@@ -210,13 +210,14 @@ export default function AdminProductsPage() {
       };
 
       if (editingProduct) {
-        const success = await updateProduct(editingProduct.id, payload);
+        // Seed rows carry a non-uuid id; updateProduct persists them by slug.
+        const success = await updateProduct(editingProduct.id, { ...payload, slug: payload.slug });
         if (success) {
-          toast.success('Product updated successfully in Supabase');
+          toast.success('Product saved successfully in Supabase');
           setIsModalOpen(false);
           loadData();
         } else {
-          toast.error('Failed to update product');
+          toast.error('Failed to save product');
         }
       } else {
         const created = await createProduct(payload);
@@ -235,9 +236,9 @@ export default function AdminProductsPage() {
     }
   };
 
-  const handleDelete = async (id: string, name: string) => {
+  const handleDelete = async (id: string, name: string, slug?: string) => {
     if (confirm(`Are you sure you want to delete "${name}"?`)) {
-      const ok = await deleteProduct(id);
+      const ok = await deleteProduct(id, slug);
       if (ok) {
         toast.success(`Deleted ${name}`);
         setProducts(prev => prev.filter(p => p.id !== id));
@@ -391,7 +392,7 @@ export default function AdminProductsPage() {
                       <Button 
                         variant="ghost" 
                         size="sm"
-                        onClick={() => handleDelete(product.id, product.name)}
+                        onClick={() => handleDelete(product.id, product.name, product.slug)}
                         className="h-8 px-2 text-xs text-red-600 hover:text-red-700 hover:bg-red-50"
                       >
                         <Trash2 className="h-3.5 w-3.5" />

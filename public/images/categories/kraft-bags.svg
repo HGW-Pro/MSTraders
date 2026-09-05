@@ -1,42 +1,37 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="100%" height="100%">
   <defs>
-    <linearGradient id="kraftBrown" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#cca073" />
-      <stop offset="50%" stop-color="#b68858" />
-      <stop offset="100%" stop-color="#9a6e3e" />
+    <linearGradient id="kraftA" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#cca073"/>
+      <stop offset="100%" stop-color="#9a6e3e"/>
     </linearGradient>
-    <linearGradient id="kraftDark" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#a37648" />
-      <stop offset="100%" stop-color="#7a5229" />
+    <linearGradient id="kraftB" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#c0935f"/>
+      <stop offset="100%" stop-color="#8d6132"/>
     </linearGradient>
-    <filter id="drop3" x="-10%" y="-10%" width="120%" height="120%">
-      <feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#2a1a0c" flood-opacity="0.3"/>
+    <linearGradient id="kraftC" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#d6ae86"/>
+      <stop offset="100%" stop-color="#a67c4c"/>
+    </linearGradient>
+    <filter id="soft" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#2a1a0c" flood-opacity="0.28"/>
     </filter>
   </defs>
 
   <rect width="800" height="800" fill="#f5ede3"/>
-  <rect y="600" width="800" height="200" fill="#e0d1c0"/>
+  <rect y="600" width="800" height="200" fill="#e7dccd"/>
 
-  <g filter="url(#drop3)">
-    <g>
-      <path d="M 180 250 C 180 120, 290 120, 290 250" fill="none" stroke="#7a5229" stroke-width="14" stroke-linecap="round"/>
-      <polygon points="90,260 130,220 130,640 90,670" fill="url(#kraftDark)"/>
-      <polygon points="130,220 380,220 380,640 130,640" fill="url(#kraftBrown)"/>
-      <line x1="130" y1="220" x2="380" y2="220" stroke="#7a5229" stroke-width="2" stroke-dasharray="4,3"/>
-    </g>
-
-    <g>
-      <path d="M 540 270 C 540 160, 640 160, 640 270" fill="none" stroke="#7a5229" stroke-width="14" stroke-linecap="round"/>
-      <polygon points="460,280 500,240 500,660 460,690" fill="url(#kraftDark)"/>
-      <polygon points="500,240 710,240 710,660 500,660" fill="url(#kraftBrown)"/>
-      <line x1="500" y1="240" x2="710" y2="240" stroke="#7a5229" stroke-width="2" stroke-dasharray="4,3"/>
-    </g>
-
-    <g>
-      <path d="M 270 380 C 270 280, 350 280, 350 380" fill="none" stroke="#7a5229" stroke-width="12" stroke-linecap="round"/>
-      <polygon points="200,390 235,360 235,700 200,720" fill="url(#kraftDark)"/>
-      <polygon points="235,360 410,360 410,700 235,700" fill="url(#kraftBrown)"/>
-      <line x1="235" y1="360" x2="410" y2="360" stroke="#7a5229" stroke-width="2" stroke-dasharray="4,3"/>
-    </g>
+  <g filter="url(#soft)">
+      <polygon points="305,290 347,267 347,527 305,550" fill="#7f5628"/>
+      <polygon points="130,290 172,267 347,267 305,290" fill="#b98d5c"/>
+      <rect x="130" y="290" width="175" height="260" fill="url(#kraftB)"/>
+      <path d="M 182.5 290 C 182.5 245.8, 252.5 245.8, 252.5 290" fill="none" stroke="#8a6134" stroke-width="11" stroke-linecap="round"/>
+      <polygon points="535,230 582,204 582,524 535,550" fill="#83592a"/>
+      <polygon points="340,230 387,204 582,204 535,230" fill="#c59a68"/>
+      <rect x="340" y="230" width="195" height="320" fill="url(#kraftA)"/>
+      <path d="M 398.5 230 C 398.5 175.6, 476.5 175.6, 476.5 230" fill="none" stroke="#8a6134" stroke-width="11" stroke-linecap="round"/>
+      <polygon points="720,310 756,290 756,530 720,550" fill="#8b6134"/>
+      <polygon points="570,310 606,290 756,290 720,310" fill="#cfa679"/>
+      <rect x="570" y="310" width="150" height="240" fill="url(#kraftC)"/>
+      <path d="M 615 310 C 615 269.2, 675 269.2, 675 310" fill="none" stroke="#8a6134" stroke-width="11" stroke-linecap="round"/>
   </g>
 </svg>

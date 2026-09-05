@@ -1,35 +1,37 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="100%" height="100%">
   <defs>
-    <filter id="rainShadow" x="-10%" y="-10%" width="120%" height="120%">
-      <feDropShadow dx="3" dy="10" stdDeviation="12" flood-color="#000" flood-opacity="0.2"/>
+    <linearGradient id="nwA" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3f8f6d"/>
+      <stop offset="100%" stop-color="#256b4d"/>
+    </linearGradient>
+    <linearGradient id="nwB" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2f6fa8"/>
+      <stop offset="100%" stop-color="#1d4f7d"/>
+    </linearGradient>
+    <linearGradient id="nwC" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#c9603f"/>
+      <stop offset="100%" stop-color="#a1442a"/>
+    </linearGradient>
+    <filter id="soft" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#2a1a0c" flood-opacity="0.28"/>
     </filter>
   </defs>
 
-  <rect width="800" height="800" fill="#f8fafc"/>
+  <rect width="800" height="800" fill="#f5ede3"/>
+  <rect y="600" width="800" height="200" fill="#e7dccd"/>
 
-  <g filter="url(#rainShadow)">
-    <path d="M 100 240 C 100 130, 140 130, 140 240" fill="none" stroke="#dc2626" stroke-width="12"/>
-    <polygon points="70,240 170,240 150,700 50,700" fill="#ef4444"/>
-
-    <path d="M 170 240 C 170 130, 210 130, 210 240" fill="none" stroke="#eab308" stroke-width="12"/>
-    <polygon points="140,240 240,240 220,700 120,700" fill="#facc15"/>
-
-    <path d="M 240 240 C 240 130, 280 130, 280 240" fill="none" stroke="#ea580c" stroke-width="12"/>
-    <polygon points="210,240 310,240 290,700 190,700" fill="#fb923c"/>
-
-    <path d="M 310 240 C 310 130, 350 130, 350 240" fill="none" stroke="#16a34a" stroke-width="12"/>
-    <polygon points="280,240 380,240 360,700 260,700" fill="#4ade80"/>
-
-    <path d="M 380 240 C 380 130, 420 130, 420 240" fill="none" stroke="#cbd5e1" stroke-width="12"/>
-    <polygon points="350,240 450,240 430,700 330,700" fill="#f8fafc" stroke="#e2e8f0"/>
-
-    <path d="M 450 240 C 450 130, 490 130, 490 240" fill="none" stroke="#0f172a" stroke-width="12"/>
-    <polygon points="420,240 520,240 500,700 400,700" fill="#1e293b"/>
-
-    <path d="M 520 240 C 520 130, 560 130, 560 240" fill="none" stroke="#0284c7" stroke-width="12"/>
-    <polygon points="490,240 590,240 570,700 470,700" fill="#38bdf8"/>
-
-    <path d="M 590 240 C 590 130, 630 130, 630 240" fill="none" stroke="#1d4ed8" stroke-width="12"/>
-    <polygon points="560,240 680,240 660,700 540,700" fill="#2563eb"/>
+  <g filter="url(#soft)">
+      <polygon points="290,300 331,277 331,527 290,550" fill="#8d3a23"/>
+      <polygon points="120,300 161,277 331,277 290,300" fill="#d4795a"/>
+      <rect x="120" y="300" width="170" height="250" fill="url(#nwC)"/>
+      <path d="M 164.2 300 C 164.2 245, 245.8 245, 245.8 300" fill="none" stroke="#a1442a" stroke-width="17" stroke-linecap="round"/>
+      <polygon points="520,240 566,215 566,525 520,550" fill="#1f5c41"/>
+      <polygon points="330,240 376,215 566,215 520,240" fill="#54a281"/>
+      <rect x="330" y="240" width="190" height="310" fill="url(#nwA)"/>
+      <path d="M 379.4 240 C 379.4 171.8, 470.6 171.8, 470.6 240" fill="none" stroke="#256b4d" stroke-width="17" stroke-linecap="round"/>
+      <polygon points="715,310 752,290 752,530 715,550" fill="#18456c"/>
+      <polygon points="560,310 597,290 752,290 715,310" fill="#4183bd"/>
+      <rect x="560" y="310" width="155" height="240" fill="url(#nwB)"/>
+      <path d="M 600.3 310 C 600.3 257.2, 674.7 257.2, 674.7 310" fill="none" stroke="#1d4f7d" stroke-width="17" stroke-linecap="round"/>
   </g>
 </svg>

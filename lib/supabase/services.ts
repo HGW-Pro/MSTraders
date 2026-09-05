@@ -43,17 +43,35 @@ export const DEFAULT_SETTINGS: BusinessSettings = {
   require_account_for_quotes: true
 };
 
+/**
+ * Rows that come from the local seed fallbacks (`seed-1`, `cat-3`, `ind-2`, `ms-item-7`, ...)
+ * are NOT database rows. Postgres will reject them with
+ * `22P02 invalid input syntax for type uuid` if they are ever used in a
+ * `.eq('id', ...)` filter. Every write path must check this before filtering by id.
+ */
+export function isUuid(value?: string | null): boolean {
+  return (
+    !!value &&
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value)
+  );
+}
+
+/** True when the id belongs to a local seed record that has never been persisted. */
+export function isSeedId(value?: string | null): boolean {
+  return !isUuid(value);
+}
+
 // DEFAULT CATEGORIES
 export const DEFAULT_CATEGORIES: Category[] = [
-  { id: 'cat-1', name: 'Paper Bags', slug: 'paper-bags', description: 'High-quality customized paper bags for retail, gifting, and corporate branding.', image_url: '/images/categories/paper-bags.svg', display_order: 1 },
-  { id: 'cat-2', name: 'Kraft Bags', slug: 'kraft-bags', description: 'Eco-friendly brown and white kraft paper bags with twisted or flat handles.', image_url: '/images/categories/kraft-bags.svg', display_order: 2 },
-  { id: 'cat-3', name: 'Non-Woven Bags', slug: 'non-woven-bags', description: 'Durable, reusable non-woven fabric bags for everyday shopping and retail.', image_url: '/images/categories/non-woven-bags.svg', display_order: 3 },
-  { id: 'cat-4', name: 'W-Cut Bags', slug: 'w-cut-bags', description: 'Grocery and supermarket bags with ergonomic W-cut handles.', image_url: '/images/categories/w-cut-bags.svg', display_order: 4 },
-  { id: 'cat-5', name: 'D-Cut Bags', slug: 'd-cut-bags', description: 'Sleek D-cut handle bags for apparel stores, exhibitions, and pharmacies.', image_url: '/images/categories/d-cut-bags.svg', display_order: 5 },
-  { id: 'cat-6', name: 'Designer Bags', slug: 'designer-bags', description: 'Luxury laminated boutique bags with foil stamping and velvet or rope handles.', image_url: '/images/categories/designer-bags.svg', display_order: 6 },
-  { id: 'cat-7', name: 'Gift Bags', slug: 'gift-bags', description: 'Festive and corporate gift packaging bags with custom prints.', image_url: '/images/categories/gift-bags.svg', display_order: 7 },
-  { id: 'cat-8', name: 'Customized Bags', slug: 'customized-bags', description: 'Tailor-made bags engineered to your exact dimension, GSM, handle, and printing specs.', image_url: '/images/categories/customized-bags.svg', display_order: 8 },
-  { id: 'cat-9', name: 'Envelopes', slug: 'envelopes', description: 'Heavy paper envelope pouches for documents, boutique items, and gifts.', image_url: '/images/categories/envelopes.svg', display_order: 9 },
+  { id: 'cat-1', name: 'Paper Bags', slug: 'paper-bags', description: 'High-quality customized paper bags for retail, gifting, and corporate branding.', image_url: '/images/categories/paper-bags.svg', display_order: 1, is_active: true },
+  { id: 'cat-2', name: 'Kraft Bags', slug: 'kraft-bags', description: 'Eco-friendly brown and white kraft paper bags with twisted or flat handles.', image_url: '/images/categories/kraft-bags.svg', display_order: 2, is_active: true },
+  { id: 'cat-3', name: 'Non-Woven Bags', slug: 'non-woven-bags', description: 'Durable, reusable non-woven fabric bags for everyday shopping and retail.', image_url: '/images/categories/non-woven-bags.svg', display_order: 3, is_active: true },
+  { id: 'cat-4', name: 'W-Cut Bags', slug: 'w-cut-bags', description: 'Grocery and supermarket bags with ergonomic W-cut handles.', image_url: '/images/categories/w-cut-bags.svg', display_order: 4, is_active: true },
+  { id: 'cat-5', name: 'D-Cut Bags', slug: 'd-cut-bags', description: 'Sleek D-cut handle bags for apparel stores, exhibitions, and pharmacies.', image_url: '/images/categories/d-cut-bags.svg', display_order: 5, is_active: true },
+  { id: 'cat-6', name: 'Designer Bags', slug: 'designer-bags', description: 'Luxury laminated boutique bags with foil stamping and velvet or rope handles.', image_url: '/images/categories/designer-bags.svg', display_order: 6, is_active: true },
+  { id: 'cat-7', name: 'Gift Bags', slug: 'gift-bags', description: 'Festive and corporate gift packaging bags with custom prints.', image_url: '/images/categories/gift-bags.svg', display_order: 7, is_active: true },
+  { id: 'cat-8', name: 'Customized Bags', slug: 'customized-bags', description: 'Tailor-made bags engineered to your exact dimension, GSM, handle, and printing specs.', image_url: '/images/categories/customized-bags.svg', display_order: 8, is_active: true },
+  { id: 'cat-9', name: 'Envelopes', slug: 'envelopes', description: 'Heavy paper envelope pouches for documents, boutique items, and gifts.', image_url: '/images/categories/envelopes.svg', display_order: 9, is_active: true },
 ];
 
 // DEFAULT SEED PRODUCTS FOR FIRST-TIME SUPABASE INITIALIZATION
@@ -621,7 +639,9 @@ export async function getProducts(options?: {
   try {
     let query = supabase.from('products').select('*');
 
-    if (options?.status) {
+    if (options?.status === 'all') {
+      // Admin views every status - do not filter at all
+    } else if (options?.status) {
       query = query.eq('status', options.status);
     } else {
       // By default public queries published products
@@ -646,34 +666,39 @@ export async function getProducts(options?: {
 
     if (error || !data || data.length === 0) {
       // Seed fallback products if database table is empty for standard viewing
-      return INITIAL_PRODUCTS.map((p, idx) => ({
-        id: `seed-${idx + 1}`,
-        created_at: new Date().toISOString(),
-        name: p.name!,
-        slug: p.slug!,
-        description: p.description || null,
-        price: p.price ?? null,
-        sale_price: p.sale_price ?? null,
-        category: p.category!,
-        sku: p.sku || null,
-        material: p.material || null,
-        moq: p.moq || 100,
-        is_featured: p.is_featured ?? false,
-        is_customizable: p.is_customizable ?? true,
-        status: p.status as 'published',
-        images: p.images || [],
-        sizes: p.sizes || [],
-        colors: p.colors || [],
-        handles: p.handles || [],
-        printing_options: p.printing_options || []
-      }));
+      return buildSeedProducts();
     }
 
     return data as Product[];
   } catch (err) {
     console.warn('Error fetching products from Supabase, using initial catalog:', err);
-    return INITIAL_PRODUCTS as Product[];
+    return buildSeedProducts();
   }
+}
+
+/** Local catalog shown only until the `products` table has been seeded. */
+function buildSeedProducts(): Product[] {
+  return INITIAL_PRODUCTS.map((p, idx) => ({
+    id: `seed-${idx + 1}`,
+    created_at: new Date().toISOString(),
+    name: p.name!,
+    slug: p.slug!,
+    description: p.description || null,
+    price: p.price ?? null,
+    sale_price: p.sale_price ?? null,
+    category: p.category!,
+    sku: p.sku || null,
+    material: p.material || null,
+    moq: p.moq || 100,
+    is_featured: p.is_featured ?? false,
+    is_customizable: p.is_customizable ?? true,
+    status: (p.status as 'published') || 'published',
+    images: p.images || [],
+    sizes: p.sizes || [],
+    colors: p.colors || [],
+    handles: p.handles || [],
+    printing_options: p.printing_options || []
+  }));
 }
 
 export async function getProductBySlug(slug: string): Promise<Product | null> {
@@ -736,6 +761,26 @@ export async function createProduct(product: Partial<Product>): Promise<Product 
 
 export async function updateProduct(id: string, updates: Partial<Product>): Promise<boolean> {
   try {
+    // A seed id (`seed-2`) is not a uuid and must never reach a `.eq('id', ...)`
+    // filter. The row simply does not exist yet, so persist it by slug instead.
+    if (isSeedId(id)) {
+      const payload = { ...updates };
+      delete (payload as Partial<Product>).id;
+      delete (payload as Partial<Product>).created_at;
+
+      if (!payload.slug) {
+        console.error('Cannot persist a seed product without a slug');
+        return false;
+      }
+
+      const { error } = await supabase
+        .from('products')
+        .upsert([payload], { onConflict: 'slug' });
+
+      if (error) throw error;
+      return true;
+    }
+
     const { error } = await supabase
       .from('products')
       .update(updates)
@@ -749,8 +794,18 @@ export async function updateProduct(id: string, updates: Partial<Product>): Prom
   }
 }
 
-export async function deleteProduct(id: string): Promise<boolean> {
+export async function deleteProduct(id: string, slug?: string): Promise<boolean> {
   try {
+    if (isSeedId(id)) {
+      // Seed rows only exist in memory. If a real row shares the slug, remove it;
+      // otherwise there is nothing to delete server-side.
+      if (slug) {
+        const { error } = await supabase.from('products').delete().eq('slug', slug);
+        if (error) throw error;
+      }
+      return true;
+    }
+
     const { error } = await supabase
       .from('products')
       .delete()
@@ -1790,8 +1845,7 @@ export async function getGalleryItems(): Promise<GalleryItem[]> {
 
 export async function createGalleryItem(item: Partial<GalleryItem>): Promise<GalleryItem | null> {
   try {
-    const isUuid = (val?: string) => !!val && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(val);
-    const payload = { ...item };
+      const payload = { ...item };
     if (payload.id && !isUuid(payload.id)) {
       delete payload.id;
     }
@@ -1833,7 +1887,6 @@ export async function createGalleryItem(item: Partial<GalleryItem>): Promise<Gal
 }
 
 export async function updateGalleryItem(id: string, updates: Partial<GalleryItem>): Promise<GalleryItem | null> {
-  const isUuid = (val?: string) => !!val && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(val);
 
   let updatedItem: GalleryItem | null = null;
   try {
@@ -1869,7 +1922,6 @@ export async function updateGalleryItem(id: string, updates: Partial<GalleryItem
 }
 
 export async function deleteGalleryItem(id: string, imageUrl?: string): Promise<boolean> {
-  const isUuid = (val?: string) => !!val && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(val);
 
   // Attempt database deletion in Supabase if connected
   try {
@@ -2431,15 +2483,16 @@ export async function deleteCustomerAddress(addressId: string, userId: string): 
 // --- CATEGORIES CRUD SERVICE ---
 export async function saveCategory(category: Partial<Category>): Promise<Category | null> {
   try {
-    const isUuid = (val?: string) => !!val && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(val);
     const payload = { ...category };
+    // `cat-3` style seed ids are not uuids - drop them and let the row be
+    // matched (or created) by its unique slug instead.
     if (payload.id && !isUuid(payload.id)) {
       delete payload.id;
     }
 
     const { data, error } = await supabase
       .from('categories')
-      .upsert([payload])
+      .upsert([payload], { onConflict: 'slug' })
       .select()
       .single();
 
@@ -2451,12 +2504,22 @@ export async function saveCategory(category: Partial<Category>): Promise<Categor
   }
 }
 
-export async function deleteCategory(id: string): Promise<boolean> {
+export async function deleteCategory(id: string, slug?: string): Promise<boolean> {
   try {
+    if (isSeedId(id)) {
+      // Seed category - only remove a persisted row if one shares the slug.
+      if (slug) {
+        const { error } = await supabase.from('categories').delete().eq('slug', slug);
+        if (error) throw error;
+      }
+      return true;
+    }
+
     const { error } = await supabase.from('categories').delete().eq('id', id);
     if (error) throw error;
     return true;
   } catch (err) {
+    console.error('Error deleting category:', err);
     return false;
   }
 }
@@ -2603,8 +2666,7 @@ export async function getHomepageSections(): Promise<Record<string, HomepageSect
 
 export async function updateHomepageSection(sectionKey: string, sectionData: Partial<HomepageSection>): Promise<boolean> {
   try {
-    const isUuid = (val?: string) => !!val && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(val);
-    const payload: Record<string, any> = {
+      const payload: Record<string, any> = {
       ...sectionData,
       section_key: sectionKey,
       updated_at: new Date().toISOString()

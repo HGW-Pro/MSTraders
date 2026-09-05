@@ -102,9 +102,9 @@ export default function AdminCategoriesPage() {
     }
   };
 
-  const handleDelete = async (id: string, name: string) => {
+  const handleDelete = async (id: string, name: string, slug?: string) => {
     if (!confirm(`Are you sure you want to delete category "${name}"?`)) return;
-    const success = await deleteCategory(id);
+    const success = await deleteCategory(id, slug);
     if (success) {
       toast.success(`Category "${name}" deleted`);
       loadCategories();
@@ -195,7 +195,7 @@ export default function AdminCategoriesPage() {
                 <Button variant="outline" size="sm" onClick={() => handleOpenEdit(cat)} className="flex-1 text-xs font-bold">
                   <Edit2 className="h-3.5 w-3.5 mr-1.5" /> Edit Category
                 </Button>
-                <Button variant="outline" size="sm" onClick={() => handleDelete(cat.id, cat.name)} className="text-xs font-bold text-red-600 border-red-200 hover:bg-red-50">
+                <Button variant="outline" size="sm" onClick={() => handleDelete(cat.id, cat.name, cat.slug)} className="text-xs font-bold text-red-600 border-red-200 hover:bg-red-50">
                   <Trash2 className="h-3.5 w-3.5" />
                 </Button>
               </div>

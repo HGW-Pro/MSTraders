@@ -1,16 +1,47 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="100%" height="100%">
   <defs>
-    <filter id="wsh" x="-10%" y="-10%" width="120%" height="120%">
-      <feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#000" flood-opacity="0.2"/>
+    <linearGradient id="wcA" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f6d24a"/>
+      <stop offset="100%" stop-color="#e0b021"/>
+    </linearGradient>
+    <linearGradient id="wcB" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fdfaf2"/>
+      <stop offset="100%" stop-color="#e6dfd0"/>
+    </linearGradient>
+    <filter id="soft" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#2a1a0c" flood-opacity="0.28"/>
     </filter>
   </defs>
 
-  <rect width="800" height="800" fill="#f3f4f6"/>
+  <rect width="800" height="800" fill="#f5ede3"/>
+  <rect y="600" width="800" height="200" fill="#e7dccd"/>
 
-  <g filter="url(#wsh)">
-    <path d="M 220 180 L 290 180 L 290 300 Q 360 360 430 300 L 430 180 L 500 180 L 520 700 L 200 700 Z" fill="#fef08a" stroke="#ca8a04" stroke-width="2"/>
-    <polygon points="200,700 240,700 250,220 220,180" fill="#fde047" opacity="0.6"/>
-    <polygon points="520,700 480,700 470,220 500,180" fill="#fde047" opacity="0.6"/>
-    <line x1="200" y1="670" x2="520" y2="670" stroke="#ca8a04" stroke-width="3" stroke-dasharray="6,4"/>
+  <g filter="url(#soft)">
+      <path d="M 150 301
+        L 150 550 Q 150 564 166 564
+        L 364 564 Q 380 564 380 550
+        L 380 301
+        L 334 301
+        L 334 250
+        L 324 250
+        L 324 301
+        Q 265 340 206 301
+        L 206 250
+        L 196 250
+        L 196 301 Z"
+        fill="url(#wcA)" stroke="#c99a17" stroke-width="4" stroke-linejoin="round"/>
+      <path d="M 420 330.05
+        L 420 550 Q 420 564 436 564
+        L 614 564 Q 630 564 630 550
+        L 630 330.05
+        L 588 330.05
+        L 588 285
+        L 578 285
+        L 578 330.05
+        Q 525 364.5 472 330.05
+        L 472 285
+        L 462 285
+        L 462 330.05 Z"
+        fill="url(#wcB)" stroke="#cfc6b4" stroke-width="4" stroke-linejoin="round"/>
   </g>
 </svg>
