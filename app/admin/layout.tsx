@@ -162,7 +162,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex">
+    <div className="h-dvh bg-slate-50 flex overflow-hidden">
       {/* Mobile Sidebar Overlay */}
       {isSidebarOpen && (
         <div 
@@ -173,10 +173,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       {/* Sidebar */}
       <aside className={cn(
-        "fixed inset-y-0 left-0 z-50 w-64 bg-brand-charcoal text-white transition-transform duration-300 lg:static lg:translate-x-0 flex flex-col shadow-xl",
+        "fixed inset-y-0 left-0 z-50 w-64 shrink-0 bg-brand-charcoal text-white transition-transform duration-300 lg:static lg:translate-x-0 flex flex-col shadow-xl",
         isSidebarOpen ? "translate-x-0" : "-translate-x-full"
       )}>
-        <div className="h-20 flex items-center justify-between px-6 border-b border-white/10">
+        <div className="h-20 shrink-0 flex items-center justify-between px-6 border-b border-white/10">
           <div>
             <span className="font-heading text-xl font-bold text-brand-gold tracking-tight block">
               MS TRADERS
@@ -190,7 +190,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </button>
         </div>
 
-        <nav className="flex-1 px-4 py-6 space-y-1.5 overflow-y-auto">
+        <nav className="flex-1 min-h-0 px-4 py-6 space-y-1.5 overflow-y-auto">
           {adminNav.map((item) => {
             const isActive = pathname === item.href || (item.href !== '/admin' && pathname?.startsWith(item.href));
             return (
@@ -212,7 +212,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           })}
         </nav>
         
-        <div className="p-4 border-t border-white/10 bg-black/20">
+        <div className="shrink-0 p-4 border-t border-white/10 bg-black/20">
           <div className="mb-3 px-2">
             <p className="text-xs text-white/50">Signed in as</p>
             <p className="text-xs font-medium text-brand-gold truncate">{userEmail || 'admin@mstraders.com'}</p>
@@ -229,7 +229,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       {/* Main Content */}
       <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <header className="h-20 bg-white border-b border-border flex items-center justify-between px-4 sm:px-6 lg:px-8 z-30 shadow-xs">
+        <header className="h-20 shrink-0 bg-white border-b border-border flex items-center justify-between px-4 sm:px-6 lg:px-8 z-30 shadow-xs">
           <div className="flex items-center gap-4">
             <button 
               className="lg:hidden text-brand-charcoal hover:bg-muted p-2 rounded-md transition-colors"
@@ -255,7 +255,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
         </header>
         
-        <div className="flex-1 overflow-auto p-4 sm:p-6 lg:p-8">
+        <div className="flex-1 min-h-0 overflow-auto p-4 sm:p-6 lg:p-8">
           {children}
         </div>
       </main>
