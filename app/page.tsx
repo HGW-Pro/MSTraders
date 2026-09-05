@@ -112,7 +112,7 @@ export default function HomePage() {
     <>
       {/* 1. HERO SECTION */}
       {hero.enabled !== false && (
-        <section className="relative overflow-hidden bg-brand-cream pb-10 pt-10 sm:pb-14 sm:pt-14 md:pb-16 md:pt-16">
+        <section className="relative flex items-center overflow-hidden bg-brand-cream min-h-[calc(100svh-94px)] md:min-h-[calc(100svh-109px)] py-10 sm:py-12 md:py-14">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
               <div className="max-w-2xl">
@@ -145,7 +145,7 @@ export default function HomePage() {
                 </div>
               </div>
               
-              <div className="relative aspect-[4/3] md:aspect-[5/4] w-full max-h-[min(58vh,520px)] rounded-2xl overflow-hidden shadow-2xl">
+              <div className="relative aspect-[4/3] md:aspect-[5/4] w-full max-h-[min(64vh,600px)] rounded-2xl overflow-hidden shadow-2xl">
                 <Image 
                   src={hero.image_url || '/images/products/rajputi-saafe-luxury-bag.svg'} 
                   alt={hero.metadata?.alt_text || hero.title}
