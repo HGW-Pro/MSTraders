@@ -21,7 +21,6 @@ import {
   Share2
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { DatabaseSetupRunner } from '@/components/database-setup-runner';
 
 export default function AdminSettingsPage() {
   const { refreshSettings } = useSettings();
@@ -107,9 +106,6 @@ export default function AdminSettingsPage() {
         <h1 className="font-heading text-2xl font-bold text-brand-charcoal">Business Profile & Store Settings</h1>
         <p className="text-sm text-muted-foreground">Manage official contact information, WhatsApp numbers, address details, and global website branding</p>
       </div>
-
-      {/* Database & Storage Provisioning Runner */}
-      <DatabaseSetupRunner />
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Company Identity */}
