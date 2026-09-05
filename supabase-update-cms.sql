@@ -431,6 +431,25 @@ CREATE POLICY "Public storage delete policy" ON storage.objects
 -- =====================================================================
 
 -- ---------------------------------------------------------------------
+-- 0. PRECONDITIONS
+-- ---------------------------------------------------------------------
+-- The ON CONFLICT (slug) clauses below need a unique index on each slug
+-- column. Postgres has no "ADD CONSTRAINT IF NOT EXISTS", so guard it.
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'categories_slug_key'
+  ) THEN
+    ALTER TABLE categories ADD CONSTRAINT categories_slug_key UNIQUE (slug);
+  END IF;
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'products_slug_key'
+  ) THEN
+    ALTER TABLE products ADD CONSTRAINT products_slug_key UNIQUE (slug);
+  END IF;
+END $$;
+
+-- ---------------------------------------------------------------------
 -- 1. CATEGORIES
 -- ---------------------------------------------------------------------
 ALTER TABLE categories ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT true;
