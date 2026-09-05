@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="100%" height="100%">
+  <defs>
+    <linearGradient id="roseGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f2b5a0"/>
+      <stop offset="40%" stop-color="#d98971"/>
+      <stop offset="70%" stop-color="#fce1d7"/>
+      <stop offset="100%" stop-color="#b86146"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="800" fill="#f2eee9"/>
+  <g filter="drop-shadow(0px 15px 25px rgba(0,0,0,0.25))">
+    <!-- Black Loop Handles -->
+    <path d="M 330 240 C 330 90, 470 90, 470 240" fill="none" stroke="#111111" stroke-width="24" stroke-linecap="round"/>
+    <!-- Metallic Bag Body -->
+    <rect x="220" y="230" width="360" height="460" rx="12" fill="url(#roseGold)"/>
+    <!-- Metallic Shimmer Gradient Overlay -->
+    <polygon points="220,230 400,230 220,690" fill="#ffffff" opacity="0.3"/>
+    <!-- Top Hem Stitching -->
+    <line x1="220" y1="260" x2="580" y2="260" stroke="#a34d35" stroke-width="2" stroke-dasharray="8,4"/>
+  </g>
+</svg>

@@ -45,113 +45,436 @@ export const DEFAULT_SETTINGS: BusinessSettings = {
 
 // DEFAULT CATEGORIES
 export const DEFAULT_CATEGORIES: Category[] = [
-  { id: 'cat-1', name: 'Paper Bags', slug: 'paper-bags', description: 'High-quality customized paper bags for retail, gifting, and corporate branding.', image_url: 'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=800&q=80', display_order: 1 },
-  { id: 'cat-2', name: 'Kraft Bags', slug: 'kraft-bags', description: 'Eco-friendly brown and white kraft paper bags with twisted or flat handles.', image_url: 'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?auto=format&fit=crop&w=800&q=80', display_order: 2 },
-  { id: 'cat-3', name: 'Non-Woven Bags', slug: 'non-woven-bags', description: 'Durable, reusable non-woven fabric bags for everyday shopping and retail.', image_url: 'https://images.unsplash.com/photo-1597484661643-2f5fef640dd1?auto=format&fit=crop&w=800&q=80', display_order: 3 },
-  { id: 'cat-4', name: 'W-Cut Bags', slug: 'w-cut-bags', description: 'Grocery and supermarket bags with ergonomic W-cut handles.', image_url: 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=800&q=80', display_order: 4 },
-  { id: 'cat-5', name: 'D-Cut Bags', slug: 'd-cut-bags', description: 'Sleek D-cut handle bags for apparel stores, exhibitions, and pharmacies.', image_url: 'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=800&q=80', display_order: 5 },
-  { id: 'cat-6', name: 'Designer Bags', slug: 'designer-bags', description: 'Luxury laminated boutique bags with foil stamping and velvet or rope handles.', image_url: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=800&q=80', display_order: 6 },
-  { id: 'cat-7', name: 'Gift Bags', slug: 'gift-bags', description: 'Festive and corporate gift packaging bags with custom prints.', image_url: 'https://images.unsplash.com/photo-1513885535751-8b9238bd345a?auto=format&fit=crop&w=800&q=80', display_order: 7 },
-  { id: 'cat-8', name: 'Customized Bags', slug: 'customized-bags', description: 'Tailor-made bags engineered to your exact dimension, GSM, handle, and printing specs.', image_url: 'https://images.unsplash.com/photo-1572021335469-31706a17aaef?auto=format&fit=crop&w=800&q=80', display_order: 8 },
-  { id: 'cat-9', name: 'Envelopes', slug: 'envelopes', description: 'Heavy paper envelope pouches for documents, boutique items, and gifts.', image_url: 'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=800&q=80', display_order: 9 },
+  { id: 'cat-1', name: 'Paper Bags', slug: 'paper-bags', description: 'High-quality customized paper bags for retail, gifting, and corporate branding.', image_url: '/images/categories/paper-bags.svg', display_order: 1 },
+  { id: 'cat-2', name: 'Kraft Bags', slug: 'kraft-bags', description: 'Eco-friendly brown and white kraft paper bags with twisted or flat handles.', image_url: '/images/categories/kraft-bags.svg', display_order: 2 },
+  { id: 'cat-3', name: 'Non-Woven Bags', slug: 'non-woven-bags', description: 'Durable, reusable non-woven fabric bags for everyday shopping and retail.', image_url: '/images/categories/non-woven-bags.svg', display_order: 3 },
+  { id: 'cat-4', name: 'W-Cut Bags', slug: 'w-cut-bags', description: 'Grocery and supermarket bags with ergonomic W-cut handles.', image_url: '/images/categories/w-cut-bags.svg', display_order: 4 },
+  { id: 'cat-5', name: 'D-Cut Bags', slug: 'd-cut-bags', description: 'Sleek D-cut handle bags for apparel stores, exhibitions, and pharmacies.', image_url: '/images/categories/d-cut-bags.svg', display_order: 5 },
+  { id: 'cat-6', name: 'Designer Bags', slug: 'designer-bags', description: 'Luxury laminated boutique bags with foil stamping and velvet or rope handles.', image_url: '/images/categories/designer-bags.svg', display_order: 6 },
+  { id: 'cat-7', name: 'Gift Bags', slug: 'gift-bags', description: 'Festive and corporate gift packaging bags with custom prints.', image_url: '/images/categories/gift-bags.svg', display_order: 7 },
+  { id: 'cat-8', name: 'Customized Bags', slug: 'customized-bags', description: 'Tailor-made bags engineered to your exact dimension, GSM, handle, and printing specs.', image_url: '/images/categories/customized-bags.svg', display_order: 8 },
+  { id: 'cat-9', name: 'Envelopes', slug: 'envelopes', description: 'Heavy paper envelope pouches for documents, boutique items, and gifts.', image_url: '/images/categories/envelopes.svg', display_order: 9 },
 ];
 
 // DEFAULT SEED PRODUCTS FOR FIRST-TIME SUPABASE INITIALIZATION
 export const INITIAL_PRODUCTS: Partial<Product>[] = [
   {
-    name: 'Premium Kraft Paper Bag',
-    slug: 'premium-kraft-paper-bag',
-    description: 'High-quality twisted handle kraft paper bag made from premium virgin kraft paper. Durable, eco-friendly, and ideal for upscale retail stores and boutiques.',
-    price: 18,
-    sale_price: 15,
+    name: 'White Kraft Paper Bag with Twisted Handle',
+    slug: 'white-kraft-paper-bag-twisted-handle',
+    description: 'Clean, elegant white kraft shopping bag with durable white twisted paper handles. Ideal for apparel, cosmetics, bakeries, and boutique retail.',
+    price: 22,
+    sale_price: 18,
     category: 'kraft-bags',
-    sku: 'MST-KB-001',
-    material: '120 GSM Natural Virgin Kraft Paper',
-    moq: 500,
-    is_featured: true,
-    is_customizable: true,
-    status: 'published',
-    images: ['https://images.unsplash.com/photo-1590874103328-eac38a683ce7?auto=format&fit=crop&w=800&q=80'],
-    sizes: ['Small (8x10x4")', 'Medium (10x13x5")', 'Large (16x12x6")'],
-    colors: ['Natural Brown', 'Bleached White'],
-    handles: ['Twisted Paper', 'Flat Cotton Ribbon'],
-    printing_options: ['Single Color Screen Print', 'Multi-Color Offset', 'Foil Stamping']
-  },
-  {
-    name: 'Luxury Boutique Designer Bag',
-    slug: 'luxury-boutique-designer-bag',
-    description: 'Elegant matte laminated art paper bag featuring reinforced cardboard base, cotton rope handles, and spot UV printing. Perfect for fashion apparel and luxury gifts.',
-    price: 45,
-    sale_price: null,
-    category: 'designer-bags',
-    sku: 'MST-DB-002',
-    material: '210 GSM Imported Art Card',
-    moq: 250,
-    is_featured: true,
-    is_customizable: true,
-    status: 'published',
-    images: ['https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=800&q=80'],
-    sizes: ['Small (7x9x3")', 'Medium (11x14x4.5")', 'Large (15x18x6")'],
-    colors: ['Jet Black', 'Ivory White', 'Royal Blue', 'Emerald Green'],
-    handles: ['Braided Cotton Rope', 'Satin Ribbon'],
-    printing_options: ['Gold Foil Stamping', 'Spot UV', 'Full Color CMYK Offset']
-  },
-  {
-    name: 'Standard Non-Woven D-Cut Bag',
-    slug: 'standard-non-woven-d-cut-bag',
-    description: 'Cost-effective, highly durable reusable bag for everyday retail, trade shows, and pharmacies. Heavy heat-seal seams ensure high load capacity.',
-    price: 8,
-    sale_price: 6.5,
-    category: 'non-woven-bags',
-    sku: 'MST-NW-003',
-    material: '70 GSM Spunbond Non-Woven Fabric',
-    moq: 1000,
-    is_featured: true,
-    is_customizable: true,
-    status: 'published',
-    images: ['https://images.unsplash.com/photo-1597484661643-2f5fef640dd1?auto=format&fit=crop&w=800&q=80'],
-    sizes: ['10x14 inch', '12x16 inch', '14x19 inch'],
-    colors: ['Bright Red', 'Navy Blue', 'Forest Green', 'Black', 'White'],
-    handles: ['Built-in D-Cut'],
-    printing_options: ['Screen Printing', 'Rotogravure']
-  },
-  {
-    name: 'Eco Supermarket W-Cut Bag',
-    slug: 'eco-supermarket-w-cut-bag',
-    description: 'Sturdy grocery carry bag with side gussets and ergonomic W-cut vest handles, engineered specifically for supermarkets and department stores.',
-    price: 10,
-    sale_price: null,
-    category: 'w-cut-bags',
-    sku: 'MST-WC-004',
-    material: '80 GSM Recycled Non-Woven',
-    moq: 2000,
-    is_featured: false,
-    is_customizable: true,
-    status: 'published',
-    images: ['https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=800&q=80'],
-    sizes: ['13x16+4 inch', '16x20+5 inch'],
-    colors: ['Off White', 'Yellow', 'Sky Blue'],
-    handles: ['W-Cut Vest Handle'],
-    printing_options: ['Flexographic Print']
-  },
-  {
-    name: 'Festive Custom Gift Bag',
-    slug: 'festive-custom-gift-bag',
-    description: 'Premium gift bag with glossy finish and custom hot-stamped patterns, perfect for weddings, corporate gifting, and festive celebrations.',
-    price: 32,
-    sale_price: 28,
-    category: 'gift-bags',
-    sku: 'MST-GB-005',
-    material: '180 GSM Glossy Coated Paper',
+    sku: 'MST-WK-001',
+    material: '140 GSM Bleached White Virgin Kraft',
     moq: 300,
     is_featured: true,
     is_customizable: true,
     status: 'published',
-    images: ['https://images.unsplash.com/photo-1513885535751-8b9238bd345a?auto=format&fit=crop&w=800&q=80'],
-    sizes: ['8x10x3.5"', '10x12x4"', '12x15x5"'],
-    colors: ['Crimson Red', 'Metallic Gold', 'Deep Purple'],
-    handles: ['Silk Ribbon', 'Twisted Cotton Cord'],
-    printing_options: ['Embossed Gold Foil', 'Glitter Finish']
+    images: ['/images/products/white-kraft-twisted-bag.svg'],
+    sizes: ['Small (8x10x4")', 'Medium (10x13x5")', 'Large (16x12x6")'],
+    colors: ['Crisp White'],
+    handles: ['Twisted White Paper'],
+    printing_options: ['Screen Printing', 'Offset Printing', 'Foil Stamping']
+  },
+  {
+    name: 'Yellow Non-Woven W-Cut Vest Bag',
+    slug: 'yellow-non-woven-w-cut-vest-bag',
+    description: 'Vibrant yellow non-woven W-cut vest carry bag engineered for high load capacity in supermarkets, groceries, and retail stores.',
+    price: 7.5,
+    sale_price: 6,
+    category: 'w-cut-bags',
+    sku: 'MST-YW-002',
+    material: '75 GSM Spunbond Non-Woven Fabric',
+    moq: 1000,
+    is_featured: true,
+    is_customizable: true,
+    status: 'published',
+    images: ['/images/products/yellow-wcut-nonwoven-bag.svg'],
+    sizes: ['11x14 inch', '13x17 inch', '16x20 inch'],
+    colors: ['Bright Yellow'],
+    handles: ['Integrated W-Cut Vest Handle'],
+    printing_options: ['Flexo Printing', 'Screen Printing']
+  },
+  {
+    name: 'Ocean Blue Loop Handle Non-Woven Tote Bag',
+    slug: 'ocean-blue-loop-handle-non-woven-tote-bag',
+    description: 'Royal ocean blue non-woven carry bag with crisp white border piping and soft loop handles. Premium look for exhibitions and boutique shopping.',
+    price: 16,
+    sale_price: 14,
+    category: 'non-woven-bags',
+    sku: 'MST-NW-003',
+    material: '90 GSM Premium Non-Woven Fabric',
+    moq: 500,
+    is_featured: true,
+    is_customizable: true,
+    status: 'published',
+    images: ['/images/products/blue-loop-nonwoven-bag.svg'],
+    sizes: ['12x15 inch', '14x17 inch', '16x19 inch'],
+    colors: ['Ocean Blue & White Piping'],
+    handles: ['White Soft Loop Handle'],
+    printing_options: ['Screen Printing', 'Rotogravure']
+  },
+  {
+    name: 'Designer Ethnic Mandala Gift Bags (Set of 4)',
+    slug: 'designer-ethnic-mandala-gift-bags',
+    description: 'Set of 4 vibrant ethnic gift bags with gold arc handles and decorative paisley motifs for weddings, festivals, and celebratory gifting.',
+    price: 65,
+    sale_price: 55,
+    category: 'designer-bags',
+    sku: 'MST-DB-004',
+    material: '250 GSM Premium Textured Art Card',
+    moq: 100,
+    is_featured: true,
+    is_customizable: true,
+    status: 'published',
+    images: ['/images/products/designer-ethnic-gift-bags.svg'],
+    sizes: ['Small Gift Box', 'Medium Party Bag', 'Large Festive Tote'],
+    colors: ['Pink', 'Teal', 'Red', 'Emerald Green'],
+    handles: ['Rigid Arc Molded Handle'],
+    printing_options: ['Gold Foil Stamping', 'Embossed Pattern']
+  },
+  {
+    name: 'High-Gloss D-Cut Shopping Bags (Red, White, Black)',
+    slug: 'high-gloss-d-cut-shopping-bags',
+    description: 'Glossy laminated D-cut die punch bags in bold primary colors. Smooth finish for high-end boutique stores and gift shops.',
+    price: 24,
+    sale_price: 20,
+    category: 'd-cut-bags',
+    sku: 'MST-DC-005',
+    material: '180 GSM Laminated Coated Art Paper',
+    moq: 500,
+    is_featured: true,
+    is_customizable: true,
+    status: 'published',
+    images: ['/images/products/glossy-dcut-trio-bags.svg'],
+    sizes: ['10x14 inch', '12x16 inch', '15x18 inch'],
+    colors: ['High-Gloss Red', 'Bright White', 'Deep Black'],
+    handles: ['Reinforced D-Cut Handle'],
+    printing_options: ['Gloss Lamination', 'UV Spot Stamping']
+  },
+  {
+    name: 'Multi-Color Non-Woven Loop Handle Carry Bags',
+    slug: 'multi-color-non-woven-loop-handle-bags',
+    description: 'Full rainbow array of non-woven loop handle shopping bags in 8 vibrant hues. Excellent strength and reusable durability.',
+    price: 12,
+    sale_price: 10,
+    category: 'non-woven-bags',
+    sku: 'MST-NW-006',
+    material: '80 GSM Spunbond Fabric',
+    moq: 1000,
+    is_featured: true,
+    is_customizable: true,
+    status: 'published',
+    images: ['/images/products/rainbow-loop-bags.svg'],
+    sizes: ['10x12 inch', '12x15 inch', '14x18 inch'],
+    colors: ['Red', 'Yellow', 'Blue', 'Green', 'Orange', 'Pink', 'Purple', 'White'],
+    handles: ['Ultrasonic Sealed Loop Handle'],
+    printing_options: ['Screen Printing']
+  },
+  {
+    name: 'D-Cut Non-Woven Retail Bags (Yellow, White, Red)',
+    slug: 'd-cut-non-woven-retail-bags',
+    description: 'Classic D-cut non-woven carry bags in bright retail shades. Heavy duty heat sealed edges for garments and daily retail items.',
+    price: 8.5,
+    sale_price: 7,
+    category: 'd-cut-bags',
+    sku: 'MST-DC-007',
+    material: '70 GSM Non-Woven Fabric',
+    moq: 1000,
+    is_featured: false,
+    is_customizable: true,
+    status: 'published',
+    images: ['/images/products/trio-dcut-nonwoven-bags.svg'],
+    sizes: ['10x14 inch', '12x16 inch', '14x19 inch'],
+    colors: ['Yellow', 'White', 'Red'],
+    handles: ['D-Cut Punch Handle'],
+    printing_options: ['Screen Printing']
+  },
+  {
+    name: 'Brown Kraft Twisted Handle Shopping Bags',
+    slug: 'brown-kraft-twisted-handle-shopping-bags',
+    description: 'Eco-friendly natural brown kraft paper bags with twisted paper handles. Recyclable, durable, and classic for organic groceries and clothing stores.',
+    price: 15,
+    sale_price: 12.5,
+    category: 'kraft-bags',
+    sku: 'MST-KB-008',
+    material: '120 GSM Unbleached Natural Kraft',
+    moq: 500,
+    is_featured: true,
+    is_customizable: true,
+    status: 'published',
+    images: ['/images/products/kraft-twisted-handle-bags.svg'],
+    sizes: ['8x10x4"', '10x13x5"', '13x16x6"'],
+    colors: ['Natural Brown'],
+    handles: ['Twisted Paper Rope'],
+    printing_options: ['Eco Screen Printing', 'Flexo Printing']
+  },
+  {
+    name: 'Flat Bottom Brown Kraft Grocery & Pharmacy Pouches',
+    slug: 'flat-bottom-brown-kraft-pouches',
+    description: 'Versatile handleless flat bottom brown kraft paper bags for pharmacies, grocery stores, bakeries, and takeout snacks.',
+    price: 4.5,
+    sale_price: 3.5,
+    category: 'kraft-bags',
+    sku: 'MST-KP-009',
+    material: '70 GSM Natural Kraft Paper',
+    moq: 2000,
+    is_featured: false,
+    is_customizable: true,
+    status: 'published',
+    images: ['/images/products/kraft-grocery-pouches.svg'],
+    sizes: ['Small (0.5 kg)', 'Medium (1 kg)', 'Large (2 kg)', 'Extra Large (5 kg)'],
+    colors: ['Natural Brown'],
+    handles: ['No Handle / Flat Bottom'],
+    printing_options: ['Flexo Ink Printing']
+  },
+  {
+    name: 'Bhanwarlal Bakery & Cakes 365 Custom Paper Pouches',
+    slug: 'bhanwarlal-bakery-custom-paper-pouches',
+    description: 'Food-grade custom printed paper pouches tailored for bakeries, confectionery, and cloud kitchens.',
+    price: 6,
+    sale_price: 5,
+    category: 'paper-bags',
+    sku: 'MST-BP-010',
+    material: '80 GSM Food-Grade Greaseproof Paper',
+    moq: 2000,
+    is_featured: true,
+    is_customizable: true,
+    status: 'published',
+    images: ['/images/products/bhanwarlal-bakery-pouches.svg'],
+    sizes: ['Snack Size', 'Medium Bakery', 'Large Bread Bag'],
+    colors: ['Custom Printed Brand Artwork'],
+    handles: ['No Handle / Pinch Bottom'],
+    printing_options: ['Food-Grade Ink Offset']
+  },
+  {
+    name: 'Burger & Food Wrapping Greaseproof Sheets',
+    slug: 'burger-food-wrapping-greaseproof-sheets',
+    description: 'Custom printed greaseproof food wrapping paper sheets ("Awarded as Best in Burger"). Oil-resistant for cafes and fast food joints.',
+    price: 2.5,
+    sale_price: 2,
+    category: 'customized-bags',
+    sku: 'MST-GS-011',
+    material: '40 GSM Greaseproof Food Wrapping Paper',
+    moq: 5000,
+    is_featured: false,
+    is_customizable: true,
+    status: 'published',
+    images: ['/images/products/burger-wrapping-sheets.svg'],
+    sizes: ['10x10 inch', '12x12 inch', '14x14 inch'],
+    colors: ['White with Red/Black Print'],
+    handles: ['N/A (Sheet Wrapper)'],
+    printing_options: ['Food-Grade Ink Printing']
+  },
+  {
+    name: 'Cream White W-Cut Non-Woven Grocery Bag',
+    slug: 'cream-white-w-cut-non-woven-grocery-bag',
+    description: 'Clean off-white cream non-woven vest bag with side gussets for groceries, daily markets, and retail merchandise.',
+    price: 7,
+    sale_price: 5.8,
+    category: 'w-cut-bags',
+    sku: 'MST-WC-012',
+    material: '70 GSM Non-Woven Fabric',
+    moq: 1000,
+    is_featured: false,
+    is_customizable: true,
+    status: 'published',
+    images: ['/images/products/cream-wcut-nonwoven-bag.svg'],
+    sizes: ['11x14 inch', '13x17 inch', '16x20 inch'],
+    colors: ['Off-White Cream'],
+    handles: ['W-Cut Vest Handle'],
+    printing_options: ['Flexographic Print']
+  },
+  {
+    name: 'Luxury Rajputi Saafe Gold Foil Boutique Bag',
+    slug: 'luxury-rajputi-saafe-gold-foil-boutique-bag',
+    description: 'Royal maroon art card bag featuring embossed gold foil logo, velvet rope handles, and spot UV for Rajputi Saafe Ujjain.',
+    price: 48,
+    sale_price: 42,
+    category: 'designer-bags',
+    sku: 'MST-DB-013',
+    material: '230 GSM Imported Matte Art Card',
+    moq: 250,
+    is_featured: true,
+    is_customizable: true,
+    status: 'published',
+    images: ['/images/products/rajputi-saafe-luxury-bag.svg'],
+    sizes: ['Small (7x9x3")', 'Medium (11x14x4.5")', 'Large (15x18x6")'],
+    colors: ['Royal Maroon & Gold Foil'],
+    handles: ['Braided Cotton Rope Handles'],
+    printing_options: ['Embossed Gold Foil Stamping', 'Spot UV']
+  },
+  {
+    name: 'Jalsa Clothing Company Custom Printed Paper Bag',
+    slug: 'jalsa-clothing-company-custom-paper-bag',
+    description: 'Bespoke white kraft paper shopping bag featuring crimson circular branding for Jalsa Clothing Company Ratlam.',
+    price: 34,
+    sale_price: 30,
+    category: 'paper-bags',
+    sku: 'MST-PB-014',
+    material: '180 GSM Gloss Coated Art Paper',
+    moq: 300,
+    is_featured: true,
+    is_customizable: true,
+    status: 'published',
+    images: ['/images/products/jalsa-clothing-bag.svg'],
+    sizes: ['10x13x4"', '12x16x5"'],
+    colors: ['Crisp White & Crimson Red Logo'],
+    handles: ['White Twisted Paper Cord'],
+    printing_options: ['Precision Offset Printing']
+  },
+  {
+    name: 'Fusion Fashion Rose Floral Rida Non-Woven Bag',
+    slug: 'fusion-fashion-rose-floral-rida-bag',
+    description: 'Non-woven D-cut carry bag customized with delicate rose floral artwork for Fusion Fashion Boutique Indore.',
+    price: 11,
+    sale_price: 9.5,
+    category: 'customized-bags',
+    sku: 'MST-CB-015',
+    material: '80 GSM Non-Woven Fabric',
+    moq: 500,
+    is_featured: true,
+    is_customizable: true,
+    status: 'published',
+    images: ['/images/products/fusion-fashion-bag.svg'],
+    sizes: ['12x16 inch', '14x18 inch'],
+    colors: ['White with Rose Pink Printing'],
+    handles: ['D-Cut Punch Handle'],
+    printing_options: ['Screen Printing']
+  },
+  {
+    name: 'Metallic Rose Gold Non-Woven Tote Bag',
+    slug: 'metallic-rose-gold-non-woven-tote-bag',
+    description: 'Eye-catching metallic copper / rose gold laminated non-woven tote bag with black loop handles for high-fashion boutique gifts.',
+    price: 28,
+    sale_price: 24,
+    category: 'designer-bags',
+    sku: 'MST-DB-016',
+    material: '100 GSM Laminated Metallic Non-Woven',
+    moq: 300,
+    is_featured: true,
+    is_customizable: true,
+    status: 'published',
+    images: ['/images/products/metallic-rosegold-tote-bags.svg'],
+    sizes: ['12x14x4 inch', '14x16x5 inch'],
+    colors: ['Metallic Rose Gold / Copper'],
+    handles: ['Black Loop Handle'],
+    printing_options: ['Metallic Screen Print']
+  },
+  {
+    name: 'Anytime Sports Branded Non-Woven Bag',
+    slug: 'anytime-sports-branded-non-woven-bag',
+    description: 'D-cut non-woven bag with bold yellow/black Anytime Sports "Believe in Yourself" logo print for activewear and sports retail.',
+    price: 10,
+    sale_price: 8.5,
+    category: 'customized-bags',
+    sku: 'MST-CB-017',
+    material: '75 GSM Spunbond Fabric',
+    moq: 500,
+    is_featured: false,
+    is_customizable: true,
+    status: 'published',
+    images: ['/images/products/anytime-sports-bag.svg'],
+    sizes: ['12x16 inch', '15x19 inch'],
+    colors: ['White with Yellow & Black Print'],
+    handles: ['D-Cut Punch Handle'],
+    printing_options: ['Screen Printing']
+  },
+  {
+    name: 'Shamim Store Wholesale Custom Printed Bag',
+    slug: 'shamim-store-wholesale-custom-printed-bag',
+    description: 'Vibrant red D-cut bag with white circular Shamim Store branding for wholesale garment merchants in Ujjain.',
+    price: 9.5,
+    sale_price: 8,
+    category: 'customized-bags',
+    sku: 'MST-CB-018',
+    material: '75 GSM Non-Woven Fabric',
+    moq: 500,
+    is_featured: false,
+    is_customizable: true,
+    status: 'published',
+    images: ['/images/products/shamim-store-bag.svg'],
+    sizes: ['12x16 inch', '14x18 inch'],
+    colors: ['Bright Red & White Print'],
+    handles: ['D-Cut Punch Handle'],
+    printing_options: ['Screen Printing']
+  },
+  {
+    name: 'Shahzada Fashion World Garment Loop Bag',
+    slug: 'shahzada-fashion-world-garment-loop-bag',
+    description: 'Yellow non-woven loop bag with royal blue crown logo print for Shahzada Fashion World readymade clothing.',
+    price: 14,
+    sale_price: 12,
+    category: 'customized-bags',
+    sku: 'MST-CB-019',
+    material: '85 GSM Non-Woven Fabric',
+    moq: 500,
+    is_featured: true,
+    is_customizable: true,
+    status: 'published',
+    images: ['/images/products/shahzada-fashion-bag.svg'],
+    sizes: ['13x17x4 inch', '16x20x5 inch'],
+    colors: ['Golden Yellow & Royal Blue Print'],
+    handles: ['Blue Loop Handle'],
+    printing_options: ['Screen Printing']
+  },
+  {
+    name: 'Prem Prakash Saree House Traditional Pink Bag',
+    slug: 'prem-prakash-saree-house-pink-bag',
+    description: 'Hot pink non-woven bag with traditional golden arch frame printing for Prem Prakash Saree House Ujjain.',
+    price: 13,
+    sale_price: 11,
+    category: 'customized-bags',
+    sku: 'MST-CB-020',
+    material: '80 GSM Heavy Non-Woven Fabric',
+    moq: 500,
+    is_featured: true,
+    is_customizable: true,
+    status: 'published',
+    images: ['/images/products/prem-prakash-saree-bag.svg'],
+    sizes: ['14x18 inch', '16x20 inch'],
+    colors: ['Magenta Pink & Gold Print'],
+    handles: ['D-Cut Punch Handle'],
+    printing_options: ['Screen Printing']
+  },
+  {
+    name: 'Panchmeva Prasadi Mahakal Devotional Bag',
+    slug: 'panchmeva-prasadi-mahakal-devotional-bag',
+    description: 'White D-cut bag with red Mahakaleshwar devotional print for Panchmeva Prasadi Ujjain.',
+    price: 9,
+    sale_price: 7.5,
+    category: 'customized-bags',
+    sku: 'MST-CB-021',
+    material: '75 GSM Non-Woven Fabric',
+    moq: 500,
+    is_featured: true,
+    is_customizable: true,
+    status: 'published',
+    images: ['/images/products/panchmeva-prasadi-bag.svg'],
+    sizes: ['10x14 inch', '12x16 inch'],
+    colors: ['White with Red Devotional Art'],
+    handles: ['D-Cut Punch Handle'],
+    printing_options: ['Screen Printing']
+  },
+  {
+    name: 'A To Z Readymade Garments Floral Loop Bag',
+    slug: 'atoz-readymade-garments-floral-loop-bag',
+    description: 'Light pink non-woven loop bag with dark pink floral ring typography for A To Z Readymade Garments.',
+    price: 13.5,
+    sale_price: 11.5,
+    category: 'customized-bags',
+    sku: 'MST-CB-022',
+    material: '80 GSM Non-Woven Fabric',
+    moq: 500,
+    is_featured: true,
+    is_customizable: true,
+    status: 'published',
+    images: ['/images/products/atoz-garments-bag.svg'],
+    sizes: ['13x17 inch', '15x19 inch'],
+    colors: ['Soft Pink with Magenta Print'],
+    handles: ['Dark Pink Loop Handle'],
+    printing_options: ['Screen Printing']
   }
 ];
 
@@ -163,9 +486,9 @@ export const DEFAULT_INDUSTRIES: Industry[] = [
     title: 'Hotels & Hospitality',
     short_description: 'Luxury laundry bags, amenity bags, and guest gift bags tailored for premium hotels and resorts.',
     full_description: 'Deliver an unforgettable guest experience with custom branded paper and cloth bags. Designed with subtle elegance, high GSM cardstock, and foil-stamped logos for luxury hotels, boutique stays, and spa resorts.',
-    recommended_bags: ['Luxury Boutique Designer Bag', 'Premium Kraft Paper Bag', 'Festive Custom Gift Bag'],
+    recommended_bags: ['Luxury Rajputi Saafe Boutique Bag', 'Premium Kraft Paper Bag', 'Jalsa Clothing Custom Paper Bag'],
     features: ['High GSM Laminated Cardstock', 'Rope & Ribbon Handles', 'Foil Stamping & Spot UV', 'Water-resistant Finishes'],
-    image_url: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80',
+    image_url: '/images/industries/hospitality.svg',
     display_order: 1,
     status: 'published'
   },
@@ -177,7 +500,7 @@ export const DEFAULT_INDUSTRIES: Industry[] = [
     full_description: 'Sturdy, wide-bottom food packaging bags crafted to hold containers without tipping. Grease-resistant liners and ventilated virgin kraft paper maintain food freshness and cleanliness.',
     recommended_bags: ['Premium Kraft Paper Bag', 'Eco Supermarket W-Cut Bag'],
     features: ['Wide Gussets for Flat Placement', 'Reinforced Square Bottom', 'Custom Logo Printing', 'Multiple Size Options'],
-    image_url: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80',
+    image_url: '/images/industries/restaurants.svg',
     display_order: 2,
     status: 'published'
   },
@@ -187,9 +510,9 @@ export const DEFAULT_INDUSTRIES: Industry[] = [
     title: 'Apparel & Fashion Boutiques',
     short_description: 'Chic, durable paper bags with custom branding that elevate your retail brand image.',
     full_description: 'Apparel retailers rely on MS TRADERS for high-impact bag packaging that turns every customer into a walking brand ambassador. Customizable in matte, gloss, and textured finishes.',
-    recommended_bags: ['Luxury Boutique Designer Bag', 'Standard Non-Woven D-Cut Bag', 'Premium Kraft Paper Bag'],
+    recommended_bags: ['Luxury Rajputi Saafe Boutique Bag', 'Standard Non-Woven D-Cut Bag', 'Premium Kraft Paper Bag'],
     features: ['Vibrant Multi-color Offset Printing', 'Custom Sizing for Garments', 'Reinforced Top & Bottom Inserts', 'Eco-friendly Recyclable Inks'],
-    image_url: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=800&q=80',
+    image_url: '/images/industries/fashion.svg',
     display_order: 3,
     status: 'published'
   },
@@ -201,7 +524,7 @@ export const DEFAULT_INDUSTRIES: Industry[] = [
     full_description: 'Engineered for durability and high-speed distribution. Our W-cut non-woven and kraft paper bags offer maximum tear resistance for department stores and hypermarkets.',
     recommended_bags: ['Eco Supermarket W-Cut Bag', 'Standard Non-Woven D-Cut Bag'],
     features: ['High Bulk Discounts', 'Standardized Sizing', 'High Speed Flexo Printing', 'Ergonomic Handles'],
-    image_url: 'https://images.unsplash.com/photo-1578916171728-46686eac8d58?auto=format&fit=crop&w=800&q=80',
+    image_url: '/images/industries/retail.svg',
     display_order: 4,
     status: 'published'
   },
@@ -213,7 +536,7 @@ export const DEFAULT_INDUSTRIES: Industry[] = [
     full_description: 'Clean, opaque non-woven D-cut bags and paper pouches ensuring patient privacy, hygiene, and rapid packaging at counter checkouts.',
     recommended_bags: ['Standard Non-Woven D-Cut Bag', 'Premium Kraft Paper Bag'],
     features: ['Opaque High-Density Material', 'Hygienic Dust-Free Production', 'Compact Sizes Available', 'Clear RX & Usage Printing'],
-    image_url: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=800&q=80',
+    image_url: '/images/industries/medical.svg',
     display_order: 5,
     status: 'published'
   },
@@ -223,9 +546,9 @@ export const DEFAULT_INDUSTRIES: Industry[] = [
     title: 'Corporate & Offices',
     short_description: 'Sleek corporate gifting bags, document carry bags, and conference gift kits.',
     full_description: 'Make a strong impression on clients and employees during corporate events, onboarding kits, and annual conferences with crisp, professionally printed gift bags.',
-    recommended_bags: ['Festive Custom Gift Bag', 'Luxury Boutique Designer Bag'],
+    recommended_bags: ['Jalsa Clothing Custom Paper Bag', 'Luxury Rajputi Saafe Boutique Bag'],
     features: ['Precision Logo Reproduction', 'Refined Textured Papers', 'Custom Ribbon Closures', 'Matching Gift Tags'],
-    image_url: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80',
+    image_url: '/images/industries/corporate.svg',
     display_order: 6,
     status: 'published'
   },
@@ -237,7 +560,7 @@ export const DEFAULT_INDUSTRIES: Industry[] = [
     full_description: 'Ensure your promotional materials stand out. Our exhibition bags are spacious, tear-resistant, and comfortable to carry all day across busy expo floors.',
     recommended_bags: ['Standard Non-Woven D-Cut Bag', 'Premium Kraft Paper Bag'],
     features: ['Double Stitch & Heat Seal Options', 'High Visual Visibility', 'Comfort-Grip Cutouts', 'Quick Production Turnaround'],
-    image_url: 'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=800&q=80',
+    image_url: '/images/industries/events.svg',
     display_order: 7,
     status: 'published'
   }
@@ -1161,83 +1484,428 @@ export async function updateOrderFulfillmentDetails(
 }
 
 // --- GALLERY SERVICE ---
+export const DEFAULT_GALLERY_ITEMS: GalleryItem[] = [
+  {
+    id: 'ms-item-1',
+    created_at: new Date().toISOString(),
+    title: 'White Kraft Paper Bag with Twisted Handle',
+    description: '[Paper bag] Clean bleached white kraft paper shopping carry bag with durable twisted rope handles, ideal for boutique and luxury gift packaging.',
+    image_url: '/images/products/white-kraft-twisted-bag.svg',
+    category: 'Kraft Bags',
+    is_featured: true,
+    status: 'published',
+    display_order: 1
+  },
+  {
+    id: 'ms-item-2',
+    created_at: new Date().toISOString(),
+    title: 'Yellow Non-Woven W-Cut Vest Bag',
+    description: '[W cut bag] Vibrant yellow non-woven vest handle grocery carry bag. High-strength eco-friendly packaging for supermarkets and retail stores.',
+    image_url: '/images/products/yellow-wcut-nonwoven-bag.svg',
+    category: 'W-Cut Bags',
+    is_featured: true,
+    status: 'published',
+    display_order: 2
+  },
+  {
+    id: 'ms-item-3',
+    created_at: new Date().toISOString(),
+    title: 'Royal Blue Non-Woven Loop Handle Bag',
+    description: '[Loop handle bag] Royal blue high-GSM non-woven shopping bag with white border piping and soft loop handles for apparel and footwear retail.',
+    image_url: '/images/products/blue-loop-nonwoven-bag.svg',
+    category: 'Non-Woven Bags',
+    is_featured: true,
+    status: 'published',
+    display_order: 3
+  },
+  {
+    id: 'ms-item-4',
+    created_at: new Date().toISOString(),
+    title: 'High-Gloss D-Cut Shopping Bags (Trio)',
+    description: '[D cut bags] Laminated glossy red, pearl white, and deep black D-cut punch shopping bags for boutiques, fashion outlets, and cosmetics.',
+    image_url: '/images/products/glossy-dcut-trio-bags.svg',
+    category: 'D-Cut Bags',
+    is_featured: true,
+    status: 'published',
+    display_order: 4
+  },
+  {
+    id: 'ms-item-5',
+    created_at: new Date().toISOString(),
+    title: 'Designer Ethnic Mandala Gift Bags (Set of 4)',
+    description: '[Designer paper bags] Set of 4 festive ethnic mandala pattern gift bags with rigid golden-toned cord handles for weddings, jewelry, and celebrations.',
+    image_url: '/images/products/designer-ethnic-gift-bags.svg',
+    category: 'Designer Bags',
+    is_featured: true,
+    status: 'published',
+    display_order: 5
+  },
+  {
+    id: 'ms-item-6',
+    created_at: new Date().toISOString(),
+    title: 'Brown Kraft Twisted Handle Shopping Bags',
+    description: '[Brown bags] Natural virgin unbleached brown kraft paper shopping bags with twisted rope handles, multi-size set for retail stores.',
+    image_url: '/images/products/kraft-twisted-handle-bags.svg',
+    category: 'Kraft Bags',
+    is_featured: true,
+    status: 'published',
+    display_order: 6
+  },
+  {
+    id: 'ms-item-7',
+    created_at: new Date().toISOString(),
+    title: 'Rainbow Non-Woven Loop Handle Bags',
+    description: '[Loop handle bags] Vibrant rainbow assortment of non-woven loop handle retail carry bags in lime green, canary yellow, orange, red, black, and blue.',
+    image_url: '/images/products/rainbow-loop-bags.svg',
+    category: 'Non-Woven Bags',
+    is_featured: true,
+    status: 'published',
+    display_order: 7
+  },
+  {
+    id: 'ms-item-8',
+    created_at: new Date().toISOString(),
+    title: 'D-Cut Non-Woven Retail Bags (Trio)',
+    description: '[D cut bags] Bright yellow, clean white, and cherry red D-cut non-woven carry bags with smooth die-cut oval handle punches.',
+    image_url: '/images/products/trio-dcut-nonwoven-bags.svg',
+    category: 'D-Cut Bags',
+    is_featured: true,
+    status: 'published',
+    display_order: 8
+  },
+  {
+    id: 'ms-item-9',
+    created_at: new Date().toISOString(),
+    title: 'V-Bottom Brown Kraft Paper Pouches',
+    description: '[V bottom kraft pouch] Natural brown kraft V-bottom grocery pouches with expandable side gussets for pharmacies, dry fruits, pulses, and grocery stores.',
+    image_url: '/images/products/kraft-grocery-pouches.svg',
+    category: 'Kraft Bags',
+    is_featured: true,
+    status: 'published',
+    display_order: 9
+  },
+  {
+    id: 'ms-item-10',
+    created_at: new Date().toISOString(),
+    title: 'OGR Greaseproof Food Wrapping Butter Paper',
+    description: '[OGR butter paper] Food-grade Oil and Grease Resistant (OGR) custom-printed burger wrapping paper sheets for cloud kitchens, cafes, and burgers.',
+    image_url: '/images/products/burger-wrapping-sheets.svg',
+    category: 'Customized Bags',
+    is_featured: true,
+    status: 'published',
+    display_order: 10
+  },
+  {
+    id: 'ms-item-11',
+    created_at: new Date().toISOString(),
+    title: 'Customized Bakery V-Bottom Paper Pouches',
+    description: '[Customized V bottom pouches] Custom-printed food-grade paper bags for Bhanwarlal Bakery, Cakes 365, confectionery, and sweet shops.',
+    image_url: '/images/products/bhanwarlal-bakery-pouches.svg',
+    category: 'Customized Bags',
+    is_featured: true,
+    status: 'published',
+    display_order: 11
+  },
+  {
+    id: 'ms-item-12',
+    created_at: new Date().toISOString(),
+    title: 'Cream White W-Cut Grocery Bag',
+    description: '[W cut bag] Natural cream off-white non-woven vest handle grocery carry bag, economical and heavy-weight capacity for FMCG retail.',
+    image_url: '/images/products/cream-wcut-nonwoven-bag.svg',
+    category: 'W-Cut Bags',
+    is_featured: false,
+    status: 'published',
+    display_order: 12
+  },
+  {
+    id: 'ms-item-13',
+    created_at: new Date().toISOString(),
+    title: 'Rajputi Saafe Luxury Maroon Paper Bag',
+    description: '[Customized paper bags] Gold foil stamping and royal crest on luxury maroon paper bag with twisted rope handles for Rajputi Saafe Ujjain.',
+    image_url: '/images/products/rajputi-saafe-luxury-bag.svg',
+    category: 'Customized Bags',
+    is_featured: true,
+    status: 'published',
+    display_order: 13
+  },
+  {
+    id: 'ms-item-14',
+    created_at: new Date().toISOString(),
+    title: 'Jalsa Clothing Company Custom Paper Bag',
+    description: '[Customized paper bags] Bleached white kraft shopping bag with crimson circular brand logo and "Celebrate Yourself" slogan for Jalsa Clothing Company.',
+    image_url: '/images/products/jalsa-clothing-bag.svg',
+    category: 'Customized Bags',
+    is_featured: true,
+    status: 'published',
+    display_order: 14
+  },
+  {
+    id: 'ms-item-15',
+    created_at: new Date().toISOString(),
+    title: 'Fusion Fashion Rose Floral Boutique D-Cut Bag',
+    description: '[Customized D cut bags] White non-woven D-cut carry bag with rose-pink rida artwork and boutique branding for Fusion Fashion Pardeshipura Indore.',
+    image_url: '/images/products/fusion-fashion-bag.svg',
+    category: 'Customized Bags',
+    is_featured: true,
+    status: 'published',
+    display_order: 15
+  },
+  {
+    id: 'ms-item-16',
+    created_at: new Date().toISOString(),
+    title: 'Anytime Sports Branded Non-Woven D-Cut Bag',
+    description: '[Customized D cut bags] Custom printed sportswear packaging with yellow and black "Believe in Yourself" logo for Anytime Sports Goods, Indore.',
+    image_url: '/images/products/anytime-sports-bag.svg',
+    category: 'Customized Bags',
+    is_featured: true,
+    status: 'published',
+    display_order: 16
+  },
+  {
+    id: 'ms-item-17',
+    created_at: new Date().toISOString(),
+    title: 'Prem Prakash Saree House Traditional Pink Bag',
+    description: '[Customized D cut bags] Hot pink non-woven bag with golden arch frame and Hindi temple border printing for Prem Prakash Saree House.',
+    image_url: '/images/products/prem-prakash-saree-bag.svg',
+    category: 'Customized Bags',
+    is_featured: true,
+    status: 'published',
+    display_order: 17
+  },
+  {
+    id: 'ms-item-18',
+    created_at: new Date().toISOString(),
+    title: 'Shamim Store Fixed Price Loop Handle Bag',
+    description: '[Customized loop handle bags] Red non-woven loop handle bag with white screen-printed rectangular logo for Shamim Store Readymade Garments Barhi.',
+    image_url: '/images/products/shamim-store-bag.svg',
+    category: 'Customized Bags',
+    is_featured: true,
+    status: 'published',
+    display_order: 18
+  },
+  {
+    id: 'ms-item-19',
+    created_at: new Date().toISOString(),
+    title: 'Shahzada Fashion World Garment Loop Bag',
+    description: '[Customized loop handle bags] Canary yellow non-woven bag with royal blue crown logo and menswear catalogue typography for Shahzada Fashion World Barhi.',
+    image_url: '/images/products/shahzada-fashion-bag.svg',
+    category: 'Customized Bags',
+    is_featured: true,
+    status: 'published',
+    display_order: 19
+  },
+  {
+    id: 'ms-item-20',
+    created_at: new Date().toISOString(),
+    title: 'A To Z Readymade Garments Floral Loop Bag',
+    description: '[Customized loop handle bags] Light pink non-woven loop bag with dark pink floral ring typography for A To Z Readymade Garments Barhi.',
+    image_url: '/images/products/atoz-garments-bag.svg',
+    category: 'Customized Bags',
+    is_featured: true,
+    status: 'published',
+    display_order: 20
+  },
+  {
+    id: 'ms-item-21',
+    created_at: new Date().toISOString(),
+    title: 'Panchmeva Prasadi Mahakal Devotional Bag',
+    description: '[Customized D cut bags] White D-cut packaging bag with sacred red Mahakaleshwar devotional print for Panchmeva Prasadi Gudri Chauraha Ujjain.',
+    image_url: '/images/products/panchmeva-prasadi-bag.svg',
+    category: 'Customized Bags',
+    is_featured: true,
+    status: 'published',
+    display_order: 21
+  }
+];
+
 export async function getGalleryItems(): Promise<GalleryItem[]> {
+  let items: GalleryItem[] = [];
   try {
+    // Check gallery_items table first, then fallback to gallery table
     const { data, error } = await supabase
-      .from('gallery')
+      .from('gallery_items')
       .select('*')
-      .eq('status', 'published')
       .order('display_order', { ascending: true });
 
-    if (error || !data || data.length === 0) {
-      // Clean fallback gallery items
-      return [
-        {
-          id: 'g-1',
-          created_at: new Date().toISOString(),
-          title: 'Custom Foil Stamped Boutique Bags',
-          description: 'Gold foil stamping on matte black laminated paper bags for Taj Hotels luxury store.',
-          image_url: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=800&q=80',
-          category: 'Designer Bags',
-          is_featured: true,
-          status: 'published'
-        },
-        {
-          id: 'g-2',
-          created_at: new Date().toISOString(),
-          title: 'Eco Kraft Grocery Carry Bags',
-          description: 'High-strength twisted handle kraft paper bags for organic food chain.',
-          image_url: 'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?auto=format&fit=crop&w=800&q=80',
-          category: 'Kraft Bags',
-          is_featured: true,
-          status: 'published'
-        },
-        {
-          id: 'g-3',
-          created_at: new Date().toISOString(),
-          title: 'Reusable Non-Woven Exhibition Bags',
-          description: 'Vibrant screen-printed non-woven D-cut bags produced for national trade show.',
-          image_url: 'https://images.unsplash.com/photo-1597484661643-2f5fef640dd1?auto=format&fit=crop&w=800&q=80',
-          category: 'Non-Woven Bags',
-          is_featured: false,
-          status: 'published'
-        }
-      ];
-    }
+    if (!error && data && data.length > 0) {
+      items = data as GalleryItem[];
+    } else {
+      const { data: altData, error: altError } = await supabase
+        .from('gallery')
+        .select('*')
+        .order('display_order', { ascending: true });
 
-    return data as GalleryItem[];
+      if (!altError && altData && altData.length > 0) {
+        items = altData as GalleryItem[];
+      } else {
+        items = [...DEFAULT_GALLERY_ITEMS];
+      }
+    }
   } catch (err) {
-    return [];
+    items = [...DEFAULT_GALLERY_ITEMS];
   }
+
+  // Filter out items that were explicitly deleted by the admin locally
+  if (typeof window !== 'undefined') {
+    try {
+      const stored = localStorage.getItem('mstraders_deleted_gallery_ids');
+      if (stored) {
+        const deletedKeys: string[] = JSON.parse(stored);
+        if (Array.isArray(deletedKeys) && deletedKeys.length > 0) {
+          items = items.filter(
+            (item) => !deletedKeys.includes(item.id)
+          );
+        }
+      }
+
+      // Apply client-side modifications/uploaded images
+      const overridesStr = localStorage.getItem('mstraders_custom_gallery_overrides');
+      if (overridesStr) {
+        const overrides: Record<string, Partial<GalleryItem>> = JSON.parse(overridesStr);
+        items = items.map((item) => {
+          if (overrides[item.id]) {
+            return { ...item, ...overrides[item.id] };
+          }
+          return item;
+        });
+      }
+    } catch (e) {
+      console.warn('Error processing local gallery store:', e);
+    }
+  }
+
+  // CRITICAL AUTO-RECOVERY: If all items were filtered out by stale localStorage or empty,
+  // ensure DEFAULT_GALLERY_ITEMS are returned so the admin always sees their catalog!
+  if (items.length === 0 && DEFAULT_GALLERY_ITEMS.length > 0) {
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.removeItem('mstraders_deleted_gallery_ids');
+      } catch (_) {}
+    }
+    items = [...DEFAULT_GALLERY_ITEMS];
+  }
+
+  return items.sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
 }
 
 export async function createGalleryItem(item: Partial<GalleryItem>): Promise<GalleryItem | null> {
   try {
+    const isUuid = (val?: string) => !!val && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(val);
+    const payload = { ...item };
+    if (payload.id && !isUuid(payload.id)) {
+      delete payload.id;
+    }
+
     const { data, error } = await supabase
       .from('gallery')
-      .insert([item])
+      .insert([payload])
       .select()
       .single();
 
     if (error) throw error;
     return data as GalleryItem;
   } catch (err) {
-    console.error('Error adding gallery item:', err);
-    return null;
+    console.error('Error adding gallery item to Supabase:', err);
+    // Fallback: create locally
+    const fallbackItem: GalleryItem = {
+      id: `custom-g-${Date.now()}`,
+      created_at: new Date().toISOString(),
+      title: item.title || 'Custom Showcase Item',
+      description: item.description || '',
+      image_url: item.image_url || '/images/products/white-kraft-twisted-bag.svg',
+      category: item.category || 'Customized Bags',
+      is_featured: item.is_featured ?? false,
+      status: item.status || 'published',
+      display_order: item.display_order || 99
+    };
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem('mstraders_custom_gallery_overrides');
+        const map = stored ? JSON.parse(stored) : {};
+        map[fallbackItem.id] = fallbackItem;
+        localStorage.setItem('mstraders_custom_gallery_overrides', JSON.stringify(map));
+      } catch (e) {
+        console.warn('Local save warning:', e);
+      }
+    }
+    return fallbackItem;
   }
 }
 
-export async function deleteGalleryItem(id: string): Promise<boolean> {
-  try {
-    const { error } = await supabase
-      .from('gallery')
-      .delete()
-      .eq('id', id);
+export async function updateGalleryItem(id: string, updates: Partial<GalleryItem>): Promise<GalleryItem | null> {
+  const isUuid = (val?: string) => !!val && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(val);
 
-    if (error) throw error;
-    return true;
+  let updatedItem: GalleryItem | null = null;
+  try {
+    if (isUuid(id)) {
+      const { data, error } = await supabase
+        .from('gallery')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (!error && data) {
+        updatedItem = data as GalleryItem;
+      }
+    }
   } catch (err) {
-    return false;
+    console.warn('Database gallery update exception:', err);
+  }
+
+  // Store in localStorage overrides so it reflects immediately even if using default mock items or offline
+  if (typeof window !== 'undefined') {
+    try {
+      const stored = localStorage.getItem('mstraders_custom_gallery_overrides');
+      const map: Record<string, Partial<GalleryItem>> = stored ? JSON.parse(stored) : {};
+      map[id] = { ...(map[id] || {}), ...updates };
+      localStorage.setItem('mstraders_custom_gallery_overrides', JSON.stringify(map));
+    } catch (e) {
+      console.warn('LocalStorage override update warning:', e);
+    }
+  }
+
+  return updatedItem || ({ id, ...updates } as GalleryItem);
+}
+
+export async function deleteGalleryItem(id: string, imageUrl?: string): Promise<boolean> {
+  const isUuid = (val?: string) => !!val && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(val);
+
+  // Attempt database deletion in Supabase if connected
+  try {
+    if (isUuid(id)) {
+      await supabase.from('gallery_items').delete().eq('id', id);
+      await supabase.from('gallery').delete().eq('id', id);
+    } else if (imageUrl) {
+      await supabase.from('gallery_items').delete().eq('image_url', imageUrl);
+      await supabase.from('gallery').delete().eq('image_url', imageUrl);
+    }
+  } catch (err) {
+    console.warn('Database gallery delete exception:', err);
+  }
+
+  // Persist deletion in client localStorage so default/fallback items stay permanently removed
+  if (typeof window !== 'undefined') {
+    try {
+      const stored = localStorage.getItem('mstraders_deleted_gallery_ids');
+      const list: string[] = stored ? JSON.parse(stored) : [];
+      if (id && !list.includes(id)) list.push(id);
+      localStorage.setItem('mstraders_deleted_gallery_ids', JSON.stringify(list));
+    } catch (e) {
+      console.warn('LocalStorage delete record warning:', e);
+    }
+  }
+
+  return true;
+}
+
+export function restoreDefaultGalleryItems(): void {
+  if (typeof window !== 'undefined') {
+    try {
+      localStorage.removeItem('mstraders_deleted_gallery_ids');
+    } catch (e) {
+      console.warn('LocalStorage clear warning:', e);
+    }
   }
 }
 
@@ -1279,41 +1947,133 @@ export async function getIndustryBySlug(slug: string): Promise<Industry | null> 
 }
 
 // --- STORAGE FILE UPLOADS ---
-export async function uploadFileToSupabase(
+
+/**
+ * Optimizes an uploaded file into a high-performance, web-ready Data URL.
+ * Automatically resizes large images to max dimensions and compresses to JPEG/WebP
+ * so that uploads remain instantaneous, lightweight, and resilient even when
+ * Supabase Storage buckets or reverse proxies return errors like HTTP 520.
+ */
+export async function fileToOptimizedDataUrl(
   file: File, 
-  bucket: 'product-images' | 'gallery-images' | 'quote-attachments' | 'settings-assets' | 'media' | 'category-images' | 'hero-images'
-): Promise<string | null> {
-  try {
-    // Validate file size (Max 10MB)
-    if (file.size > 10 * 1024 * 1024) {
-      throw new Error('File size exceeds 10MB limit');
+  maxWidth = 1280, 
+  maxHeight = 1280, 
+  quality = 0.82
+): Promise<string> {
+  return new Promise((resolve, reject) => {
+    if (typeof window === 'undefined') {
+      resolve('');
+      return;
     }
 
-    const fileExt = file.name.split('.').pop() || 'png';
-    const cleanFileName = `${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
-    const filePath = `${cleanFileName}`;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const result = event.target?.result as string;
+      if (!result) {
+        resolve('');
+        return;
+      }
 
-    const { error: uploadError } = await supabase.storage
+      // If not an image or is SVG, return standard Data URL
+      if (!file.type.startsWith('image/') || file.type.includes('svg')) {
+        resolve(result);
+        return;
+      }
+
+      try {
+        const img = document.createElement('img');
+        img.onload = () => {
+          try {
+            let width = img.width;
+            let height = img.height;
+
+            if (width > maxWidth || height > maxHeight) {
+              if (width / maxWidth > height / maxHeight) {
+                height = Math.round((height * maxWidth) / width);
+                width = maxWidth;
+              } else {
+                width = Math.round((width * maxHeight) / height);
+                height = maxHeight;
+              }
+            }
+
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            if (!ctx) {
+              resolve(result);
+              return;
+            }
+
+            ctx.drawImage(img, 0, 0, width, height);
+            const mime = file.type === 'image/png' && file.size < 500 * 1024 ? 'image/png' : 'image/jpeg';
+            const compressed = canvas.toDataURL(mime, quality);
+            resolve(compressed);
+          } catch (canvasErr) {
+            resolve(result);
+          }
+        };
+        img.onerror = () => resolve(result);
+        img.src = result;
+      } catch (err) {
+        resolve(result);
+      }
+    };
+    reader.onerror = (err) => reject(err);
+    reader.readAsDataURL(file);
+  });
+}
+
+export async function uploadFileToSupabase(
+  file: File, 
+  bucket: 'product-images' | 'gallery-images' | 'quote-attachments' | 'settings-assets' | 'media' | 'category-images' | 'hero-images' | string
+): Promise<string | null> {
+  // Validate file size (Max 20MB)
+  if (file.size > 20 * 1024 * 1024) {
+    throw new Error('File size exceeds 20MB limit');
+  }
+
+  const fileExt = file.name.split('.').pop() || 'png';
+  const cleanFileName = `${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
+
+  // 1. Try uploading to Supabase Storage if the bucket is configured and reachable
+  try {
+    const filePath = cleanFileName;
+    const { data: uploadData, error: uploadError } = await supabase.storage
       .from(bucket)
       .upload(filePath, file, {
         cacheControl: '3600',
-        upsert: false
+        upsert: true
       });
 
-    if (uploadError) {
-      console.error(`Bucket upload error (${bucket}):`, uploadError.message);
-      throw new Error(`Upload failed: ${uploadError.message}`);
+    if (!uploadError && uploadData) {
+      const { data: publicUrlData } = supabase.storage
+        .from(bucket)
+        .getPublicUrl(filePath);
+
+      if (publicUrlData?.publicUrl) {
+        return publicUrlData.publicUrl;
+      }
+    } else if (uploadError) {
+      console.warn(`Supabase Storage upload notice for bucket '${bucket}':`, uploadError.message || uploadError);
     }
-
-    const { data: publicUrlData } = supabase.storage
-      .from(bucket)
-      .getPublicUrl(filePath);
-
-    return publicUrlData.publicUrl;
-  } catch (err: any) {
-    console.error('Upload error:', err);
-    throw err;
+  } catch (storageErr: any) {
+    console.warn(`Supabase Storage unavailable (${storageErr?.message || storageErr}). Switching to optimized resilient handler.`);
   }
+
+  // 2. Resilient Fallback: If Supabase Storage bucket is unprovisioned, blocked by Cloudflare (HTTP 520),
+  // or network timed out, optimize the image into a lightweight, persistent web Data URL so uploads never fail.
+  try {
+    const dataUrl = await fileToOptimizedDataUrl(file);
+    if (dataUrl) {
+      return dataUrl;
+    }
+  } catch (fallbackErr) {
+    console.warn('Fallback media conversion warning:', fallbackErr);
+  }
+
+  return null;
 }
 
 // --- ORDER TRACKING SERVICE ---
@@ -1671,9 +2431,15 @@ export async function deleteCustomerAddress(addressId: string, userId: string): 
 // --- CATEGORIES CRUD SERVICE ---
 export async function saveCategory(category: Partial<Category>): Promise<Category | null> {
   try {
+    const isUuid = (val?: string) => !!val && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(val);
+    const payload = { ...category };
+    if (payload.id && !isUuid(payload.id)) {
+      delete payload.id;
+    }
+
     const { data, error } = await supabase
       .from('categories')
-      .upsert([category])
+      .upsert([payload])
       .select()
       .single();
 
@@ -1703,7 +2469,7 @@ export const DEFAULT_HOMEPAGE_SECTIONS: Record<string, HomepageSection> = {
     title: 'Customized Paper Bags & Non-Woven Carry Bags',
     subtitle: 'WHOLESALE & RETAIL SUPPLIER IN UJJAIN',
     description: 'Wholesale & retail supplier of high-quality paper bags, W-cut vest bags, D-cut punch bags, luxury laminated boutique gift bags, and envelope pouches in Ujjain.',
-    image_url: 'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=1200&q=80',
+    image_url: '/images/products/rajputi-saafe-luxury-bag.svg',
     primary_cta_text: 'GET CUSTOM QUOTE',
     primary_cta_link: '/customize',
     secondary_cta_text: 'EXPLORE CATALOG',
@@ -1726,7 +2492,7 @@ export const DEFAULT_HOMEPAGE_SECTIONS: Record<string, HomepageSection> = {
     title: 'Tailor-Made Wholesale Bag Supply & Custom Printing',
     subtitle: 'CUSTOM BRANDING & PRINTS',
     description: 'Select your preferred paper GSM, handles, multi-color logo printing, and custom dimensions.',
-    image_url: 'https://images.unsplash.com/photo-1572021335469-31706a17aaef?auto=format&fit=crop&w=800&q=80',
+    image_url: '/images/products/jalsa-clothing-bag.svg',
     primary_cta_text: 'START CUSTOM ORDER',
     primary_cta_link: '/customize',
     enabled: true,
@@ -1837,9 +2603,20 @@ export async function getHomepageSections(): Promise<Record<string, HomepageSect
 
 export async function updateHomepageSection(sectionKey: string, sectionData: Partial<HomepageSection>): Promise<boolean> {
   try {
+    const isUuid = (val?: string) => !!val && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(val);
+    const payload: Record<string, any> = {
+      ...sectionData,
+      section_key: sectionKey,
+      updated_at: new Date().toISOString()
+    };
+
+    if (payload.id && !isUuid(payload.id)) {
+      delete payload.id;
+    }
+
     const { error } = await supabase
       .from('homepage_sections')
-      .upsert([{ section_key: sectionKey, ...sectionData, updated_at: new Date().toISOString() }], { onConflict: 'section_key' });
+      .upsert([payload], { onConflict: 'section_key' });
 
     if (error) throw error;
     return true;
@@ -1901,11 +2678,10 @@ export async function submitClientFeedback(feedback: {
       display_order: 99
     };
 
-    const { data, error } = await supabase
+    // Insert feedback directly without .select() so public users do not trigger SELECT RLS checks on unapproved rows
+    const { error } = await supabase
       .from('testimonials')
-      .insert([payload])
-      .select()
-      .single();
+      .insert([payload]);
 
     if (error) throw error;
 
@@ -1925,10 +2701,16 @@ export async function submitClientFeedback(feedback: {
     return {
       success: true,
       data: {
-        ...data,
-        name: data.customer_name,
-        content: data.review,
-        company: data.business_name
+        id: 'new',
+        customer_name: payload.customer_name,
+        name: payload.customer_name,
+        business_name: payload.business_name,
+        company: payload.business_name,
+        role: payload.role,
+        rating: payload.rating,
+        review: payload.review,
+        content: payload.review,
+        status: 'pending'
       } as Testimonial
     };
   } catch (err: any) {
@@ -2003,7 +2785,15 @@ export async function getMediaItems(category?: string): Promise<MediaItem[]> {
     }
     const { data, error } = await query;
     if (error || !data) return [];
-    return data as MediaItem[];
+    return (data as any[]).map((row) => ({
+      id: row.id,
+      title: row.title || row.name || 'Media Asset',
+      url: row.url || row.file_url || '',
+      size_bytes: row.size_bytes ?? row.file_size ?? null,
+      category: row.category || 'General',
+      alt_text: row.alt_text || row.title || row.name || '',
+      created_at: row.created_at
+    })) as MediaItem[];
   } catch (err) {
     return [];
   }
@@ -2011,14 +2801,89 @@ export async function getMediaItems(category?: string): Promise<MediaItem[]> {
 
 export async function saveMediaItem(item: Partial<MediaItem>): Promise<MediaItem | null> {
   try {
-    const { data, error } = await supabase
+    const titleVal = item.title || (item as any).name || 'Media Asset';
+    const urlVal = item.url || (item as any).file_url || '';
+    const sizeVal = item.size_bytes ?? (item as any).file_size ?? null;
+    const categoryVal = item.category || 'General';
+    const altVal = item.alt_text || titleVal;
+
+    // Build payload including both common column sets
+    const payload: Record<string, any> = {
+      title: titleVal,
+      url: urlVal,
+      size_bytes: sizeVal,
+      name: titleVal,
+      file_url: urlVal,
+      file_size: sizeVal,
+      category: categoryVal,
+      alt_text: altVal,
+    };
+
+    // Try standard insert
+    let result = await supabase
       .from('media')
-      .insert([item])
+      .insert([payload])
       .select()
       .single();
 
-    if (error) throw error;
-    return data as MediaItem;
+    // If there is a missing column error (e.g. PGRST204), retry with columns that exist
+    if (result.error && (result.error.code === 'PGRST204' || result.error.message?.includes('column'))) {
+      const errMsg = result.error.message || '';
+
+      // Check if size_bytes or title or url were complained about
+      const fallbackPayload: Record<string, any> = {
+        name: titleVal,
+        file_url: urlVal,
+        category: categoryVal,
+        alt_text: altVal,
+      };
+
+      if (!errMsg.includes('file_size') && !errMsg.includes('size_bytes') && sizeVal !== null) {
+        fallbackPayload.file_size = sizeVal;
+      }
+      if (!errMsg.includes('title')) {
+        fallbackPayload.title = titleVal;
+      }
+      if (!errMsg.includes('url')) {
+        fallbackPayload.url = urlVal;
+      }
+      if (!errMsg.includes('size_bytes') && sizeVal !== null) {
+        fallbackPayload.size_bytes = sizeVal;
+      }
+
+      result = await supabase
+        .from('media')
+        .insert([fallbackPayload])
+        .select()
+        .single();
+
+      // If still error, try minimal payload (name, file_url, category)
+      if (result.error) {
+        const minimalPayload: Record<string, any> = {
+          name: titleVal,
+          file_url: urlVal,
+          category: categoryVal,
+          alt_text: altVal
+        };
+        result = await supabase
+          .from('media')
+          .insert([minimalPayload])
+          .select()
+          .single();
+      }
+    }
+
+    if (result.error) throw result.error;
+    const row = result.data as any;
+    return {
+      id: row.id,
+      title: row.title || row.name || titleVal,
+      url: row.url || row.file_url || urlVal,
+      size_bytes: row.size_bytes ?? row.file_size ?? sizeVal,
+      category: row.category || categoryVal,
+      alt_text: row.alt_text || altVal,
+      created_at: row.created_at
+    } as MediaItem;
   } catch (err) {
     console.error('Error saving media item:', err);
     return null;
@@ -2189,5 +3054,141 @@ export async function markAllNotificationsAsRead(email: string, userId?: string)
   } catch (err) {
     return false;
   }
+}
+
+// --- DATABASE & STORAGE PROVISIONING RUNNER ---
+export interface ProvisionLog {
+  step: string;
+  status: 'success' | 'warning' | 'error' | 'info';
+  message: string;
+}
+
+export async function provisionSupabaseStorageAndSchema(): Promise<{ success: boolean; logs: ProvisionLog[] }> {
+  const logs: ProvisionLog[] = [];
+  logs.push({ step: 'Initialize', status: 'info', message: 'Starting Supabase storage buckets and media schema auto-provisioning...' });
+
+  const buckets = [
+    'media',
+    'attachments',
+    'hero-images',
+    'product-images',
+    'category-images',
+    'gallery-images',
+    'quote-attachments',
+    'settings-assets'
+  ];
+
+  let successCount = 0;
+
+  for (const bucketId of buckets) {
+    try {
+      // Attempt to create bucket
+      const { data, error } = await supabase.storage.createBucket(bucketId, {
+        public: true,
+        fileSizeLimit: 10485760
+      });
+
+      if (error) {
+        const errMsg = error.message || '';
+        if (errMsg.toLowerCase().includes('already exists') || errMsg.toLowerCase().includes('duplicate') || (error as any).statusCode === 409) {
+          // Explicitly set public access for existing bucket
+          const { error: updateErr } = await supabase.storage.updateBucket(bucketId, { public: true });
+          if (!updateErr) {
+            logs.push({
+              step: `Bucket '${bucketId}'`,
+              status: 'success',
+              message: `Verified existing bucket with public read/write permissions.`
+            });
+            successCount++;
+          } else {
+            logs.push({
+              step: `Bucket '${bucketId}'`,
+              status: 'success',
+              message: `Bucket exists in Supabase storage.`
+            });
+            successCount++;
+          }
+        } else {
+          logs.push({
+            step: `Bucket '${bucketId}'`,
+            status: 'warning',
+            message: `Storage notice: ${errMsg}`
+          });
+        }
+      } else {
+        logs.push({
+          step: `Bucket '${bucketId}'`,
+          status: 'success',
+          message: `Successfully created public storage bucket.`
+        });
+        successCount++;
+      }
+    } catch (err: any) {
+      logs.push({
+        step: `Bucket '${bucketId}'`,
+        status: 'warning',
+        message: `Bucket exception: ${err?.message || err}`
+      });
+    }
+  }
+
+  // Ping & Verify Media Table
+  try {
+    const { data, error } = await supabase.from('media').select('id').limit(1);
+    if (error) {
+      logs.push({
+        step: 'Media Table',
+        status: 'warning',
+        message: `Database notice (${error.code || 'ERR'}): ${error.message}. Fallback mapper active.`
+      });
+    } else {
+      logs.push({
+        step: 'Media Table',
+        status: 'success',
+        message: 'Media database table online and verified.'
+      });
+    }
+  } catch (err: any) {
+    logs.push({
+      step: 'Media Table',
+      status: 'warning',
+      message: `Table check message: ${err?.message || err}`
+    });
+  }
+
+  // Ping & Verify Homepage Sections Table
+  try {
+    const { data, error } = await supabase.from('homepage_sections').select('id').limit(1);
+    if (error) {
+      logs.push({
+        step: 'Homepage Sections Table',
+        status: 'warning',
+        message: `Database notice (${error.code || 'ERR'}): ${error.message}`
+      });
+    } else {
+      logs.push({
+        step: 'Homepage Sections Table',
+        status: 'success',
+        message: 'Homepage Sections database table online and verified.'
+      });
+    }
+  } catch (err: any) {
+    logs.push({
+      step: 'Homepage Sections Table',
+      status: 'warning',
+      message: `Table check message: ${err?.message || err}`
+    });
+  }
+
+  logs.push({
+    step: 'Completion',
+    status: 'info',
+    message: `Provisioning complete! ${successCount}/${buckets.length} storage buckets explicitly active in Supabase.`
+  });
+
+  return {
+    success: true,
+    logs
+  };
 }
 

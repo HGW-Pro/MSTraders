@@ -127,13 +127,13 @@ export default function ShopPage() {
                     href={`/shop/${product.slug}`}
                     className="group bg-white border border-border/80 rounded-2xl overflow-hidden hover:shadow-md transition-all flex flex-col"
                   >
-                    <div className="relative aspect-square bg-slate-100 overflow-hidden">
+                    <div className="relative aspect-square bg-slate-50 dark:bg-slate-800/40 p-4 flex items-center justify-center overflow-hidden">
                       {product.images && product.images[0] ? (
                          <Image 
                            src={product.images[0]} 
                            alt={product.name}
                            fill
-                           className="object-cover group-hover:scale-105 transition-transform duration-500"
+                           className="object-contain p-2 group-hover:scale-105 transition-transform duration-500 drop-shadow-sm"
                            referrerPolicy="no-referrer"
                          />
                       ) : (

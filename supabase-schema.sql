@@ -205,9 +205,12 @@ CREATE TABLE IF NOT EXISTS testimonials (
 -- 13. MEDIA
 CREATE TABLE IF NOT EXISTS media (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  name TEXT NOT NULL,
-  file_url TEXT NOT NULL,
-  file_size INTEGER,
+  name TEXT,
+  title TEXT,
+  file_url TEXT,
+  url TEXT,
+  file_size BIGINT,
+  size_bytes BIGINT,
   mime_type TEXT,
   category TEXT DEFAULT 'General',
   alt_text TEXT,
@@ -357,15 +360,41 @@ CREATE POLICY "Admins can manage media" ON media
   FOR ALL USING (public.is_admin());
 
 -- STORAGE BUCKETS SETUP
-INSERT INTO storage.buckets (id, name, public) 
-VALUES ('media', 'media', true), ('attachments', 'attachments', true)
-ON CONFLICT (id) DO NOTHING;
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types) 
+VALUES 
+  ('media', 'media', true, 10485760, null),
+  ('attachments', 'attachments', true, 10485760, null),
+  ('hero-images', 'hero-images', true, 10485760, null),
+  ('product-images', 'product-images', true, 10485760, null),
+  ('category-images', 'category-images', true, 10485760, null),
+  ('gallery-images', 'gallery-images', true, 10485760, null),
+  ('quote-attachments', 'quote-attachments', true, 10485760, null),
+  ('settings-assets', 'settings-assets', true, 10485760, null)
+ON CONFLICT (id) DO UPDATE SET public = true;
 
-CREATE POLICY "Public Read Access on Storage" ON storage.objects
-  FOR SELECT USING (bucket_id IN ('media', 'attachments'));
+UPDATE storage.buckets 
+SET public = true 
+WHERE id IN ('media', 'attachments', 'hero-images', 'product-images', 'category-images', 'gallery-images', 'quote-attachments', 'settings-assets');
 
-CREATE POLICY "Public Upload Access on Storage" ON storage.objects
-  FOR INSERT WITH CHECK (bucket_id IN ('media', 'attachments'));
+ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Public Read Access on All Buckets" ON storage.objects;
+DROP POLICY IF EXISTS "Public Read Access on Storage" ON storage.objects;
+CREATE POLICY "Public Read Access on All Buckets" ON storage.objects
+  FOR SELECT USING (bucket_id IN ('media', 'attachments', 'hero-images', 'product-images', 'category-images', 'gallery-images', 'quote-attachments', 'settings-assets'));
+
+DROP POLICY IF EXISTS "Public Upload Access on All Buckets" ON storage.objects;
+DROP POLICY IF EXISTS "Public Upload Access on Storage" ON storage.objects;
+CREATE POLICY "Public Upload Access on All Buckets" ON storage.objects
+  FOR INSERT WITH CHECK (bucket_id IN ('media', 'attachments', 'hero-images', 'product-images', 'category-images', 'gallery-images', 'quote-attachments', 'settings-assets'));
+
+DROP POLICY IF EXISTS "Public Update Access on All Buckets" ON storage.objects;
+CREATE POLICY "Public Update Access on All Buckets" ON storage.objects
+  FOR UPDATE USING (bucket_id IN ('media', 'attachments', 'hero-images', 'product-images', 'category-images', 'gallery-images', 'quote-attachments', 'settings-assets'));
+
+DROP POLICY IF EXISTS "Public Delete Access on All Buckets" ON storage.objects;
+CREATE POLICY "Public Delete Access on All Buckets" ON storage.objects
+  FOR DELETE USING (bucket_id IN ('media', 'attachments', 'hero-images', 'product-images', 'category-images', 'gallery-images', 'quote-attachments', 'settings-assets'));
 
 -- AUTOMATIC UPDATED_AT TRIGGER FUNCTION
 CREATE OR REPLACE FUNCTION update_updated_at_column()

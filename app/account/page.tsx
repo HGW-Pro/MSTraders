@@ -450,28 +450,30 @@ export default function CustomerAccountPage() {
 
         {/* Dashboard Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="bg-white border border-border p-1 rounded-2xl w-full flex overflow-x-auto justify-start sm:justify-center">
-            <TabsTrigger value="orders" className="flex items-center gap-2 text-xs font-bold py-2.5 px-4 rounded-xl">
-              <ShoppingBag className="h-4 w-4" /> My Orders ({orders.length})
-            </TabsTrigger>
-            <TabsTrigger value="quotes" className="flex items-center gap-2 text-xs font-bold py-2.5 px-4 rounded-xl">
-              <FileText className="h-4 w-4" /> Custom Quotes ({quotes.length})
-            </TabsTrigger>
-            <TabsTrigger value="notifications" className="flex items-center gap-2 text-xs font-bold py-2.5 px-4 rounded-xl relative">
-              <Bell className="h-4 w-4 text-brand-green" /> Notifications
-              {notifications.filter(n => !n.read).length > 0 && (
-                <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-red-600 text-white font-bold ml-1">
-                  {notifications.filter(n => !n.read).length}
-                </span>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="addresses" className="flex items-center gap-2 text-xs font-bold py-2.5 px-4 rounded-xl">
-              <MapPin className="h-4 w-4" /> Saved Addresses ({addresses.length})
-            </TabsTrigger>
-            <TabsTrigger value="profile" className="flex items-center gap-2 text-xs font-bold py-2.5 px-4 rounded-xl">
-              <User className="h-4 w-4" /> Account Profile
-            </TabsTrigger>
-          </TabsList>
+          <div className="w-full overflow-x-auto pb-1">
+            <TabsList className="bg-white border border-border p-1 rounded-2xl w-max min-w-full sm:w-full flex items-center justify-start sm:justify-center gap-1">
+              <TabsTrigger value="orders" className="shrink-0 flex items-center gap-2 text-xs font-bold py-2.5 px-4 rounded-xl whitespace-nowrap">
+                <ShoppingBag className="h-4 w-4" /> My Orders ({orders.length})
+              </TabsTrigger>
+              <TabsTrigger value="quotes" className="shrink-0 flex items-center gap-2 text-xs font-bold py-2.5 px-4 rounded-xl whitespace-nowrap">
+                <FileText className="h-4 w-4" /> Custom Quotes ({quotes.length})
+              </TabsTrigger>
+              <TabsTrigger value="notifications" className="shrink-0 flex items-center gap-2 text-xs font-bold py-2.5 px-4 rounded-xl relative whitespace-nowrap">
+                <Bell className="h-4 w-4 text-brand-green" /> Notifications
+                {notifications.filter(n => !n.read).length > 0 && (
+                  <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-red-600 text-white font-bold ml-1">
+                    {notifications.filter(n => !n.read).length}
+                  </span>
+                )}
+              </TabsTrigger>
+              <TabsTrigger value="addresses" className="shrink-0 flex items-center gap-2 text-xs font-bold py-2.5 px-4 rounded-xl whitespace-nowrap">
+                <MapPin className="h-4 w-4" /> Saved Addresses ({addresses.length})
+              </TabsTrigger>
+              <TabsTrigger value="profile" className="shrink-0 flex items-center gap-2 text-xs font-bold py-2.5 px-4 rounded-xl whitespace-nowrap">
+                <User className="h-4 w-4" /> Account Profile
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           {/* TAB 1: ORDERS */}
           <TabsContent value="orders">

@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="100%" height="100%">
+  <defs>
+    <linearGradient id="pouchGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#d6ab7d" />
+      <stop offset="100%" stop-color="#9a6e3f" />
+    </linearGradient>
+    <filter id="pouchShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="4" dy="12" stdDeviation="14" flood-color="#000" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+
+  <rect width="800" height="800" fill="#faf6f0"/>
+
+  <g filter="url(#pouchShadow)">
+    <polygon points="80,180 200,180 180,680 70,680" fill="url(#pouchGrad)"/>
+    <line x1="80" y1="180" x2="200" y2="180" stroke="#68451f" stroke-width="3" stroke-dasharray="3,3"/>
+
+    <polygon points="160,260 280,260 260,680 150,680" fill="url(#pouchGrad)"/>
+    <line x1="160" y1="260" x2="280" y2="260" stroke="#68451f" stroke-width="3" stroke-dasharray="3,3"/>
+
+    <polygon points="240,320 360,320 340,680 230,680" fill="url(#pouchGrad)"/>
+    <line x1="240" y1="320" x2="360" y2="320" stroke="#68451f" stroke-width="3" stroke-dasharray="3,3"/>
+
+    <polygon points="320,380 440,380 420,680 310,680" fill="url(#pouchGrad)"/>
+    <line x1="320" y1="380" x2="440" y2="380" stroke="#68451f" stroke-width="3" stroke-dasharray="3,3"/>
+
+    <polygon points="400,440 520,440 500,680 390,680" fill="url(#pouchGrad)"/>
+    <line x1="400" y1="440" x2="520" y2="440" stroke="#68451f" stroke-width="3" stroke-dasharray="3,3"/>
+
+    <polygon points="480,500 600,500 580,680 470,680" fill="url(#pouchGrad)"/>
+    <line x1="480" y1="500" x2="600" y2="500" stroke="#68451f" stroke-width="3" stroke-dasharray="3,3"/>
+
+    <polygon points="560,560 680,560 660,680 550,680" fill="url(#pouchGrad)"/>
+    <line x1="560" y1="560" x2="680" y2="560" stroke="#68451f" stroke-width="3" stroke-dasharray="3,3"/>
+  </g>
+</svg>

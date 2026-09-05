@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="100%" height="100%">
+  <rect width="800" height="800" fill="#f0e9df"/>
+  <g filter="drop-shadow(0px 10px 20px rgba(0,0,0,0.2))">
+    <!-- Box 1: Top Left - Red Floral -->
+    <g transform="translate(140, 100) rotate(-5)">
+      <path d="M 50 40 C 50 0, 150 0, 150 40" fill="none" stroke="#d4af37" stroke-width="12"/>
+      <rect x="10" y="35" width="180" height="150" rx="10" fill="#e63956"/>
+      <circle cx="100" cy="110" r="35" fill="#ffd700" opacity="0.8"/>
+      <circle cx="100" cy="110" r="20" fill="#a8112b"/>
+    </g>
+
+    <!-- Box 2: Top Right - Blue/Green Floral -->
+    <g transform="translate(420, 120) rotate(5)">
+      <path d="M 50 40 C 50 0, 150 0, 150 40" fill="none" stroke="#e6f2ff" stroke-width="12"/>
+      <rect x="10" y="35" width="180" height="150" rx="10" fill="#008080"/>
+      <circle cx="100" cy="110" r="35" fill="#ffffff" opacity="0.8"/>
+      <circle cx="100" cy="110" r="20" fill="#e63956"/>
+    </g>
+
+    <!-- Box 3: Bottom Left - Teal Paisley -->
+    <g transform="translate(100, 380) rotate(4)">
+      <path d="M 80 50 C 80 0, 220 0, 220 50" fill="none" stroke="#a3e5e1" stroke-width="14"/>
+      <rect x="20" y="45" width="260" height="200" rx="12" fill="#20b2aa"/>
+      <path d="M 150 140 Q 180 100 150 180 Q 120 180 150 140" fill="#ffffff" opacity="0.8"/>
+    </g>
+
+    <!-- Box 4: Bottom Right - Pink Mandala -->
+    <g transform="translate(400, 410) rotate(-3)">
+      <path d="M 80 50 C 80 0, 220 0, 220 50" fill="none" stroke="#ffd1dc" stroke-width="14"/>
+      <rect x="20" y="45" width="260" height="200" rx="12" fill="#ff1493"/>
+      <!-- Mandala -->
+      <circle cx="150" cy="145" r="50" fill="#ffa07a" opacity="0.9"/>
+      <circle cx="150" cy="145" r="30" fill="#ffff00" opacity="0.9"/>
+      <circle cx="150" cy="145" r="15" fill="#8b0082"/>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="100%" height="100%">
+  <rect width="800" height="800" fill="#dedede"/>
+  <g filter="drop-shadow(0px 10px 20px rgba(0,0,0,0.2))">
+    <!-- Bag body white with yellow/black print -->
+    <rect x="220" y="160" width="360" height="520" rx="8" fill="#ffffff" stroke="#cccccc" stroke-width="2"/>
+    <!-- D-Cut Punch handle -->
+    <rect x="350" y="200" width="100" height="32" rx="16" fill="#dedede"/>
+    <!-- Branded Yellow Header Oval -->
+    <ellipse cx="400" cy="340" rx="130" ry="70" fill="#ffd700"/>
+    <text x="400" y="335" font-family="'Arial Black', sans-serif" font-size="22" font-weight="900" fill="#000000" text-anchor="middle">ANYTIME</text>
+    <text x="400" y="360" font-family="'Arial Black', sans-serif" font-size="20" font-weight="900" fill="#000000" text-anchor="middle">SPORTS</text>
+    <!-- Tagline -->
+    <text x="400" y="440" font-family="sans-serif" font-size="16" font-weight="bold" fill="#222222" text-anchor="middle">BELIEVE IN YOURSELF</text>
+    <text x="400" y="470" font-family="sans-serif" font-size="14" fill="#555555" text-anchor="middle">All Types of Sports & Fitness Wear</text>
+    <text x="400" y="520" font-family="sans-serif" font-size="14" font-weight="bold" fill="#000000" text-anchor="middle">UJJAIN (M.P.)</text>
+  </g>
+</svg>

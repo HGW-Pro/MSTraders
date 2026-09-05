@@ -78,14 +78,36 @@ ALTER TABLE testimonials ADD CONSTRAINT testimonials_status_check
 -- 4. ADD MEDIA TABLE (For Supabase Asset & Upload Library)
 CREATE TABLE IF NOT EXISTS media (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  name TEXT NOT NULL,
-  file_url TEXT NOT NULL,
-  file_size INTEGER,
+  name TEXT,
+  title TEXT,
+  file_url TEXT,
+  url TEXT,
+  file_size BIGINT,
+  size_bytes BIGINT,
   mime_type TEXT,
   category TEXT DEFAULT 'General',
   alt_text TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- Ensure all compatible columns exist on media table if created previously
+ALTER TABLE media ADD COLUMN IF NOT EXISTS title TEXT;
+ALTER TABLE media ADD COLUMN IF NOT EXISTS url TEXT;
+ALTER TABLE media ADD COLUMN IF NOT EXISTS size_bytes BIGINT;
+ALTER TABLE media ADD COLUMN IF NOT EXISTS file_size BIGINT;
+ALTER TABLE media ADD COLUMN IF NOT EXISTS file_url TEXT;
+ALTER TABLE media ADD COLUMN IF NOT EXISTS name TEXT;
+ALTER TABLE media ADD COLUMN IF NOT EXISTS alt_text TEXT;
+ALTER TABLE media ADD COLUMN IF NOT EXISTS category TEXT DEFAULT 'General';
+ALTER TABLE media ADD COLUMN IF NOT EXISTS mime_type TEXT;
+
+-- Synchronize alias columns if any are missing
+UPDATE media SET title = name WHERE title IS NULL AND name IS NOT NULL;
+UPDATE media SET name = title WHERE name IS NULL AND title IS NOT NULL;
+UPDATE media SET url = file_url WHERE url IS NULL AND file_url IS NOT NULL;
+UPDATE media SET file_url = url WHERE file_url IS NULL AND url IS NOT NULL;
+UPDATE media SET size_bytes = file_size WHERE size_bytes IS NULL AND file_size IS NOT NULL;
+UPDATE media SET file_size = size_bytes WHERE file_size IS NULL AND size_bytes IS NOT NULL;
 
 -- 5. UPDATE EXISTING TABLES
 ALTER TABLE categories ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT true;
@@ -112,16 +134,23 @@ DROP POLICY IF EXISTS "Admins can manage homepage sections" ON homepage_sections
 CREATE POLICY "Admins can manage homepage sections" ON homepage_sections
   FOR ALL USING (public.is_admin());
 
--- TESTIMONIALS POLICIES
+-- TESTIMONIALS POLICIES & PERMISSIONS
+GRANT ALL ON testimonials TO anon, authenticated, service_role;
+
 DROP POLICY IF EXISTS "Public can view published testimonials" ON testimonials;
+DROP POLICY IF EXISTS "Public can submit testimonials" ON testimonials;
+DROP POLICY IF EXISTS "Enable insert for everyone" ON testimonials;
+DROP POLICY IF EXISTS "Admins can manage testimonials" ON testimonials;
+
+-- 1. Anyone (public/anon) can view published or approved reviews
 CREATE POLICY "Public can view published testimonials" ON testimonials
   FOR SELECT USING (status IN ('published', 'approved') OR public.is_admin());
 
-DROP POLICY IF EXISTS "Public can submit testimonials" ON testimonials;
+-- 2. Anyone (public/anon) can submit new feedback for moderation
 CREATE POLICY "Public can submit testimonials" ON testimonials
   FOR INSERT WITH CHECK (true);
 
-DROP POLICY IF EXISTS "Admins can manage testimonials" ON testimonials;
+-- 3. Authenticated admins can update, approve, reject, or delete testimonials
 CREATE POLICY "Admins can manage testimonials" ON testimonials
   FOR ALL USING (public.is_admin());
 
@@ -135,18 +164,44 @@ CREATE POLICY "Admins can manage media" ON media
   FOR ALL USING (public.is_admin());
 
 -- 8. STORAGE BUCKETS INITIALIZATION
-INSERT INTO storage.buckets (id, name, public) 
-VALUES ('media', 'media', true), ('attachments', 'attachments', true)
-ON CONFLICT (id) DO NOTHING;
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types) 
+VALUES 
+  ('media', 'media', true, 10485760, null),
+  ('attachments', 'attachments', true, 10485760, null),
+  ('hero-images', 'hero-images', true, 10485760, null),
+  ('product-images', 'product-images', true, 10485760, null),
+  ('category-images', 'category-images', true, 10485760, null),
+  ('gallery-images', 'gallery-images', true, 10485760, null),
+  ('quote-attachments', 'quote-attachments', true, 10485760, null),
+  ('settings-assets', 'settings-assets', true, 10485760, null)
+ON CONFLICT (id) DO UPDATE SET public = true;
+
+-- Ensure all buckets are marked public
+UPDATE storage.buckets 
+SET public = true 
+WHERE id IN ('media', 'attachments', 'hero-images', 'product-images', 'category-images', 'gallery-images', 'quote-attachments', 'settings-assets');
+
+-- Enable RLS on storage.objects
+ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
 
 -- STORAGE OBJECT POLICIES
+DROP POLICY IF EXISTS "Public Read Access on All Buckets" ON storage.objects;
 DROP POLICY IF EXISTS "Public Read Access on Storage" ON storage.objects;
-CREATE POLICY "Public Read Access on Storage" ON storage.objects
-  FOR SELECT USING (bucket_id IN ('media', 'attachments'));
+CREATE POLICY "Public Read Access on All Buckets" ON storage.objects
+  FOR SELECT USING (bucket_id IN ('media', 'attachments', 'hero-images', 'product-images', 'category-images', 'gallery-images', 'quote-attachments', 'settings-assets'));
 
+DROP POLICY IF EXISTS "Public Upload Access on All Buckets" ON storage.objects;
 DROP POLICY IF EXISTS "Public Upload Access on Storage" ON storage.objects;
-CREATE POLICY "Public Upload Access on Storage" ON storage.objects
-  FOR INSERT WITH CHECK (bucket_id IN ('media', 'attachments'));
+CREATE POLICY "Public Upload Access on All Buckets" ON storage.objects
+  FOR INSERT WITH CHECK (bucket_id IN ('media', 'attachments', 'hero-images', 'product-images', 'category-images', 'gallery-images', 'quote-attachments', 'settings-assets'));
+
+DROP POLICY IF EXISTS "Public Update Access on All Buckets" ON storage.objects;
+CREATE POLICY "Public Update Access on All Buckets" ON storage.objects
+  FOR UPDATE USING (bucket_id IN ('media', 'attachments', 'hero-images', 'product-images', 'category-images', 'gallery-images', 'quote-attachments', 'settings-assets'));
+
+DROP POLICY IF EXISTS "Public Delete Access on All Buckets" ON storage.objects;
+CREATE POLICY "Public Delete Access on All Buckets" ON storage.objects
+  FOR DELETE USING (bucket_id IN ('media', 'attachments', 'hero-images', 'product-images', 'category-images', 'gallery-images', 'quote-attachments', 'settings-assets'));
 
 -- 9. CLEAN UP DEFAULTED TESTIMONIALS (Ensures ONLY genuine approved customer feedback is displayed)
 DELETE FROM testimonials WHERE customer_name IN ('Rajesh Agarwal', 'Sunita Sharma', 'Vikram Singh');
@@ -278,4 +333,82 @@ ALTER TABLE quotes ADD COLUMN IF NOT EXISTS expected_delivery_date TEXT;
 ALTER TABLE quotes ADD COLUMN IF NOT EXISTS courier_partner TEXT;
 ALTER TABLE quotes ADD COLUMN IF NOT EXISTS tracking_number TEXT;
 ALTER TABLE quotes ADD COLUMN IF NOT EXISTS tracking_url TEXT;
+
+-- 15. GALLERY SHOWCASE & PORTFOLIO CMS TABLE
+CREATE TABLE IF NOT EXISTS gallery_items (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  title TEXT NOT NULL,
+  description TEXT,
+  category TEXT DEFAULT 'Customized Bags',
+  image_url TEXT NOT NULL,
+  is_featured BOOLEAN DEFAULT false,
+  status TEXT DEFAULT 'published',
+  display_order INTEGER DEFAULT 1,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Ensure all columns exist
+ALTER TABLE gallery_items ADD COLUMN IF NOT EXISTS description TEXT;
+ALTER TABLE gallery_items ADD COLUMN IF NOT EXISTS category TEXT DEFAULT 'Customized Bags';
+ALTER TABLE gallery_items ADD COLUMN IF NOT EXISTS is_featured BOOLEAN DEFAULT false;
+ALTER TABLE gallery_items ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'published';
+ALTER TABLE gallery_items ADD COLUMN IF NOT EXISTS display_order INTEGER DEFAULT 1;
+ALTER TABLE gallery_items ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
+
+CREATE INDEX IF NOT EXISTS idx_gallery_items_category ON gallery_items(category);
+CREATE INDEX IF NOT EXISTS idx_gallery_items_display_order ON gallery_items(display_order);
+
+ALTER TABLE gallery_items ENABLE ROW LEVEL SECURITY;
+
+GRANT ALL ON gallery_items TO anon, authenticated, service_role;
+
+DROP POLICY IF EXISTS "Public can view gallery items" ON gallery_items;
+CREATE POLICY "Public can view gallery items" ON gallery_items
+  FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Admins can manage gallery items" ON gallery_items;
+CREATE POLICY "Admins can manage gallery items" ON gallery_items
+  FOR ALL USING (public.is_admin() OR auth.role() = 'authenticated');
+
+-- Compatibility alias for 'gallery' table/view
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_tables WHERE schemaname = 'public' AND tablename = 'gallery') AND
+     NOT EXISTS (SELECT 1 FROM pg_views WHERE schemaname = 'public' AND viewname = 'gallery') THEN
+    CREATE OR REPLACE VIEW gallery AS SELECT * FROM gallery_items;
+    GRANT ALL ON gallery TO anon, authenticated, service_role;
+  END IF;
+END $$;
+
+-- 16. SUPABASE STORAGE BUCKETS & POLICIES SETUP
+-- Creates all required storage buckets for MS Traders image uploads
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+VALUES 
+  ('gallery-images', 'gallery-images', true, 20971520, ARRAY['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml']),
+  ('media', 'media', true, 20971520, NULL),
+  ('product-images', 'product-images', true, 20971520, ARRAY['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml']),
+  ('quote-attachments', 'quote-attachments', true, 31457280, NULL),
+  ('category-images', 'category-images', true, 20971520, ARRAY['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml']),
+  ('hero-images', 'hero-images', true, 20971520, ARRAY['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml']),
+  ('settings-assets', 'settings-assets', true, 20971520, NULL)
+ON CONFLICT (id) DO UPDATE SET public = true;
+
+-- Storage object policies for public read and uploads
+DROP POLICY IF EXISTS "Public storage read policy" ON storage.objects;
+CREATE POLICY "Public storage read policy" ON storage.objects
+  FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Public storage insert policy" ON storage.objects;
+CREATE POLICY "Public storage insert policy" ON storage.objects
+  FOR INSERT WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Public storage update policy" ON storage.objects;
+CREATE POLICY "Public storage update policy" ON storage.objects
+  FOR UPDATE USING (true);
+
+DROP POLICY IF EXISTS "Public storage delete policy" ON storage.objects;
+CREATE POLICY "Public storage delete policy" ON storage.objects
+  FOR DELETE USING (true);
+
 

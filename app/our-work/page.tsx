@@ -77,15 +77,16 @@ export default function OurWorkPage() {
                 className="relative group rounded-2xl overflow-hidden cursor-pointer bg-slate-100 border border-border shadow-xs hover:shadow-md transition-all flex flex-col"
                 onClick={() => setSelectedImage(item)}
               >
-                <div className="relative aspect-[4/3] w-full overflow-hidden">
+                <div className="relative aspect-[4/3] w-full bg-slate-50 dark:bg-slate-800/50 p-3 flex items-center justify-center overflow-hidden">
                   <Image 
                     src={item.image_url} 
                     alt={item.title}
                     fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    className="object-contain p-2 group-hover:scale-105 transition-transform duration-500 drop-shadow-sm"
                     referrerPolicy="no-referrer"
+                    unoptimized={Boolean(item.image_url?.startsWith('data:') || item.image_url?.endsWith('.svg'))}
                   />
-                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-5">
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-5 backdrop-blur-[2px]">
                     <div className="absolute top-4 right-4 w-9 h-9 bg-white/20 backdrop-blur rounded-full flex items-center justify-center text-white">
                       <Maximize2 className="h-4 w-4" />
                     </div>

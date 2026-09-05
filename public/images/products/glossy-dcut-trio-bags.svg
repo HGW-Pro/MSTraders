@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="100%" height="100%">
+  <rect width="800" height="800" fill="#f5f2eb"/>
+  <g filter="drop-shadow(0px 15px 25px rgba(0,0,0,0.3))">
+    <!-- Black Bag (Back Right) -->
+    <g transform="translate(360, 100) rotate(15)">
+      <rect x="0" y="0" width="300" height="420" rx="10" fill="#111111"/>
+      <rect x="100" y="30" width="100" height="30" rx="15" fill="#f5f2eb"/>
+      <path d="M 0 0 L 300 0 L 300 420 Z" fill="#ffffff" opacity="0.08"/>
+    </g>
+
+    <!-- White Bag (Middle) -->
+    <g transform="translate(240, 150) rotate(-5)">
+      <rect x="0" y="0" width="320" height="440" rx="10" fill="#ffffff" stroke="#e0e0e0" stroke-width="2"/>
+      <rect x="110" y="35" width="100" height="30" rx="15" fill="#f5f2eb"/>
+      <path d="M 0 0 L 320 0 L 320 440 Z" fill="#ffffff" opacity="0.4"/>
+    </g>
+
+    <!-- Red Bag (Front Left) -->
+    <g transform="translate(80, 220) rotate(-12)">
+      <rect x="0" y="0" width="340" height="460" rx="10" fill="#dc143c"/>
+      <!-- Glossy highlight reflection -->
+      <polygon points="0,0 200,0 0,460" fill="#ffffff" opacity="0.18"/>
+      <!-- D-Cut Punch Handle -->
+      <rect x="120" y="40" width="100" height="32" rx="16" fill="#f5f2eb"/>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="100%" height="100%">
+  <rect width="800" height="800" fill="#241e28"/>
+  <g filter="drop-shadow(0px 12px 22px rgba(0,0,0,0.5))">
+    <!-- Pink Bag Body -->
+    <rect x="200" y="150" width="400" height="540" rx="10" fill="#ff1493"/>
+    <!-- D-Cut Punch handle -->
+    <rect x="350" y="190" width="100" height="32" rx="16" fill="#241e28"/>
+    <!-- Traditional Golden Arch Frame -->
+    <path d="M 260 270 Q 400 220 540 270 L 540 590 L 260 590 Z" fill="none" stroke="#ffd700" stroke-width="4"/>
+    <text x="400" y="340" font-family="'Devanagari', serif" font-size="28" font-weight="bold" fill="#ffffff" text-anchor="middle">प्रेम प्रकाश</text>
+    <text x="400" y="380" font-family="'Devanagari', serif" font-size="22" font-weight="bold" fill="#ffd700" text-anchor="middle">साड़ी हाउस</text>
+    <text x="400" y="430" font-family="sans-serif" font-size="14" fill="#ffffff" text-anchor="middle">फैंसी साड़ी, लहंगा एवं चुंदरी</text>
+    <line x1="300" y1="460" x2="500" y2="460" stroke="#ffd700" stroke-width="2"/>
+    <text x="400" y="500" font-family="sans-serif" font-size="14" font-weight="bold" fill="#ffffff" text-anchor="middle">उज्जैन (म.प्र.)</text>
+  </g>
+</svg>

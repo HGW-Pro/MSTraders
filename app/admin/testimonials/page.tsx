@@ -53,11 +53,10 @@ export default function AdminTestimonialsPage() {
   const [saving, setSaving] = React.useState(false);
 
   const loadData = React.useCallback(async () => {
-    setLoading(true);
     try {
       const data = await getTestimonials(false); // get all statuses
       setItems(data);
-    } catch (err) {
+    } catch {
       toast.error('Failed to load testimonials');
     } finally {
       setLoading(false);
@@ -65,8 +64,28 @@ export default function AdminTestimonialsPage() {
   }, []);
 
   React.useEffect(() => {
-    loadData();
-  }, [loadData]);
+    let isMounted = true;
+    (async () => {
+      try {
+        const data = await getTestimonials(false);
+        if (isMounted) {
+          setItems(data);
+        }
+      } catch {
+        if (isMounted) {
+          toast.error('Failed to load testimonials');
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    })();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   // Status counts for tabs and dashboard
   const counts = React.useMemo(() => {

@@ -60,7 +60,7 @@ export default function AdminCategoriesPage() {
       name: '',
       slug: '',
       description: '',
-      image_url: 'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=600&q=80',
+      image_url: '/images/categories/paper-bags.svg',
       display_order: categories.length + 1,
       is_active: true
     });
@@ -177,7 +177,7 @@ export default function AdminCategoriesPage() {
 
                 <div className="relative aspect-video rounded-xl overflow-hidden bg-slate-100 border border-slate-200">
                   <Image 
-                    src={cat.image_url || 'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=600&q=80'} 
+                    src={cat.image_url || '/images/categories/paper-bags.svg'} 
                     alt={cat.name} 
                     fill 
                     className="object-cover" 

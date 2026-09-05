@@ -27,7 +27,7 @@ export default function AboutPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div className="relative aspect-square md:aspect-[4/3] lg:aspect-square rounded-2xl overflow-hidden shadow-xl">
               <Image 
-                src="https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=1000&q=80" 
+                src="/images/gallery/rajputi-saafe.svg" 
                 alt="MS TRADERS Wholesale Bag Supply"
                 fill
                 className="object-cover"

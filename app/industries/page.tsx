@@ -64,7 +64,7 @@ export default function IndustriesPage() {
                   <div key={ind.id} className="group bg-white border border-border rounded-2xl overflow-hidden shadow-xs hover:shadow-lg transition-all flex flex-col sm:flex-row">
                     <div className="relative w-full sm:w-2/5 aspect-[4/3] sm:aspect-auto sm:h-full bg-slate-100 overflow-hidden flex-shrink-0">
                       <Image 
-                        src={ind.image_url || 'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=800&q=80'} 
+                        src={ind.image_url || '/images/industries/corporate.svg'} 
                         alt={ind.title}
                         fill
                         className="object-cover group-hover:scale-105 transition-transform duration-500"

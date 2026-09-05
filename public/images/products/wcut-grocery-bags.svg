@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="100%" height="100%">
+  <defs>
+    <filter id="wsh" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#000" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+
+  <rect width="800" height="800" fill="#f3f4f6"/>
+
+  <g filter="url(#wsh)">
+    <path d="M 220 180 L 290 180 L 290 300 Q 360 360 430 300 L 430 180 L 500 180 L 520 700 L 200 700 Z" fill="#fef08a" stroke="#ca8a04" stroke-width="2"/>
+    <polygon points="200,700 240,700 250,220 220,180" fill="#fde047" opacity="0.6"/>
+    <polygon points="520,700 480,700 470,220 500,180" fill="#fde047" opacity="0.6"/>
+    <line x1="200" y1="670" x2="520" y2="670" stroke="#ca8a04" stroke-width="3" stroke-dasharray="6,4"/>
+  </g>
+</svg>

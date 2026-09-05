@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="100%" height="100%">
+  <rect width="800" height="800" fill="#ffffff"/>
+  
+  <g fill="#dc2626">
+    <g transform="translate(150, 150)">
+      <circle cx="0" cy="0" r="50" fill="none" stroke="#dc2626" stroke-width="3"/>
+      <text x="0" y="-15" font-family="sans-serif" font-size="10" font-weight="900" text-anchor="middle">AWARDED AS</text>
+      <text x="0" y="8" font-family="sans-serif" font-size="20" font-weight="900" text-anchor="middle">BEST</text>
+      <text x="0" y="28" font-family="sans-serif" font-size="12" font-weight="bold" text-anchor="middle">IN BURGER</text>
+    </g>
+    <g transform="translate(450, 150)">
+      <circle cx="0" cy="0" r="50" fill="none" stroke="#dc2626" stroke-width="3"/>
+      <text x="0" y="-15" font-family="sans-serif" font-size="10" font-weight="900" text-anchor="middle">AWARDED AS</text>
+      <text x="0" y="8" font-family="sans-serif" font-size="20" font-weight="900" text-anchor="middle">BEST</text>
+      <text x="0" y="28" font-family="sans-serif" font-size="12" font-weight="bold" text-anchor="middle">IN BURGER</text>
+    </g>
+    <g transform="translate(680, 150)">
+      <circle cx="0" cy="0" r="50" fill="none" stroke="#dc2626" stroke-width="3"/>
+      <text x="0" y="-15" font-family="sans-serif" font-size="10" font-weight="900" text-anchor="middle">AWARDED AS</text>
+      <text x="0" y="8" font-family="sans-serif" font-size="20" font-weight="900" text-anchor="middle">BEST</text>
+      <text x="0" y="28" font-family="sans-serif" font-size="12" font-weight="bold" text-anchor="middle">IN BURGER</text>
+    </g>
+
+    <text x="400" y="320" font-family="sans-serif" font-size="44" font-weight="900" text-anchor="middle" letter-spacing="4">BURGER</text>
+    <text x="400" y="380" font-family="sans-serif" font-size="28" font-weight="900" text-anchor="middle" letter-spacing="2">AWARDED AS BEST</text>
+
+    <g transform="translate(250, 520)">
+      <circle cx="0" cy="0" r="50" fill="none" stroke="#dc2626" stroke-width="3"/>
+      <text x="0" y="-15" font-family="sans-serif" font-size="10" font-weight="900" text-anchor="middle">AWARDED AS</text>
+      <text x="0" y="8" font-family="sans-serif" font-size="20" font-weight="900" text-anchor="middle">BEST</text>
+      <text x="0" y="28" font-family="sans-serif" font-size="12" font-weight="bold" text-anchor="middle">IN BURGER</text>
+    </g>
+    <g transform="translate(580, 520)">
+      <circle cx="0" cy="0" r="50" fill="none" stroke="#dc2626" stroke-width="3"/>
+      <text x="0" y="-15" font-family="sans-serif" font-size="10" font-weight="900" text-anchor="middle">AWARDED AS</text>
+      <text x="0" y="8" font-family="sans-serif" font-size="20" font-weight="900" text-anchor="middle">BEST</text>
+      <text x="0" y="28" font-family="sans-serif" font-size="12" font-weight="bold" text-anchor="middle">IN BURGER</text>
+    </g>
+
+    <text x="400" y="660" font-family="sans-serif" font-size="44" font-weight="900" text-anchor="middle" letter-spacing="4">BURGER</text>
+    <text x="400" y="720" font-family="sans-serif" font-size="28" font-weight="900" text-anchor="middle" letter-spacing="2">AWARDED AS BEST</text>
+  </g>
+</svg>

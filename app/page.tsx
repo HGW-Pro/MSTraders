@@ -40,7 +40,7 @@ export default function HomePage() {
     title: 'Customized Paper Bags & Non-Woven Carry Bags',
     subtitle: 'WHOLESALE & RETAIL SUPPLIER IN UJJAIN',
     description: 'Wholesale & retail supplier of high-quality paper bags, W-cut vest bags, D-cut punch bags, luxury laminated boutique gift bags, and envelope pouches in Ujjain.',
-    image_url: 'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=1200&q=80',
+    image_url: '/images/products/rajputi-saafe-luxury-bag.svg',
     primary_cta_text: 'GET CUSTOM QUOTE',
     primary_cta_link: '/customize',
     secondary_cta_text: 'EXPLORE CATALOG',
@@ -103,14 +103,14 @@ export default function HomePage() {
 
   // Fallback category list if none in database yet
   const displayCategories = categories.length > 0 ? categories : [
-    { id: '1', name: 'Paper Bags', slug: 'paper-bags', description: 'Eco-friendly retail carry bags', image_url: 'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=800&q=80', is_active: true, display_order: 1 },
-    { id: '2', name: 'Kraft Bags', slug: 'kraft-bags', description: 'Natural unbleached kraft paper', image_url: 'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?auto=format&fit=crop&w=800&q=80', is_active: true, display_order: 2 },
-    { id: '3', name: 'Non-Woven Bags', slug: 'non-woven-bags', description: 'Reusable cloth-feel carry bags', image_url: 'https://images.unsplash.com/photo-1597484661643-2f5fef640dd1?auto=format&fit=crop&w=800&q=80', is_active: true, display_order: 3 },
-    { id: '4', name: 'W-Cut Bags', slug: 'w-cut-bags', description: 'Standard grocery vest handles', image_url: 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=800&q=80', is_active: true, display_order: 4 },
-    { id: '5', name: 'D-Cut Bags', slug: 'd-cut-bags', description: 'Punch handle boutique carry bags', image_url: 'https://images.unsplash.com/photo-1572021335469-31706a17aaef?auto=format&fit=crop&w=800&q=80', is_active: true, display_order: 5 },
-    { id: '6', name: 'Designer Bags', slug: 'designer-bags', description: 'Luxury foil printed boutique bags', image_url: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=800&q=80', is_active: true, display_order: 6 },
-    { id: '7', name: 'Gift Bags', slug: 'gift-bags', description: 'Celebration & corporate gifting', image_url: 'https://images.unsplash.com/photo-1513885535751-8b9238bd345a?auto=format&fit=crop&w=800&q=80', is_active: true, display_order: 7 },
-    { id: '8', name: 'Customized Bags', slug: 'customized-bags', description: 'Tailor-made dimensions & print', image_url: 'https://images.unsplash.com/photo-1512909006721-3d6018887383?auto=format&fit=crop&w=800&q=80', is_active: true, display_order: 8 }
+    { id: '1', name: 'Paper Bags', slug: 'paper-bags', description: 'Eco-friendly retail carry bags', image_url: '/images/categories/paper-bags.svg', is_active: true, display_order: 1 },
+    { id: '2', name: 'Kraft Bags', slug: 'kraft-bags', description: 'Natural unbleached kraft paper', image_url: '/images/categories/kraft-bags.svg', is_active: true, display_order: 2 },
+    { id: '3', name: 'Non-Woven Bags', slug: 'non-woven-bags', description: 'Reusable cloth-feel carry bags', image_url: '/images/categories/non-woven-bags.svg', is_active: true, display_order: 3 },
+    { id: '4', name: 'W-Cut Bags', slug: 'w-cut-bags', description: 'Standard grocery vest handles', image_url: '/images/categories/w-cut-bags.svg', is_active: true, display_order: 4 },
+    { id: '5', name: 'D-Cut Bags', slug: 'd-cut-bags', description: 'Punch handle boutique carry bags', image_url: '/images/categories/d-cut-bags.svg', is_active: true, display_order: 5 },
+    { id: '6', name: 'Designer Bags', slug: 'designer-bags', description: 'Luxury foil printed boutique bags', image_url: '/images/categories/designer-bags.svg', is_active: true, display_order: 6 },
+    { id: '7', name: 'Gift Bags', slug: 'gift-bags', description: 'Celebration & corporate gifting', image_url: '/images/categories/gift-bags.svg', is_active: true, display_order: 7 },
+    { id: '8', name: 'Customized Bags', slug: 'customized-bags', description: 'Tailor-made dimensions & print', image_url: '/images/categories/customized-bags.svg', is_active: true, display_order: 8 }
   ];
 
   return (
@@ -152,7 +152,7 @@ export default function HomePage() {
               
               <div className="relative aspect-[4/3] md:aspect-square w-full rounded-2xl overflow-hidden shadow-2xl">
                 <Image 
-                  src={hero.image_url || 'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=1200&q=80'} 
+                  src={hero.image_url || '/images/products/rajputi-saafe-luxury-bag.svg'} 
                   alt={hero.metadata?.alt_text || hero.title}
                   fill
                   className="object-cover"
@@ -191,7 +191,7 @@ export default function HomePage() {
                 >
                   <div className="relative aspect-[4/3] w-full overflow-hidden">
                     <Image 
-                      src={category.image_url || 'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=800&q=80'} 
+                      src={category.image_url || '/images/categories/paper-bags.svg'} 
                       alt={category.name}
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-500"
@@ -257,13 +257,13 @@ export default function HomePage() {
               
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-4 pt-12">
-                  <div className="relative aspect-[3/4] rounded-xl overflow-hidden shadow-lg border border-white/10">
-                    <Image src="https://images.unsplash.com/photo-1590874103328-eac38a683ce7?auto=format&fit=crop&w=600&q=80" alt="Custom Kraft Paper Bag" fill className="object-cover" referrerPolicy="no-referrer" />
+                  <div className="relative aspect-[3/4] rounded-xl overflow-hidden shadow-lg border border-white/10 bg-white/5 p-4 flex items-center justify-center">
+                    <Image src="/images/products/kraft-twisted-handle-bags.svg" alt="Custom Kraft Paper Bag" fill className="object-contain p-2" referrerPolicy="no-referrer" />
                   </div>
                 </div>
                 <div className="space-y-4">
-                  <div className="relative aspect-[3/4] rounded-xl overflow-hidden shadow-lg border border-white/10">
-                    <Image src="https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=600&q=80" alt="Custom Boutique Designer Bag" fill className="object-cover" referrerPolicy="no-referrer" />
+                  <div className="relative aspect-[3/4] rounded-xl overflow-hidden shadow-lg border border-white/10 bg-white/5 p-4 flex items-center justify-center">
+                    <Image src="/images/products/rajputi-saafe-luxury-bag.svg" alt="Custom Boutique Designer Bag" fill className="object-contain p-2" referrerPolicy="no-referrer" />
                   </div>
                 </div>
               </div>

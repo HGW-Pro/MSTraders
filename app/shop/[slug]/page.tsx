@@ -80,13 +80,13 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 xl:gap-16">
           {/* Image Gallery */}
           <div className="space-y-4">
-            <div className="relative aspect-square rounded-2xl overflow-hidden bg-slate-100 border border-border shadow-xs">
+            <div className="relative aspect-square rounded-2xl overflow-hidden bg-slate-50 dark:bg-slate-800/40 border border-border shadow-xs p-6 flex items-center justify-center">
               {product.images && product.images[selectedImageIndex] ? (
                 <Image 
                   src={product.images[selectedImageIndex]} 
                   alt={product.name}
                   fill
-                  className="object-cover"
+                  className="object-contain p-2 drop-shadow-md"
                   priority
                   referrerPolicy="no-referrer"
                 />

@@ -23,6 +23,7 @@ import { toast } from 'sonner';
 import { getMediaItems, saveMediaItem, deleteMediaItem, uploadFileToSupabase } from '@/lib/supabase/services';
 import { MediaItem } from '@/types';
 import { cn } from '@/lib/utils';
+import { DatabaseSetupRunner } from '@/components/database-setup-runner';
 
 const MEDIA_CATEGORIES = ['ALL', 'Logo', 'Homepage', 'Products', 'Gallery', 'Industries', 'About'];
 
@@ -147,6 +148,9 @@ export default function AdminMediaLibraryPage() {
           <Upload className="h-4 w-4 mr-2" /> Upload New Asset
         </Button>
       </div>
+
+      {/* Database & Storage Provisioning Runner */}
+      <DatabaseSetupRunner />
 
       {/* Filters Bar */}
       <div className="bg-white border border-border rounded-2xl p-4 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4">

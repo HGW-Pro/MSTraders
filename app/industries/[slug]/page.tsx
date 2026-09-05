@@ -11,31 +11,31 @@ const INDUSTRY_DETAILS: Record<string, { title: string; desc: string; bags: stri
     title: 'Hotels & Hospitality Packaging',
     desc: 'Luxurious laminated paper bags, laundry paper bags, amenity pouches, and room service packaging tailored for premium hotels and resorts.',
     bags: ['Luxury Laminated Paper Bags', 'Laundry & Linen Paper Bags', 'Room Service Paper Carry Bags', 'Gift & Souvenir Bags'],
-    img: 'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=1000&q=80'
+    img: '/images/industries/hospitality.svg'
   },
   restaurants: {
     title: 'Restaurants & Food Delivery Packaging',
     desc: 'Grease-resistant brown kraft food carry bags, flat bottom takeaway paper bags, and non-woven food delivery bags engineered to keep food warm and fresh.',
     bags: ['Brown Kraft Food Takeaway Bags', 'Greaseproof Food Bags', 'Wide Base Delivery Bags', 'Non-Woven Thermal Carry Bags'],
-    img: 'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?auto=format&fit=crop&w=1000&q=80'
+    img: '/images/industries/restaurants.svg'
   },
   clothing: {
     title: 'Clothing & Apparel Boutiques',
     desc: 'Stylish custom printed paper shopping bags with ribbon handles, rope handles, and metallic gold foil stamping designed to elevate retail brand presence.',
     bags: ['Boutique Designer Paper Bags', 'Cotton Rope Handle Bags', 'Satin Ribbon Handle Bags', 'Non-Woven Garment Cover Bags'],
-    img: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=1000&q=80'
+    img: '/images/industries/fashion.svg'
   },
   retail: {
     title: 'Supermarkets & Retail Chains',
     desc: 'Heavy-duty non-woven W-cut vest handle bags and reinforced brown kraft carry bags designed for high volume weight capacity.',
     bags: ['Non-Woven W-Cut Vest Bags', 'Non-Woven D-Cut Punch Bags', 'Kraft Grocery Carry Bags', 'Custom Printed Paper Bags'],
-    img: 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=1000&q=80'
+    img: '/images/industries/retail.svg'
   },
   'medical-pharma': {
     title: 'Medical & Pharmacy Stores',
     desc: 'Hygienic, eco-friendly paper prescription bags and non-woven D-cut bags customized for hospitals, diagnostic labs, and medical stores.',
     bags: ['Small Paper Chemist Bags', 'Non-Woven D-Cut Pharmacy Bags', 'Sample Carry Pouches', 'Recyclable Medicine Bags'],
-    img: 'https://images.unsplash.com/photo-1572021335469-31706a17aaef?auto=format&fit=crop&w=1000&q=80'
+    img: '/images/industries/medical.svg'
   }
 };
 
@@ -46,7 +46,7 @@ export default function IndustryDetailPage({ params }: { params: Promise<{ slug:
     title: `${slug.toUpperCase().replace('-', ' ')} Packaging Solutions`,
     desc: 'Wholesale eco-friendly paper bags, non-woven bags, and retail packaging tailored specifically for your business.',
     bags: ['Custom Printed Kraft Bags', 'Non-Woven D-Cut Bags', 'Luxury Designer Bags', 'Wholesale Bulk Bags'],
-    img: 'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=1000&q=80'
+    img: '/images/industries/corporate.svg'
   };
 
   return (

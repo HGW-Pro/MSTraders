@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="100%" height="100%">
+  <defs>
+    <linearGradient id="kraftBrown" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#cca073" />
+      <stop offset="50%" stop-color="#b68858" />
+      <stop offset="100%" stop-color="#9a6e3e" />
+    </linearGradient>
+    <linearGradient id="kraftDark" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#a37648" />
+      <stop offset="100%" stop-color="#7a5229" />
+    </linearGradient>
+    <filter id="drop3" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#2a1a0c" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <rect width="800" height="800" fill="#f5ede3"/>
+  <rect y="600" width="800" height="200" fill="#e0d1c0"/>
+
+  <g filter="url(#drop3)">
+    <g>
+      <path d="M 180 250 C 180 120, 290 120, 290 250" fill="none" stroke="#7a5229" stroke-width="14" stroke-linecap="round"/>
+      <polygon points="90,260 130,220 130,640 90,670" fill="url(#kraftDark)"/>
+      <polygon points="130,220 380,220 380,640 130,640" fill="url(#kraftBrown)"/>
+      <line x1="130" y1="220" x2="380" y2="220" stroke="#7a5229" stroke-width="2" stroke-dasharray="4,3"/>
+    </g>
+
+    <g>
+      <path d="M 540 270 C 540 160, 640 160, 640 270" fill="none" stroke="#7a5229" stroke-width="14" stroke-linecap="round"/>
+      <polygon points="460,280 500,240 500,660 460,690" fill="url(#kraftDark)"/>
+      <polygon points="500,240 710,240 710,660 500,660" fill="url(#kraftBrown)"/>
+      <line x1="500" y1="240" x2="710" y2="240" stroke="#7a5229" stroke-width="2" stroke-dasharray="4,3"/>
+    </g>
+
+    <g>
+      <path d="M 270 380 C 270 280, 350 280, 350 380" fill="none" stroke="#7a5229" stroke-width="12" stroke-linecap="round"/>
+      <polygon points="200,390 235,360 235,700 200,720" fill="url(#kraftDark)"/>
+      <polygon points="235,360 410,360 410,700 235,700" fill="url(#kraftBrown)"/>
+      <line x1="235" y1="360" x2="410" y2="360" stroke="#7a5229" stroke-width="2" stroke-dasharray="4,3"/>
+    </g>
+  </g>
+</svg>

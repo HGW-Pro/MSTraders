@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="100%" height="100%">
+  <rect width="800" height="800" fill="#f8f6f0"/>
+  <rect y="580" width="800" height="220" fill="#dfd0bd"/>
+  <line x1="0" y1="580" x2="800" y2="580" stroke="#cbb8a3" stroke-width="3"/>
+  <g filter="drop-shadow(0px 15px 15px rgba(0,0,0,0.2))">
+    <!-- Twisted handles -->
+    <path d="M 330 250 C 330 80, 470 80, 470 250" fill="none" stroke="#e0e0e0" stroke-width="24" stroke-linecap="round"/>
+    <path d="M 330 250 C 330 80, 470 80, 470 250" fill="none" stroke="#ffffff" stroke-width="18" stroke-dasharray="10,6" stroke-linecap="round"/>
+    <!-- Bag body side gusset -->
+    <polygon points="180,260 250,220 250,650 180,680" fill="#ebebeb"/>
+    <!-- Bag body front -->
+    <polygon points="250,220 620,220 620,650 250,650" fill="#ffffff"/>
+    <polygon points="250,220 620,220 620,230 250,230" fill="#f0f0f0"/>
+    <line x1="250" y1="420" x2="620" y2="420" stroke="#f0f0f0" stroke-width="2"/>
+    <!-- Top serrated edge -->
+    <path d="M 250 220 L 260 215 L 270 220 L 280 215 L 290 220 L 300 215 L 310 220 L 320 215 L 330 220 L 340 215 L 350 220 L 360 215 L 370 220 L 380 215 L 390 220 L 400 215 L 410 220 L 420 215 L 430 220 L 440 215 L 450 220 L 460 215 L 470 220 L 480 215 L 490 220 L 500 215 L 510 220 L 520 215 L 530 220 L 540 215 L 550 220 L 560 215 L 570 220 L 580 215 L 590 220 L 600 215 L 610 220 L 620 215" fill="none" stroke="#e0e0e0" stroke-width="2"/>
+  </g>
+</svg>

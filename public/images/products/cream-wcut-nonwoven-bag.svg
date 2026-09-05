@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="100%" height="100%">
+  <rect width="800" height="800" fill="#2d2b28"/>
+  <g filter="drop-shadow(0px 10px 20px rgba(0,0,0,0.5))">
+    <!-- Off-white / Cream Non-Woven W-Cut Bag -->
+    <path d="M 220 150 L 220 300 C 220 340, 260 380, 310 380 C 360 380, 400 320, 400 320 C 400 320, 440 380, 490 380 C 540 380, 580 340, 580 300 L 580 150 L 510 150 L 510 260 C 510 300, 460 320, 400 320 C 340 320, 290 300, 290 260 L 290 150 Z" fill="#f5f0e1"/>
+    <path d="M 220 300 L 220 700 C 220 720, 240 730, 260 730 L 540 730 C 560 730, 580 720, 580 700 L 580 300 Z" fill="#faf6eb"/>
+    <!-- Center gusset fold -->
+    <rect x="340" y="260" width="120" height="470" fill="#ebe4d1" opacity="0.6"/>
+    <!-- Handles stitching -->
+    <line x1="220" y1="165" x2="290" y2="165" stroke="#d6ccb2" stroke-width="3" stroke-dasharray="6,4"/>
+    <line x1="510" y1="165" x2="580" y2="165" stroke="#d6ccb2" stroke-width="3" stroke-dasharray="6,4"/>
+  </g>
+</svg>
