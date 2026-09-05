@@ -17,7 +17,6 @@ import {
   ExternalLink,
   FolderKanban,
   LayoutTemplate,
-  FolderGit2,
   MessageSquareQuote,
   ShieldAlert
 } from 'lucide-react';
@@ -32,7 +31,10 @@ const adminNav = [
   { title: 'Products Catalog', href: '/admin/products', icon: Package },
   { title: 'Categories', href: '/admin/categories', icon: FolderKanban },
   { title: 'Homepage CMS', href: '/admin/content/homepage', icon: LayoutTemplate },
-  { title: 'Media Library', href: '/admin/media', icon: FolderGit2 },
+  // Media Library hidden from the admin nav. The page still exists at
+  // app/admin/media/page.tsx and the route redirects to the dashboard;
+  // restore by uncommenting this line and removing the redirect in that file.
+  // { title: 'Media Library', href: '/admin/media', icon: FolderGit2 },
   { title: 'Quotes', href: '/admin/quotes', icon: FileText },
   { title: 'Orders', href: '/admin/orders', icon: ShoppingBag },
   { title: 'Customers', href: '/admin/customers', icon: Users },
