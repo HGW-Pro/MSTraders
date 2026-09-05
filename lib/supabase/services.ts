@@ -11,7 +11,6 @@ import {
   CustomerAddress,
   HomepageSection,
   Testimonial,
-  MediaItem,
   AppNotification,
   QuoteStatus,
   OrderStatus 
@@ -2006,76 +2005,6 @@ export async function getIndustryBySlug(slug: string): Promise<Industry | null> 
  * so that uploads remain instantaneous, lightweight, and resilient even when
  * Supabase Storage buckets or reverse proxies return errors like HTTP 520.
  */
-export async function fileToOptimizedDataUrl(
-  file: File, 
-  maxWidth = 1280, 
-  maxHeight = 1280, 
-  quality = 0.82
-): Promise<string> {
-  return new Promise((resolve, reject) => {
-    if (typeof window === 'undefined') {
-      resolve('');
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const result = event.target?.result as string;
-      if (!result) {
-        resolve('');
-        return;
-      }
-
-      // If not an image or is SVG, return standard Data URL
-      if (!file.type.startsWith('image/') || file.type.includes('svg')) {
-        resolve(result);
-        return;
-      }
-
-      try {
-        const img = document.createElement('img');
-        img.onload = () => {
-          try {
-            let width = img.width;
-            let height = img.height;
-
-            if (width > maxWidth || height > maxHeight) {
-              if (width / maxWidth > height / maxHeight) {
-                height = Math.round((height * maxWidth) / width);
-                width = maxWidth;
-              } else {
-                width = Math.round((width * maxHeight) / height);
-                height = maxHeight;
-              }
-            }
-
-            const canvas = document.createElement('canvas');
-            canvas.width = width;
-            canvas.height = height;
-            const ctx = canvas.getContext('2d');
-            if (!ctx) {
-              resolve(result);
-              return;
-            }
-
-            ctx.drawImage(img, 0, 0, width, height);
-            const mime = file.type === 'image/png' && file.size < 500 * 1024 ? 'image/png' : 'image/jpeg';
-            const compressed = canvas.toDataURL(mime, quality);
-            resolve(compressed);
-          } catch (canvasErr) {
-            resolve(result);
-          }
-        };
-        img.onerror = () => resolve(result);
-        img.src = result;
-      } catch (err) {
-        resolve(result);
-      }
-    };
-    reader.onerror = (err) => reject(err);
-    reader.readAsDataURL(file);
-  });
-}
 
 export async function uploadFileToSupabase(
   file: File, 
@@ -2089,43 +2018,155 @@ export async function uploadFileToSupabase(
   const fileExt = file.name.split('.').pop() || 'png';
   const cleanFileName = `${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
 
-  // 1. Try uploading to Supabase Storage if the bucket is configured and reachable
-  try {
-    const filePath = cleanFileName;
-    const { data: uploadData, error: uploadError } = await supabase.storage
+  const filePath = cleanFileName;
+  const { data: uploadData, error: uploadError } = await supabase.storage
+    .from(bucket)
+    .upload(filePath, file, { cacheControl: '3600', upsert: true });
+
+  if (uploadError || !uploadData) {
+    // Do NOT fall back to embedding the image as a base64 data URL. That
+    // used to happen here silently: uploads "succeeded", nothing reached
+    // storage, and multi-megabyte blobs were written into product rows.
+    // Surface the real reason so it can be fixed (bucket missing, RLS
+    // denying the caller, network) instead of hiding it.
+    const reason = uploadError?.message || 'unknown storage error';
+    throw new Error(`Upload to bucket "${bucket}" failed: ${reason}`);
+  }
+
+  const { data: publicUrlData } = supabase.storage.from(bucket).getPublicUrl(filePath);
+  if (!publicUrlData?.publicUrl) {
+    throw new Error(`Uploaded to "${bucket}" but could not resolve a public URL`);
+  }
+  return publicUrlData.publicUrl;
+}
+
+
+// --- MEDIA LIBRARY (Supabase Storage driven) ---
+// The media library lists what is actually in Supabase Storage, across every
+// content bucket, and cross-references each file against the rows that use
+// it. Previously it only listed rows from the `media` table, which is only
+// written by the media page itself, so images uploaded via Products,
+// Categories, Gallery or Homepage never appeared and the page looked empty.
+
+export const CONTENT_BUCKETS = [
+  { id: 'product-images',  label: 'Products'   },
+  { id: 'category-images', label: 'Categories' },
+  { id: 'gallery-images',  label: 'Gallery'    },
+  { id: 'hero-images',     label: 'Homepage'   },
+  { id: 'media',           label: 'General'    },
+  { id: 'settings-assets', label: 'Branding'   },
+] as const;
+export type ContentBucketId = typeof CONTENT_BUCKETS[number]['id'];
+
+export interface AssetUsage {
+  kind: 'product' | 'category' | 'gallery' | 'homepage' | 'industry' | 'logo';
+  label: string;
+  href: string;
+}
+
+export interface StorageAsset {
+  bucket: ContentBucketId;
+  path: string;
+  url: string;
+  size_bytes: number | null;
+  mime_type: string | null;
+  created_at: string | null;
+  usages: AssetUsage[];
+}
+
+export interface MediaLibraryReport {
+  assets: StorageAsset[];
+  /** Image references in content that are NOT storage URLs (local /images/* or data: URLs). */
+  externalRefs: { url: string; usages: AssetUsage[]; kind: 'local' | 'embedded' | 'remote' }[];
+  bucketErrors: { bucket: string; message: string }[];
+}
+
+async function collectImageUsages(): Promise<Map<string, AssetUsage[]>> {
+  const map = new Map<string, AssetUsage[]>();
+  const add = (url: string | null | undefined, usage: AssetUsage) => {
+    if (!url) return;
+    const list = map.get(url) || [];
+    list.push(usage);
+    map.set(url, list);
+  };
+
+  const [products, categories, gallery, sections, industries, settings] = await Promise.all([
+    supabase.from('products').select('slug, name, images'),
+    supabase.from('categories').select('slug, name, image_url'),
+    supabase.from('gallery_items').select('id, title, image_url'),
+    supabase.from('homepage_sections').select('section_key, image_url'),
+    supabase.from('industries').select('slug, title, image_url'),
+    supabase.from('settings').select('key, value').eq('key', 'logo_url'),
+  ]);
+
+  (products.data || []).forEach((p: any) =>
+    (p.images || []).forEach((u: string) =>
+      add(u, { kind: 'product', label: p.name, href: '/admin/products' })));
+  (categories.data || []).forEach((c: any) =>
+    add(c.image_url, { kind: 'category', label: c.name, href: '/admin/categories' }));
+  (gallery.data || []).forEach((g: any) =>
+    add(g.image_url, { kind: 'gallery', label: g.title, href: '/admin/gallery' }));
+  (sections.data || []).forEach((h: any) =>
+    add(h.image_url, { kind: 'homepage', label: `Homepage: ${h.section_key}`, href: '/admin/content/homepage' }));
+  (industries.data || []).forEach((i: any) =>
+    add(i.image_url, { kind: 'industry', label: i.title, href: '/industries' }));
+  (settings.data || []).forEach((s: any) => {
+    const v = typeof s.value === 'string' ? s.value : s.value?.url;
+    add(v, { kind: 'logo', label: 'Site logo', href: '/admin/settings' });
+  });
+
+  return map;
+}
+
+export async function getMediaLibraryReport(): Promise<MediaLibraryReport> {
+  const usages = await collectImageUsages();
+  const assets: StorageAsset[] = [];
+  const bucketErrors: MediaLibraryReport['bucketErrors'] = [];
+
+  await Promise.all(CONTENT_BUCKETS.map(async ({ id: bucket }) => {
+    const { data, error } = await supabase.storage
       .from(bucket)
-      .upload(filePath, file, {
-        cacheControl: '3600',
-        upsert: true
+      .list('', { limit: 1000, sortBy: { column: 'created_at', order: 'desc' } });
+    if (error) {
+      bucketErrors.push({ bucket, message: error.message });
+      return;
+    }
+    (data || [])
+      .filter((f) => f.id !== null && !f.name.startsWith('.')) // skip folders + placeholders
+      .forEach((f) => {
+        const { data: pub } = supabase.storage.from(bucket).getPublicUrl(f.name);
+        const url = pub.publicUrl;
+        assets.push({
+          bucket,
+          path: f.name,
+          url,
+          size_bytes: (f.metadata as any)?.size ?? null,
+          mime_type: (f.metadata as any)?.mimetype ?? null,
+          created_at: f.created_at ?? null,
+          usages: usages.get(url) || [],
+        });
       });
+  }));
 
-    if (!uploadError && uploadData) {
-      const { data: publicUrlData } = supabase.storage
-        .from(bucket)
-        .getPublicUrl(filePath);
+  const storageUrls = new Set(assets.map((a) => a.url));
+  const externalRefs: MediaLibraryReport['externalRefs'] = [];
+  usages.forEach((list, url) => {
+    if (storageUrls.has(url)) return;
+    const kind = url.startsWith('data:') ? 'embedded' : url.startsWith('/') ? 'local' : 'remote';
+    externalRefs.push({ url, usages: list, kind });
+  });
 
-      if (publicUrlData?.publicUrl) {
-        return publicUrlData.publicUrl;
-      }
-    } else if (uploadError) {
-      console.warn(`Supabase Storage upload notice for bucket '${bucket}':`, uploadError.message || uploadError);
-    }
-  } catch (storageErr: any) {
-    console.warn(`Supabase Storage unavailable (${storageErr?.message || storageErr}). Switching to optimized resilient handler.`);
+  assets.sort((a, b) => (b.created_at || '').localeCompare(a.created_at || ''));
+  return { assets, externalRefs, bucketErrors };
+}
+
+export async function deleteStorageAsset(bucket: ContentBucketId, path: string): Promise<boolean> {
+  const { error } = await supabase.storage.from(bucket).remove([path]);
+  if (error) {
+    console.error('Error deleting storage asset:', error);
+    return false;
   }
-
-  // 2. Resilient Fallback: If Supabase Storage bucket is unprovisioned, blocked by Cloudflare (HTTP 520),
-  // or network timed out, optimize the image into a lightweight, persistent web Data URL so uploads never fail.
-  try {
-    const dataUrl = await fileToOptimizedDataUrl(file);
-    if (dataUrl) {
-      return dataUrl;
-    }
-  } catch (fallbackErr) {
-    console.warn('Fallback media conversion warning:', fallbackErr);
-  }
-
-  return null;
+  return true;
 }
 
 // --- ORDER TRACKING SERVICE ---
@@ -2839,128 +2880,6 @@ export async function deleteTestimonial(id: string): Promise<boolean> {
 }
 
 // --- MEDIA LIBRARY SERVICE ---
-export async function getMediaItems(category?: string): Promise<MediaItem[]> {
-  try {
-    let query = supabase.from('media').select('*').order('created_at', { ascending: false });
-    if (category && category !== 'ALL') {
-      query = query.eq('category', category);
-    }
-    const { data, error } = await query;
-    if (error || !data) return [];
-    return (data as any[]).map((row) => ({
-      id: row.id,
-      title: row.title || row.name || 'Media Asset',
-      url: row.url || row.file_url || '',
-      size_bytes: row.size_bytes ?? row.file_size ?? null,
-      category: row.category || 'General',
-      alt_text: row.alt_text || row.title || row.name || '',
-      created_at: row.created_at
-    })) as MediaItem[];
-  } catch (err) {
-    return [];
-  }
-}
-
-export async function saveMediaItem(item: Partial<MediaItem>): Promise<MediaItem | null> {
-  try {
-    const titleVal = item.title || (item as any).name || 'Media Asset';
-    const urlVal = item.url || (item as any).file_url || '';
-    const sizeVal = item.size_bytes ?? (item as any).file_size ?? null;
-    const categoryVal = item.category || 'General';
-    const altVal = item.alt_text || titleVal;
-
-    // Build payload including both common column sets
-    const payload: Record<string, any> = {
-      title: titleVal,
-      url: urlVal,
-      size_bytes: sizeVal,
-      name: titleVal,
-      file_url: urlVal,
-      file_size: sizeVal,
-      category: categoryVal,
-      alt_text: altVal,
-    };
-
-    // Try standard insert
-    let result = await supabase
-      .from('media')
-      .insert([payload])
-      .select()
-      .single();
-
-    // If there is a missing column error (e.g. PGRST204), retry with columns that exist
-    if (result.error && (result.error.code === 'PGRST204' || result.error.message?.includes('column'))) {
-      const errMsg = result.error.message || '';
-
-      // Check if size_bytes or title or url were complained about
-      const fallbackPayload: Record<string, any> = {
-        name: titleVal,
-        file_url: urlVal,
-        category: categoryVal,
-        alt_text: altVal,
-      };
-
-      if (!errMsg.includes('file_size') && !errMsg.includes('size_bytes') && sizeVal !== null) {
-        fallbackPayload.file_size = sizeVal;
-      }
-      if (!errMsg.includes('title')) {
-        fallbackPayload.title = titleVal;
-      }
-      if (!errMsg.includes('url')) {
-        fallbackPayload.url = urlVal;
-      }
-      if (!errMsg.includes('size_bytes') && sizeVal !== null) {
-        fallbackPayload.size_bytes = sizeVal;
-      }
-
-      result = await supabase
-        .from('media')
-        .insert([fallbackPayload])
-        .select()
-        .single();
-
-      // If still error, try minimal payload (name, file_url, category)
-      if (result.error) {
-        const minimalPayload: Record<string, any> = {
-          name: titleVal,
-          file_url: urlVal,
-          category: categoryVal,
-          alt_text: altVal
-        };
-        result = await supabase
-          .from('media')
-          .insert([minimalPayload])
-          .select()
-          .single();
-      }
-    }
-
-    if (result.error) throw result.error;
-    const row = result.data as any;
-    return {
-      id: row.id,
-      title: row.title || row.name || titleVal,
-      url: row.url || row.file_url || urlVal,
-      size_bytes: row.size_bytes ?? row.file_size ?? sizeVal,
-      category: row.category || categoryVal,
-      alt_text: row.alt_text || altVal,
-      created_at: row.created_at
-    } as MediaItem;
-  } catch (err) {
-    console.error('Error saving media item:', err);
-    return null;
-  }
-}
-
-export async function deleteMediaItem(id: string): Promise<boolean> {
-  try {
-    const { error } = await supabase.from('media').delete().eq('id', id);
-    if (error) throw error;
-    return true;
-  } catch (err) {
-    return false;
-  }
-}
 
 // --- NOTIFICATIONS SERVICE ---
 export async function createNotification(notifData: {

@@ -125,10 +125,14 @@ export default function AdminGalleryPage() {
     const file = e.target.files[0];
 
     toast.info('Uploading image...');
-    const url = await uploadFileToSupabase(file, 'gallery-images');
-    if (url) {
-      setFormData(prev => ({ ...prev, image_url: url }));
-      toast.success('Image uploaded successfully');
+    try {
+      const url = await uploadFileToSupabase(file, 'gallery-images');
+      if (url) {
+        setFormData(prev => ({ ...prev, image_url: url }));
+        toast.success('Image uploaded to storage');
+      }
+    } catch (err: any) {
+      toast.error(err?.message || 'Upload failed');
     }
   };
 
@@ -281,26 +285,6 @@ export default function AdminGalleryPage() {
             <Plus className="mr-2 h-4 w-4" /> Add Showcase Image
           </Button>
         </div>
-      </div>
-
-      {/* Upload Helper Guide Banner */}
-      <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-sm text-emerald-900">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full bg-brand-green text-white flex items-center justify-center shrink-0 shadow-xs">
-            <Upload className="h-4 w-4" />
-          </div>
-          <div>
-            <p className="font-semibold text-brand-charcoal">
-              All 21 gallery items from your catalog are configured and ready!
-            </p>
-            <p className="text-xs text-emerald-800">
-              Click <strong className="font-semibold text-emerald-900">&quot;Upload Photo&quot;</strong> on any card to select and attach your photo from your device.
-            </p>
-          </div>
-        </div>
-        <span className="text-xs font-bold text-brand-green bg-white px-3 py-1 rounded-full border border-emerald-300 shrink-0">
-          {items.filter(i => !i.image_url.endsWith('.svg')).length} of {items.length} Photos Uploaded
-        </span>
       </div>
 
       {/* Filter and Search Bar */}

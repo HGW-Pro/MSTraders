@@ -167,8 +167,12 @@ export default function AdminProductsPage() {
     const newImageUrls: string[] = [];
 
     for (const file of files) {
-      const url = await uploadFileToSupabase(file, 'product-images');
-      if (url) newImageUrls.push(url);
+      try {
+        const url = await uploadFileToSupabase(file, 'product-images');
+        if (url) newImageUrls.push(url);
+      } catch (err: any) {
+        toast.error(err?.message || `Failed to upload ${file.name}`);
+      }
     }
 
     if (newImageUrls.length > 0) {
@@ -176,7 +180,7 @@ export default function AdminProductsPage() {
         ...prev,
         images: [...prev.images, ...newImageUrls]
       }));
-      toast.success('Images uploaded successfully');
+      toast.success(`${newImageUrls.length} image(s) uploaded to storage`);
     }
   };
 
